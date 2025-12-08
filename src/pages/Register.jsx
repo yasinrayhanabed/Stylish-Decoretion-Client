@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import axios from "../api/axios";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import API from "../api/axios";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -9,29 +10,58 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const auth = getAuth();
+  const googleProvider = new GoogleAuthProvider();
+
   const handleRegister = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  if (password !== confirmPassword) {
+    toast.error("Passwords do not match");
+    return;
+  }
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { data } = await axios.post("/auth/register", { name, email, password });
+  setLoading(true);
+  try {
+    const { data } = await API.post("/auth/register", { name, email, password });
+    if (data?.token) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      toast.success("Registration successful!");
+      toast.success("Registration Successful!");
       window.location.href = "/";
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+    } else {
+      toast.error("Registration failed!");
     }
-    setLoading(false);
-  };
+  } catch (err) {
+    console.error("Register error:", err);
+    toast.error(err.response?.data?.message || "Registration failed");
+  }
+  setLoading(false);
+};
 
-  const handleGoogleRegister = () => {
-    window.location.href = `${import.meta.env.VITE_API_BASE}/auth/google`;
+  // Google login/register
+  const handleGoogleRegister = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+
+      // Send Firebase user info to backend
+      const { data } = await API.post("/auth/google-login", {
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+        uid: user.uid,
+      });
+
+      if (data?.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast.success("Google Login successful!");
+        window.location.href = "/";
+      }
+    } catch (err) {
+      console.error("Google login error:", err);
+      toast.error("Google login failed");
+    }
   };
 
   return (
@@ -99,10 +129,21 @@ export default function Register() {
 
         <div className="divider my-6">OR</div>
 
-        <button onClick={handleGoogleRegister} className="btn w-full btn btn-outline btn-secondary flex items-center justify-center gap-2 mx-auto bg-white text-black border-[#e5e5e5]">
-  <svg aria-label="Google logo" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g><path d="m0 0H512V512H0" fill="#fff"></path><path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path><path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path><path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path><path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path></g></svg>
-  Continue with Google
-</button>
+        <button
+          onClick={handleGoogleRegister}
+          className="btn w-full btn-outline btn-secondary flex items-center justify-center gap-2 mx-auto bg-white text-black border-[#e5e5e5]"
+        >
+          <svg aria-label="Google logo" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <g>
+              <path d="m0 0H512V512H0" fill="#fff"></path>
+              <path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path>
+              <path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path>
+              <path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path>
+              <path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path>
+            </g>
+          </svg>
+          Continue with Google
+        </button>
 
         <p className="text-sm text-center text-black mt-4">
           Already have an account?{" "}

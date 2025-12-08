@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import axios from "../api/axios";
-import { auth, googleProvider } from "../firebase/firebase";
+import { auth, googleProvider } from "../firebase/firebase.config";
 import { signInWithPopup } from "firebase/auth";
 import API from "../api/axios";
 
@@ -11,22 +10,25 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { data } = await axios.post("/auth/login", { email, password });
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const { data } = await API.post("/auth/login", { email, password });
+    if (data?.token) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      toast.success("Login successful!");
-      // Redirect after login
+      toast.success("Login Successful!");
       window.location.href = "/";
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed");
+    } else {
+      toast.error("Login failed!");
     }
-    setLoading(false);
-  };
-
+  } catch (err) {
+    console.error("Login error:", err);
+    toast.error(err.response?.data?.message || "Login failed!");
+  }
+  setLoading(false);
+};
   const handleGoogleLogin = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
