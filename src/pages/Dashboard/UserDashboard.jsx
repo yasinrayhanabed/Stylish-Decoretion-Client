@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 export default function UserDashboard(){
   const [bookings, setBookings] = useState(null);
+
   useEffect(()=> {
     API.get('/bookings/my').then(r => setBookings(r.data)).catch(()=> setBookings([]));
   }, []);
@@ -13,7 +14,7 @@ export default function UserDashboard(){
     try {
       await API.delete(`/bookings/${id}`);
       toast.success('Cancelled');
-      setBookings(bookings.filter(b => b._id !== id));
+      setBookings(prev => prev.filter(b => b._id !== id));
     } catch(err){ toast.error('Cancel failed'); }
   };
 
@@ -26,12 +27,14 @@ export default function UserDashboard(){
         {bookings.map(b => (
           <div key={b._id} className="p-4 bg-white rounded shadow flex justify-between items-center">
             <div>
-              <div className="font-semibold">{b.service.service_name}</div>
-              <div className="text-sm">{new Date(b.date).toLocaleDateString()} • {b.timeSlot} • {b.mode}</div>
-              <div className="text-sm">Status: {b.status}</div>
+              <div className="font-semibold">{b.service?.service_name || 'Unknown Service'}</div>
+              <div className="text-sm">{new Date(b.date).toLocaleDateString()} • {b.timeSlot || 'N/A'} • {b.mode || 'N/A'}</div>
+              <div className="text-sm">Status: {b.status || 'Pending'}</div>
             </div>
             <div className="flex flex-col gap-2">
-              {b.paymentStatus === 'pending' ? <div className="text-sm">BDT {b.amount}</div> : <div className="text-sm">Paid</div>}
+              {b.paymentStatus === 'pending' 
+                ? <div className="text-sm">BDT {b.amount || 0}</div> 
+                : <div className="text-sm">Paid</div>}
               <button className="btn btn-sm btn-error" onClick={()=>cancelBooking(b._id)}>Cancel</button>
             </div>
           </div>
