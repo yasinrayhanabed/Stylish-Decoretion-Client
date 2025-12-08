@@ -63,9 +63,9 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="max-w-md w-full bg-green-50 p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Create an Account</h2>
+    <div className="min-h-screen flex items-center justify-center bg-base-100">
+      <div className="max-w-md w-full bg-base-200 p-8 rounded-xl shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-200 text-center mb-6">Create an Account</h2>
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
@@ -132,7 +132,7 @@ export default function Register() {
   Login with Google
 </button>
 
-        <p className="text-sm text-center text-black mt-4">
+        <p className="text-sm text-center text-gray-200 mt-4">
           Already have an account?{" "}
           <a href="/login" className="text-blue-500 hover:underline">
             Login

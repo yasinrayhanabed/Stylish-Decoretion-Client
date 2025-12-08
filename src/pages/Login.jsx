@@ -21,12 +21,10 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(data.user));
         toast.success("Login Successful!");
         navigate(`/dashboard/${data.user.role}`);
-      } else {
-        toast.error("Login failed!");
-      }
+      } else toast.error("Login failed! Check credentials.");
     } catch (err) {
       console.error("Login error:", err);
-      toast.error(err.response?.data?.message || "Login failed!");
+      toast.error(err.response?.data?.message || "Login failed! Try again.");
     }
     setLoading(false);
   };
@@ -35,31 +33,30 @@ export default function Login() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-
-      // Backend e call korbo
-      const response = await API.post("/auth/google-login", {
+      const res = await API.post("/auth/google-login", {
         email: user.email,
         name: user.displayName,
         photo: user.photoURL,
         uid: user.uid,
       });
-
-      if (response.data?.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+      if (res.data?.token) {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
         toast.success("Google Login Successful!");
-        navigate(`/dashboard/${response.data.user.role}`);
-      }
-    } catch (error) {
-      console.error("Google login error:", error);
-      toast.error(error.response?.data?.message || "Google Login Failed!");
+        navigate(`/dashboard/${res.data.user.role}`);
+      } else toast.error("Google Login failed! Try again.");
+    } catch (err) {
+      console.error("Google login error:", err);
+      toast.error(err.response?.data?.message || "Google Login Failed! Try again.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="max-w-md w-full bg-blue-50 p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Login to StyleDecor</h2>
+    <div className="min-h-screen flex items-center justify-center bg-base-100">
+      <div className="max-w-md w-full bg-base-200 p-8 rounded-xl shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-200 text-center mb-6">
+          Login to StyleDecor
+        </h2>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -110,13 +107,13 @@ export default function Login() {
               <path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path>
             </g>
           </svg>
-          Login with Google
+          Continue with Google
         </button>
 
-        <p className="text-sm text-center text-black mt-4">
+        <p className="text-sm text-center text-gray-200 mt-4">
           Don't have an account?{" "}
           <a href="/register" className="text-blue-500 hover:underline">
-            Register
+            Register here
           </a>
         </p>
       </div>

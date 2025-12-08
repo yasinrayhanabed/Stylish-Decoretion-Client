@@ -35,7 +35,7 @@ export default function Services() {
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto">
-      <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">Our Services</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center text-gray-200">Our Services</h1>
 
       {/* Search + Category + Sort */}
       <div className="flex flex-wrap gap-4 mb-8 justify-center">
