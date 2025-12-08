@@ -3,11 +3,12 @@ import API from '../../api/axios';
 import Spinner from '../../components/Spinner';
 import { toast } from 'react-toastify';
 
-export default function UserDashboard(){
+export default function UserDashboard() {
   const [bookings, setBookings] = useState(null);
 
-  useEffect(()=> {
-    API.get('/bookings/my').then(r => setBookings(r.data)).catch(()=> setBookings([]));
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    API.get(`/bookings/my/${user.id}`).then(r => setBookings(r.data || [])).catch(() => setBookings([]));
   }, []);
 
   const cancelBooking = async (id) => {
@@ -15,10 +16,12 @@ export default function UserDashboard(){
       await API.delete(`/bookings/${id}`);
       toast.success('Cancelled');
       setBookings(prev => prev.filter(b => b._id !== id));
-    } catch(err){ toast.error('Cancel failed'); }
+    } catch(err) {
+      toast.error('Cancel failed');
+    }
   };
 
-  if(bookings === null) return <Spinner/>;
+  if (!bookings) return <Spinner />;
 
   return (
     <div>
@@ -32,10 +35,8 @@ export default function UserDashboard(){
               <div className="text-sm">Status: {b.status || 'Pending'}</div>
             </div>
             <div className="flex flex-col gap-2">
-              {b.paymentStatus === 'pending' 
-                ? <div className="text-sm">BDT {b.amount || 0}</div> 
-                : <div className="text-sm">Paid</div>}
-              <button className="btn btn-sm btn-error" onClick={()=>cancelBooking(b._id)}>Cancel</button>
+              {b.paymentStatus === 'pending' ? <div className="text-sm">BDT {b.amount || 0}</div> : <div className="text-sm">Paid</div>}
+              <button className="btn btn-sm btn-error" onClick={() => cancelBooking(b._id)}>Cancel</button>
             </div>
           </div>
         ))}

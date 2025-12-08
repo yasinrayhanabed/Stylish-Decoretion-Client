@@ -21,9 +21,9 @@ function PrivateRoute({ children, roles = [] }) {
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
+
   if (!token) return <Navigate to="/login" replace />;
-  if (roles.length && (!user || !roles.includes(user.role)))
-    return <Navigate to="/" replace />;
+  if (roles.length && (!user || !roles.includes(user.role))) return <Navigate to="/" replace />;
   return children;
 }
 
@@ -48,24 +48,18 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+
+          {/* User Dashboard */}
           <Route
             path="/dashboard/user"
             element={
-              <PrivateRoute>
+              <PrivateRoute roles={["user"]}>
                 <UserDashboard />
               </PrivateRoute>
             }
           />
 
-          <Route
-            path="/dashboard/admin/add-service"
-            element={
-              <PrivateRoute roles={["admin"]}>
-                <AddService />
-              </PrivateRoute>
-            }
-          />
-
+          {/* Admin Dashboard */}
           <Route
             path="/dashboard/admin"
             element={
@@ -75,6 +69,16 @@ export default function App() {
             }
           />
           <Route
+            path="/dashboard/admin/add-service"
+            element={
+              <PrivateRoute roles={["admin"]}>
+                <AddService />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Decorator Dashboard */}
+          <Route
             path="/dashboard/decorator"
             element={
               <PrivateRoute roles={["decorator"]}>
@@ -82,6 +86,7 @@ export default function App() {
               </PrivateRoute>
             }
           />
+
           <Route
             path="*"
             element={

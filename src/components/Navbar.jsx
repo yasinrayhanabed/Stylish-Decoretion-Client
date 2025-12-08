@@ -6,9 +6,10 @@ function getUser() {
   return u ? JSON.parse(u) : null;
 }
 
-export default function Navbar(){
+export default function Navbar() {
   const user = getUser();
   const nav = useNavigate();
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -32,17 +33,18 @@ export default function Navbar(){
         {user ? (
           <div className="dropdown dropdown-end">
             <label tabIndex="0" className="btn btn-ghost flex items-center gap-2">
-              <img src={user.photo || 'https://i.pravatar.cc/40'} alt="avatar" className="rounded-full w-8 h-8"/>
+              <img src={user.photo || 'https://i.pravatar.cc/40'} alt="avatar" className="rounded-full w-8 h-8" />
               {user.name}
             </label>
             <ul tabIndex="0" className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
               <li>
                 <Link to={`/dashboard/${user.role}`}>
-                  {user.role === 'admin' ? 'Admin Dashboard' : user.role === 'decorator' ? 'Decorator Dashboard' : 'My Dashboard'}
+                  {user.role === 'admin' ? 'Admin Dashboard' :
+                   user.role === 'decorator' ? 'Decorator Dashboard' : 'My Dashboard'}
                 </Link>
               </li>
-              {user.role === 'admin' && <li><Link to="/add-service">Add Service</Link></li>}
-              <li><button onClick={handleLogout}>Logout</button></li>
+              {user.role === 'admin' && <li><Link to="/dashboard/admin/add-service">Add Service</Link></li>}
+              <li><button onClick={handleLogout} className='text-red-500'>Logout</button></li>
             </ul>
           </div>
         ) : (

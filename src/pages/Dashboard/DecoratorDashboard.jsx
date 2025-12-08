@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import API from '../../api/axios';
 import Spinner from '../../components/Spinner';
 
-export default function DecoratorDashboard(){
+export default function DecoratorDashboard() {
   const [services, setServices] = useState(null);
   const [bookings, setBookings] = useState(null);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  useEffect(()=> {
-    API.get('/services').then(r=> setServices(r.data || [])).catch(()=> setServices([]));
-    API.get(`/bookings/my/${user.id}`).then(r=> setBookings(r.data || [])).catch(()=> setBookings([]));
+  useEffect(() => {
+    API.get('/services').then(r => setServices(r.data || [])).catch(() => setServices([]));
+    API.get(`/bookings/my/${user.id}`).then(r => setBookings(r.data || [])).catch(() => setBookings([]));
   }, [user.id]);
 
-  if(services === null) return <Spinner/>;
+  if (!services) return <Spinner />;
 
   return (
     <div>

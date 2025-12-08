@@ -25,7 +25,7 @@ export default function Home(){
             <a className="btn btn-primary" href="/services">Book Decoration Service</a>
           </div>
           <div className="w-full lg:w-1/2">
-            <img src="/hero.jpg" alt="hero" className="rounded-lg shadow-lg" />
+            <img src="https://ibb.co.com/x46Xj2q" alt="style-decor" className="rounded-lg shadow-lg" />
           </div>
         </div>
       </motion.div>

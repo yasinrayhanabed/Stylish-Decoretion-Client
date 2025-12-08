@@ -3,11 +3,13 @@ import { toast } from "react-toastify";
 import { auth, googleProvider } from "../firebase/firebase.config";
 import { signInWithPopup } from "firebase/auth";
 import API from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,7 +20,7 @@ export default function Login() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         toast.success("Login Successful!");
-        window.location.href = "/";
+        navigate(`/dashboard/${data.user.role}`);
       } else {
         toast.error("Login failed!");
       }
@@ -34,6 +36,7 @@ export default function Login() {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
+      // Backend e call korbo
       const response = await API.post("/auth/google-login", {
         email: user.email,
         name: user.displayName,
@@ -41,13 +44,15 @@ export default function Login() {
         uid: user.uid,
       });
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      toast.success("Google Login Successful!");
-      window.location.href = "/";
+      if (response.data?.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        toast.success("Google Login Successful!");
+        navigate(`/dashboard/${response.data.user.role}`);
+      }
     } catch (error) {
-      console.error(error);
-      toast.error("Google Login Failed!");
+      console.error("Google login error:", error);
+      toast.error(error.response?.data?.message || "Google Login Failed!");
     }
   };
 
@@ -94,9 +99,18 @@ export default function Login() {
 
         <button
           onClick={handleGoogleLogin}
-          className="btn w-full btn-outline btn-secondary flex items-center justify-center gap-2"
+          className="btn w-full btn-outline btn-secondary flex items-center justify-center gap-2 bg-white text-black border-[#e5e5e5]"
         >
-          Continue with Google
+          <svg aria-label="Google logo" width="16" height="16" viewBox="0 0 512 512">
+            <g>
+              <path d="M0 0H512V512H0" fill="#fff"></path>
+              <path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path>
+              <path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path>
+              <path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path>
+              <path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path>
+            </g>
+          </svg>
+          Login with Google
         </button>
 
         <p className="text-sm text-center text-black mt-4">
