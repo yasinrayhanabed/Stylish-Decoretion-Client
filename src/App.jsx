@@ -14,6 +14,8 @@ import Contact from "./pages/Contact";
 import UserDashboard from "./pages/Dashboard/UserDashboard";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 import DecoratorDashboard from "./pages/Dashboard/DecoratorDashboard";
+import AdminManageUsers from "./pages/Dashboard/AdminManageUsers";
+import AdminManageServices from "./pages/Dashboard/AdminManageServices";
 import { ToastContainer } from "react-toastify";
 
 function PrivateRoute({ children, roles = [] }) {
@@ -23,7 +25,8 @@ function PrivateRoute({ children, roles = [] }) {
     : null;
 
   if (!token) return <Navigate to="/login" replace />;
-  if (roles.length && (!user || !roles.includes(user.role))) return <Navigate to="/" replace />;
+  if (roles.length && (!user || !roles.includes(user.role)))
+    return <Navigate to="/" replace />;
   return children;
 }
 
@@ -76,6 +79,22 @@ export default function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/dashboard/admin/manage-users"
+            element={
+              <PrivateRoute roles={["admin"]}>
+                <AdminManageUsers />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/manage-services"
+            element={
+              <PrivateRoute roles={["admin"]}>
+                <AdminManageServices />
+              </PrivateRoute>
+            }
+          />
 
           {/* Decorator Dashboard */}
           <Route
@@ -90,7 +109,7 @@ export default function App() {
           <Route
             path="*"
             element={
-              <div className="text-center py-20">404 - Page not found</div>
+              <div className="text-center text-3xl text-red-700 font-bold py-20">404 - Page not found</div>
             }
           />
         </Routes>
