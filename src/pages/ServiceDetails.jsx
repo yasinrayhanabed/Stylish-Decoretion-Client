@@ -32,23 +32,23 @@ export default function ServiceDetails() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white shadow-lg rounded-xl overflow-hidden">
+      <div className="bg-base-200 shadow-lg rounded-xl overflow-hidden">
         <img
           src={service.photo || "https://via.placeholder.com/800x400?text=Service+Image"}
           alt={service.service_name}
-          className="w-full h-96 object-cover"
+          className="w-full h-96 text-gray-200 object-cover"
         />
         <div className="p-6">
-          <h1 className="text-3xl font-bold mb-4 text-gray-800">{service.service_name}</h1>
-          <p className="text-gray-700 mb-4">{service.description}</p>
-          <div className="flex justify-between text-gray-700 font-semibold mb-4">
+          <h1 className="text-3xl font-bold mb-4 text-gray-100">{service.service_name}</h1>
+          <p className="text-gray-200 mb-4">{service.description}</p>
+          <div className="flex justify-between text-gray-200 font-semibold mb-4">
             <span>Category: {service.category}</span>
             <span>Cost: BDT {service.cost}</span>
             <span>Unit: {service.unit || "N/A"}</span>
           </div>
           <button
             onClick={handleBook}
-            className="bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 transition"
+            className="bg-violet-600 text-white py-3 px-6 rounded-lg hover:bg-violet-700 transition"
           >
             Book Now
           </button>
