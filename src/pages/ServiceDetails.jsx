@@ -34,7 +34,7 @@ export default function ServiceDetails() {
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white shadow-lg rounded-xl overflow-hidden">
         <img
-          src={service.images?.[0] || "https://via.placeholder.com/800x400?text=Service+Image"}
+          src={service.photo || "https://via.placeholder.com/800x400?text=Service+Image"}
           alt={service.service_name}
           className="w-full h-96 object-cover"
         />

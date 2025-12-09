@@ -16,7 +16,7 @@ export default function Contact() {
 
   return (
     <div className="container mx-auto px-4 py-10">
-      <h1 className="text-4xl font-bold mb-6">Contact Us</h1>
+      <h1 className="text-4xl mx-auto flex items-center justify-center font-bold mb-6">Contact Us</h1>
       <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
         <input
           type="text"
@@ -44,7 +44,7 @@ export default function Contact() {
           required
           className="w-full p-3 border rounded"
         ></textarea>
-        <button type="submit" className="bg-blue-600 text-white px-6 py-3 rounded">
+        <button type="submit" className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 rounded">
           Send Message
         </button>
       </form>
