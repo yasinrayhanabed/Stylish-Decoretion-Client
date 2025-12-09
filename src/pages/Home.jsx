@@ -30,8 +30,8 @@ export default function Home(){
         </div>
       </motion.div>
 
-      <section>
-        <h2 className="text-2xl mb-4">Popular Services</h2>
+      <section className='py-10'>
+        <h2 className="text-gray-50 font-bold text-3xl mb-4">Popular Services</h2>
         {services === null ? <Spinner/> : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {services.slice(0,6).map(s => <ServiceCard key={s._id} service={s} />)}
@@ -40,7 +40,7 @@ export default function Home(){
       </section>
 
       <section className="mt-8">
-        <h2 className="text-2xl mb-4">Service Coverage Map</h2>
+        <h2 className="text-3xl text-gray-50 font-bold mb-4">Service Coverage Map</h2>
         <div className="h-72 rounded shadow">
           <MapContainer center={[23.8103,90.4125]} zoom={13} style={{height:'100%'}}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
