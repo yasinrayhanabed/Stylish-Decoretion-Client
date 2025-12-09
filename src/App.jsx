@@ -6,16 +6,20 @@ import Home from "./pages/Home";
 import Services from "./pages/Services";
 import ServiceDetails from "./pages/ServiceDetails";
 import BookingPage from "./pages/BookingPage";
+import PaymentPage from "./pages/PaymentPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import About from "./pages/About";
-import AddService from "./pages/Dashboard/AddService";
 import Contact from "./pages/Contact";
+import AddService from "./pages/Dashboard/AddService";
 import UserDashboard from "./pages/Dashboard/UserDashboard";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 import DecoratorDashboard from "./pages/Dashboard/DecoratorDashboard";
 import AdminManageUsers from "./pages/Dashboard/AdminManageUsers";
 import AdminManageServices from "./pages/Dashboard/AdminManageServices";
+import AdminManageDecorators from "./pages/Dashboard/AdminManageDecorators";
+import AdminManageBookings from "./pages/Dashboard/AdminManageBookings";
+import AdminAnalytics from "./pages/Dashboard/AdminAnalytics";
 import { ToastContainer } from "react-toastify";
 
 function PrivateRoute({ children, roles = [] }) {
@@ -25,8 +29,10 @@ function PrivateRoute({ children, roles = [] }) {
     : null;
 
   if (!token) return <Navigate to="/login" replace />;
+
   if (roles.length && (!user || !roles.includes(user.role)))
     return <Navigate to="/" replace />;
+
   return children;
 }
 
@@ -36,23 +42,37 @@ export default function App() {
       <Navbar />
       <main className="flex-grow container mx-auto px-4 py-6">
         <Routes>
+          {/* --- Public Routes --- */}
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services/:id" element={<ServiceDetails />} />
-          <Route
-            path="/booking/:id"
-            element={
-              <PrivateRoute>
-                <BookingPage />
-              </PrivateRoute>
-            }
-          />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route
+            path="/booking/:id" 
+            element={
+              <PrivateRoute roles={["user"]}>
+                {" "}
+              
+                <BookingPage />
+              </PrivateRoute>
+            }
+          />
 
-          {/* User Dashboard */}
+         
+          <Route
+            path="/payment/:bookingId" 
+            element={
+              <PrivateRoute roles={["user"]}>
+                {" "}
+                
+                <PaymentPage />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/dashboard/user"
             element={
@@ -96,6 +116,42 @@ export default function App() {
             }
           />
 
+          <Route
+  path="/dashboard/admin"
+  element={
+    <PrivateRoute roles={["admin"]}>
+      <AdminDashboard />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/dashboard/admin/manage-decorators"
+  element={
+    <PrivateRoute roles={["admin"]}>
+      <AdminManageDecorators />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/dashboard/admin/manage-bookings"
+  element={
+    <PrivateRoute roles={["admin"]}>
+      <AdminManageBookings />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/dashboard/admin/analytics"
+  element={
+    <PrivateRoute roles={["admin"]}>
+      <AdminAnalytics />
+    </PrivateRoute>
+  }
+/>
+
           {/* Decorator Dashboard */}
           <Route
             path="/dashboard/decorator"
@@ -109,7 +165,9 @@ export default function App() {
           <Route
             path="*"
             element={
-              <div className="text-center text-3xl text-red-700 font-bold py-20">404 - Page not found</div>
+              <div className="text-center text-3xl text-red-700 font-bold py-20">
+                404 - Page not found
+              </div>
             }
           />
         </Routes>

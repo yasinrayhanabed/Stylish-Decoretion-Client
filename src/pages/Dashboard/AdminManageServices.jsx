@@ -1,4 +1,3 @@
-// src/pages/admin/AdminManageServices.jsx
 import React, { useEffect, useState } from "react";
 import API from "../../api/axios";
 import Spinner from "../../components/Spinner";

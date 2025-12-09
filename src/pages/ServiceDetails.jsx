@@ -7,15 +7,21 @@ export default function ServiceDetails() {
   const { id } = useParams();
   const [service, setService] = useState(undefined);
   const nav = useNavigate();
+  
+  console.log("Attempting to fetch service with ID:", id); 
 
   useEffect(() => {
     const fetchService = async () => {
+      if (!id) {
+        setService(null);
+        return;
+      }
       try {
-        const res = await API.get(`/services/${id}`); // ✅ baseURL = /api
+        const res = await API.get(`/services/${id}`); 
         setService(res.data);
       } catch (err) {
         console.error("Failed to fetch service:", err);
-        setService(null);
+        setService(null); 
       }
     };
     fetchService();
@@ -28,18 +34,26 @@ export default function ServiceDetails() {
   };
 
   if (service === undefined) return <Spinner />;
-  if (service === null) return <div className="text-center py-10 text-red-500">Service not found</div>;
+  if (service === null)
+    return (
+      <div className="text-center py-10 text-red-500">Service not found</div>
+    );
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-base-200 shadow-lg rounded-xl overflow-hidden">
         <img
-          src={service.photo || "https://via.placeholder.com/800x400?text=Service+Image"}
+          src={
+            service.photo ||
+            "https://via.placeholder.com/800x400?text=Service+Image"
+          }
           alt={service.service_name}
           className="w-full h-96 text-gray-200 object-cover"
         />
         <div className="p-6">
-          <h1 className="text-3xl font-bold mb-4 text-gray-100">{service.service_name}</h1>
+          <h1 className="text-3xl font-bold mb-4 text-gray-100">
+            {service.service_name}
+          </h1>
           <p className="text-gray-200 mb-4">{service.description}</p>
           <div className="flex justify-between text-gray-200 font-semibold mb-4">
             <span>Category: {service.category}</span>

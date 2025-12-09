@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from "../api/axios";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+
 
 export default function Services() {
   const [services, setServices] = useState([]);
@@ -24,21 +24,6 @@ export default function Services() {
     fetchServices();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this service?")) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      await API.delete(`/services/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Service deleted successfully");
-      fetchServices(); // refresh list
-    } catch (err) {
-      console.error("Delete service failed:", err);
-      toast.error("Failed to delete service");
-    }
-  };
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto">
@@ -70,12 +55,7 @@ export default function Services() {
                   >
                     View
                   </Link>
-                  <button
-                    onClick={() => handleDelete(service._id)}
-                    className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
-                  >
-                    Delete
-                  </button>
+              
                 </div>
               </div>
             </div>

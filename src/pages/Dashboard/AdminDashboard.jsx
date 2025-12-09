@@ -18,7 +18,7 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <h2 className="text-2xl mb-4">Admin Dashboard</h2>
+      <h2 className="text-3xl font-bold text-blue-400 mb-4">Admin Dashboard</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-4 bg-base-200 rounded shadow">Services: {services.length}</div>
         <div className="p-4 bg-base-200 rounded shadow">Decorators: {decorators?.length || 0}</div>
@@ -26,7 +26,7 @@ export default function AdminDashboard() {
       </div>
 
       <section className="mt-6">
-        <h3 className="text-xl mb-2">Manage Services</h3>
+        <h3 className="text-2xl font-bold mb-2">All Services</h3>
         <div className="grid md:grid-cols-2 gap-4">
           {services.map(s => (
             <div key={s._id} className="p-3 bg-base-200 rounded shadow">

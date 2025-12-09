@@ -37,13 +37,30 @@ export default function Navbar() {
               {user.name}
             </label>
             <ul tabIndex="0" className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+              
+              
               <li>
                 <Link to={`/dashboard/${user.role}`}>
                   {user.role === 'admin' ? 'Admin Dashboard' :
-                   user.role === 'decorator' ? 'Decorator Dashboard' : 'My Dashboard'}
+                    user.role === 'decorator' ? 'Decorator Dashboard' : 'My Dashboard'}
                 </Link>
               </li>
-              {user.role === 'admin' && <li><Link to="/dashboard/admin/add-service">Add Service</Link></li>}
+              
+             
+              {user.role === 'admin' && (
+                <>
+                
+                  <li><Link to="/dashboard/admin/add-service">Add Service</Link></li>
+                  
+                  
+                  <li><Link to="/dashboard/admin/manage-users">Manage Users</Link></li>
+                  
+                  
+                  <li><Link to="/dashboard/admin/manage-services">Manage Services</Link></li>
+                </>
+              )}
+             
+              
               <li><button onClick={handleLogout} className='text-red-500'>Logout</button></li>
             </ul>
           </div>
