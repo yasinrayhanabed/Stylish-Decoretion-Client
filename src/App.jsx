@@ -12,7 +12,7 @@ import Register from "./pages/Register";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import AddService from "./pages/Dashboard/AddService";
-import UserDashboard from "./pages/Dashboard/UserDashboard";
+import UserDashboard from "./pages/Dashboard/UserDashboard"; // এটি এখন ইউজার ড্যাশবোর্ড লেআউট হিসেবে কাজ করবে
 import AdminDashboard from "./pages/Dashboard/AdminDashboard"; 
 import DecoratorDashboard from "./pages/Dashboard/DecoratorDashboard";
 import AdminManageUsers from "./pages/Dashboard/AdminManageUsers";
@@ -21,22 +21,31 @@ import AdminManageDecorators from "./pages/Dashboard/AdminManageDecorators";
 import AdminManageBookings from "./pages/Dashboard/AdminManageBookings";
 import AdminAnalytics from "./pages/Dashboard/AdminAnalytics";
 import AdminDashboardHome from "./pages/Dashboard/AdminDashboardHome";
+// নতুন ইমপোর্ট: পেমেন্ট সফলতার পেজ (আগের উত্তরে বানানো হয়েছে)
+import PaymentSuccessPage from "./pages/PaymentSuccessPage"; 
+// বুকিং পেজ ইমপোর্ট করুন (যদি এটি আলাদা ফাইল হয়)
+import MyBookingsPage from "./pages/Dashboard/MyBookingsPage"; 
 import { ToastContainer } from "react-toastify";
 
+
+// প্রাইভেট রুট কম্পোনেন্ট
 function PrivateRoute({ children, roles = [] }) {
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
 
+  // 1. টোকেন না থাকলে লগইন এ রিডিরেক্ট
   if (!token) return <Navigate to="/login" replace />;
 
+  // 2. রোল চেক: ইউজার ডেটা না থাকলে বা রোলের সাথে না মিললে
   if (roles.length && (!user || !roles.includes(user.role)))
-    return <Navigate to="/" replace />; // 👈 Home Page এ রিডিরেক্ট হওয়ার কারণ: user.role সঠিক নয়
+    return <Navigate to="/" replace />; 
 
   return children;
 }
 
+// মূল অ্যাপ কম্পোনেন্ট
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -69,14 +78,29 @@ export default function App() {
               </PrivateRoute>
             }
           />
+          
+          {/* Payment Success Route (পেমেন্ট সফলতার পর ইউজার এখানে আসে) */}
+          {/* এটি সাধারণত সুরক্ষিত রুট হয় না, কারণ Stripe বা পেমেন্ট গেটওয়ে এটিকে কল করে */}
+          <Route 
+            path="/payment/success/:transactionId" 
+            element={<PaymentSuccessPage />} 
+          />
+
+          {/* User Dashboard - নেস্টেড রুট ব্যবহার করা হলো */}
           <Route
-            path="/dashboard/user"
+            path="/dashboard"
             element={
               <PrivateRoute roles={["user"]}>
                 <UserDashboard />
               </PrivateRoute>
             }
-          />
+          >
+             {/* default route for /dashboard (UserDashboard Home) */}
+             {/* 💡 MyBookingsPage যোগ করা হলো */}
+             <Route index element={<MyBookingsPage />} />
+             <Route path="my-bookings" element={<MyBookingsPage />} />
+             {/* এখানে ভবিষ্যতে অন্যান্য ইউজার রুট যোগ হবে (যেমন Profile, Settings) */}
+          </Route>
 
           {/* Decorator Dashboard */}
           <Route
@@ -88,7 +112,7 @@ export default function App() {
             }
           />
 
-          {/* Admin Dashboard */}
+          {/* Admin Dashboard - নেস্টেড রুট ঠিক রাখা হলো */}
           <Route
             path="/dashboard/admin"
             element={
