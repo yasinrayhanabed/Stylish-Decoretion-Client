@@ -29,7 +29,6 @@ export default function AdminAnalytics() {
 
   if (loading) return <Spinner />;
 
-  // এইখানে Chart Data তৈরি করার লজিক থাকবে
 
   return (
     <div className="p-4">
@@ -59,7 +58,7 @@ export default function AdminAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-base-100 p-6 rounded-box shadow">
           <h3 className="text-xl font-semibold mb-4">Service Demand Chart (Bookings)</h3>
-          {/* এখানে Bar Chart কম্পোনেন্ট বসবে, ডেটা হিসেবে analytics.demand পাস হবে */}
+          
           <div className="text-gray-500 h-64 flex items-center justify-center">
              (Chart Component Placeholder)
           </div>
@@ -67,7 +66,7 @@ export default function AdminAnalytics() {
 
         <div className="bg-base-100 p-6 rounded-box shadow">
           <h3 className="text-xl font-semibold mb-4">Monthly Revenue Trend</h3>
-          {/* এখানে Line Chart কম্পোনেন্ট বসবে */}
+          
           <div className="text-gray-500 h-64 flex items-center justify-center">
              (Chart Component Placeholder)
           </div>

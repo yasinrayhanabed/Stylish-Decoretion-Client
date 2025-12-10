@@ -13,13 +13,14 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import AddService from "./pages/Dashboard/AddService";
 import UserDashboard from "./pages/Dashboard/UserDashboard";
-import AdminDashboard from "./pages/Dashboard/AdminDashboard";
+import AdminDashboard from "./pages/Dashboard/AdminDashboard"; 
 import DecoratorDashboard from "./pages/Dashboard/DecoratorDashboard";
 import AdminManageUsers from "./pages/Dashboard/AdminManageUsers";
 import AdminManageServices from "./pages/Dashboard/AdminManageServices";
 import AdminManageDecorators from "./pages/Dashboard/AdminManageDecorators";
 import AdminManageBookings from "./pages/Dashboard/AdminManageBookings";
 import AdminAnalytics from "./pages/Dashboard/AdminAnalytics";
+import AdminDashboardHome from "./pages/Dashboard/AdminDashboardHome";
 import { ToastContainer } from "react-toastify";
 
 function PrivateRoute({ children, roles = [] }) {
@@ -31,7 +32,7 @@ function PrivateRoute({ children, roles = [] }) {
   if (!token) return <Navigate to="/login" replace />;
 
   if (roles.length && (!user || !roles.includes(user.role)))
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />; // 👈 Home Page এ রিডিরেক্ট হওয়ার কারণ: user.role সঠিক নয়
 
   return children;
 }
@@ -42,7 +43,7 @@ export default function App() {
       <Navbar />
       <main className="flex-grow container mx-auto px-4 py-6">
         <Routes>
-          {/* --- Public Routes --- */}
+          {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services/:id" element={<ServiceDetails />} />
@@ -50,34 +51,39 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          
+          {/* User Protected Routes */}
           <Route
             path="/booking/:id" 
             element={
               <PrivateRoute roles={["user"]}>
-                {" "}
-              
                 <BookingPage />
               </PrivateRoute>
             }
           />
-
-         
           <Route
             path="/payment/:bookingId" 
             element={
               <PrivateRoute roles={["user"]}>
-                {" "}
-                
                 <PaymentPage />
               </PrivateRoute>
             }
           />
-
           <Route
             path="/dashboard/user"
             element={
               <PrivateRoute roles={["user"]}>
                 <UserDashboard />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Decorator Dashboard */}
+          <Route
+            path="/dashboard/decorator"
+            element={
+              <PrivateRoute roles={["decorator"]}>
+                <DecoratorDashboard />
               </PrivateRoute>
             }
           />
@@ -90,78 +96,17 @@ export default function App() {
                 <AdminDashboard />
               </PrivateRoute>
             }
-          />
-          <Route
-            path="/dashboard/admin/add-service"
-            element={
-              <PrivateRoute roles={["admin"]}>
-                <AddService />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/dashboard/admin/manage-users"
-            element={
-              <PrivateRoute roles={["admin"]}>
-                <AdminManageUsers />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/dashboard/admin/manage-services"
-            element={
-              <PrivateRoute roles={["admin"]}>
-                <AdminManageServices />
-              </PrivateRoute>
-            }
-          />
-
-          <Route
-  path="/dashboard/admin"
-  element={
-    <PrivateRoute roles={["admin"]}>
-      <AdminDashboard />
-    </PrivateRoute>
-  }
-/>
-
-<Route
-  path="/dashboard/admin/manage-decorators"
-  element={
-    <PrivateRoute roles={["admin"]}>
-      <AdminManageDecorators />
-    </PrivateRoute>
-  }
-/>
-
-<Route
-  path="/dashboard/admin/manage-bookings"
-  element={
-    <PrivateRoute roles={["admin"]}>
-      <AdminManageBookings />
-    </PrivateRoute>
-  }
-/>
-
-<Route
-  path="/dashboard/admin/analytics"
-  element={
-    <PrivateRoute roles={["admin"]}>
-      <AdminAnalytics />
-    </PrivateRoute>
-  }
-/>
-
-          {/* Decorator Dashboard */}
-          <Route
-            path="/dashboard/decorator"
-            element={
-              <PrivateRoute roles={["decorator"]}>
-                <DecoratorDashboard />
-              </PrivateRoute>
-            }
-          />
-
+          >
+            <Route index element={<AdminDashboardHome />} /> 
+            <Route path="manage-users" element={<AdminManageUsers />} />
+            <Route path="manage-services" element={<AdminManageServices />} />
+            <Route path="add-service" element={<AddService />} />
+            <Route path="manage-decorators" element={<AdminManageDecorators />} />
+            <Route path="manage-bookings" element={<AdminManageBookings />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+          </Route>
+          
+          {/* Fallback 404 Route */}
           <Route
             path="*"
             element={

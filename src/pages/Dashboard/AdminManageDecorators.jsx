@@ -38,11 +38,11 @@ export default function AdminManageDecorators() {
 
   return (
     <div className="p-4">
-      <h2 className="text-3xl font-bold mb-6">Manage Decorators</h2>
+      <h2 className="text-3xl text-blue-600 font-bold mb-6">Manage Decorators</h2>
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
-            <tr>
+            <tr className="text-gray-700">
               <th>Name</th>
               <th>Email</th>
               <th>Status</th>
@@ -52,8 +52,8 @@ export default function AdminManageDecorators() {
           <tbody>
             {decorators.map((decorator) => (
               <tr key={decorator._id}>
-                <td>{decorator.name}</td>
-                <td>{decorator.email}</td>
+                <td className="text-gray-600">{decorator.name}</td>
+                <td className="text-gray-600">{decorator.email}</td>
                 <td>
                   <span
                     className={`badge ${

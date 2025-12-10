@@ -44,11 +44,11 @@ export default function AdminManageBookings() {
 
   return (
     <div className="p-4">
-      <h2 className="text-3xl font-bold mb-6">Manage Bookings</h2>
+      <h2 className="text-3xl text-blue-700 font-bold mb-6">Manage Bookings</h2>
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
-            <tr>
+            <tr className="text-gray-600">
               <th>Booking ID</th>
               <th>User</th>
               <th>Service</th>

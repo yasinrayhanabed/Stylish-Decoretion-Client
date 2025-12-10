@@ -51,7 +51,7 @@ export default function AdminManageServices() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Manage Services</h2>
+        <h2 className="text-3xl text-blue-700 font-bold">Manage Services</h2>
         <Link to="/dashboard/admin/add-service" className="btn btn-primary">Add Service</Link>
       </div>
 

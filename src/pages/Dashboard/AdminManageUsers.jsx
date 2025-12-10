@@ -50,7 +50,7 @@ export default function AdminManageUsers() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Manage Users</h2>
+      <h2 className="text-3xl text-blue-700 font-bold mb-6">Manage Users</h2>
 
       {users.length === 0 ? (
         <div className="text-center py-16 text-gray-400">No users found.</div>
