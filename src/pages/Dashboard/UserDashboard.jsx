@@ -1,106 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import API from '../../api/axios';
-import Spinner from '../../components/Spinner';
-import { toast } from 'react-toastify';
-import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate
+// src/pages/Dashboard/UserDashboard.jsx (Fixed)
 
-export default function UserDashboard() {
- const [bookings, setBookings] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const navigate = useNavigate();
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { FaUser, FaCalendarCheck, FaSignOutAlt, FaHome } from 'react-icons/fa';
 
- useEffect(() => {
-    if (!user.id) {
-        setLoading(false);
-        setBookings([]);
-        return;
-    }
-    // Note: /bookings/my/:userId এই রুটটি ব্যবহার না করে /bookings/my ব্যবহার করা ভালো
-    // কারণ রিকোয়ারমেন্ট অনুযায়ী টোকেন থেকে userId নেওয়াই নিরাপদ।
- API.get(`/bookings/my/:userId`)
-        .then(r => {
-            setBookings(r.data || []);
-            setLoading(false);
-        })
-        .catch((err) => {
-            console.error("Error fetching bookings:", err);
-            setBookings([]);
-            setLoading(false);
-        });
- }, [user.id]);
+const DashboardSidebar = () => {
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/'; 
+    };
 
- const cancelBooking = async (id) => {
-    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
- try {
-await API.delete(`/bookings/${id}`);
- toast.success('Booking cancelled successfully!');
-setBookings(prev => prev.filter(b => b._id !== id));
- } catch(err) {
- toast.error('Cancellation failed. Only pending bookings can be cancelled.');
-      console.error(err);
- }
- };
-
-  // Example: Estimate Amount (since actual amount is missing in current data structure)
-  const calculateAmount = (booking) => {
-    // Ideally, the booking object should contain the cost.
-    // Assuming a placeholder cost of 5000 BDT for pending bookings without cost.
-    return booking.cost || 5000; 
-  }
-
- if (loading || !bookings) return <Spinner />;
-
- return (
- <div className="p-4">
-<h2 className="text-3xl font-bold mb-6 text-primary">
-  My Bookings & Services
-</h2>
- <div className="space-y-4">
- {bookings.length === 0 ? (
-            <div className="text-center p-6 bg-blue-50 rounded-lg text-gray-600">
-                You have no active bookings.
+    return (
+        <div className="w-64 bg-gray-800 text-white min-h-screen p-4">
+            <h2 className="text-2xl font-bold mb-6 border-b border-gray-700 pb-2">User Dashboard</h2>
+            <nav className="space-y-2">
+                <Link 
+                    // 🚨 পরিবর্তন: /dashboard এ এখন My Bookings পেজ লোড হচ্ছে
+                    to="/dashboard/my-bookings" 
+                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 text-gray-300 transition duration-150"
+                >
+                    <FaCalendarCheck /> {/* 🚨 আইকন পরিবর্তন */}
+                    <span>My Bookings (Default)</span> {/* 🚨 টেক্সট পরিবর্তন */}
+                </Link>
+                <Link 
+                    to="/dashboard/my-bookings"
+                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 text-gray-300 transition duration-150"
+                >
+                    <FaCalendarCheck />
+                    <span>My Bookings</span>
+                </Link>
+                <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-3 p-3 mt-4 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition duration-150"
+                >
+                    <FaSignOutAlt />
+                    <span>Logout</span>
+                </button>
+            </nav>
+            <div className='mt-8 pt-4 border-t border-gray-700'>
+                 <Link 
+                    to="/"
+                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-700 text-gray-300 transition duration-150"
+                >
+                    <FaHome />
+                    <span>Back to Home</span>
+                </Link>
             </div>
-        ) : (
-            bookings.map(b => (
- <div key={b._id} className="p-4 bg-white rounded-xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center">
-<div>
- <div className="font-bold text-xl text-violet-600">{b.service_name || 'Unknown Service'}</div>
-<div className="text-sm text-gray-500 mt-1">Date: {new Date(b.date).toLocaleDateString()} | Location: {b.location}</div>
- <div className="text-md font-semibold mt-2">
-                      Status: 
-                      <span className={`ml-2 badge ${b.status === 'Completed' ? 'badge-success' : b.status === 'Cancelled' ? 'badge-error' : 'badge-warning'}`}>
-                          {b.status || 'Assigned'}
-                      </span>
-                  </div>
- </div>
- <div className="flex flex-col gap-2 mt-4 md:mt-0 items-end">
-                      {b.paymentStatus === 'pending' ? (
-                          <>
-                              <div className="text-lg font-bold text-red-600">BDT {calculateAmount(b)} (Pending)</div>
-                              {/* Assuming we pass bookingId and amount to Payment Page */}
-                              <Link 
-                                  to={`/payment/${b._id}?amount=${calculateAmount(b)}&name=${b.service_name}`}
-                                  className="btn btn-sm btn-success text-white"
-                              >
-                                  Pay Now
-                              </Link>
-                          </>
-                      ) : (
-                          <div className="text-lg font-bold text-green-600">Paid (BDT {calculateAmount(b)})</div>
-                      )}
- <button 
-                    className="btn btn-sm btn-outline btn-error" 
-                    onClick={() => cancelBooking(b._id)} 
-                    disabled={b.paymentStatus !== 'pending'} // Only allow cancellation if payment is pending
-                  >
-                    Cancel Booking
-                  </button>
- </div>
- </div>
-))
-        )}
- </div>
- </div>
- );
+        </div>
+    );
+};
+
+
+// এটি ড্যাশবোর্ড লেআউট হিসেবে কাজ করবে, যেখানে children-এর মাধ্যমে ভেতরের পেজগুলি লোড হবে
+export default function UserDashboard({ children }) {
+    return (
+        <div className="flex min-h-screen w-full"> 
+            <DashboardSidebar />
+            <div className="flex-grow p-4 md:p-8">
+                {children} {/* ড্যাশবোর্ডের কন্টেন্ট (MyBookingsPage) এখানে প্রদর্শিত হবে */}
+            </div>
+        </div>
+    );
 }

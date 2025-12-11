@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { auth, googleProvider } from "../firebase/firebase.config";
+// NOTE: Assuming firebase.config is at src/firebase/firebase.config.js or .jsx
+import { auth, googleProvider } from "../firebase/firebase.config.js"; 
 import { signInWithPopup } from "firebase/auth";
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth"; // Added useAuth to use the new login function
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth(); // Use context-provided login function
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -17,10 +20,8 @@ export default function Login() {
     try {
       const { data } = await API.post("/auth/login", { email, password });
       if (data?.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        toast.success("Login Successful!");
-        navigate(`/dashboard/${data.user.role}`);
+        // Use the context login function which handles token storage and redirection
+        login(data.token); 
       } else toast.error("Login failed! Check credentials.");
     } catch (err) {
       console.error("Login error:", err);
@@ -40,10 +41,8 @@ export default function Login() {
         uid: user.uid,
       });
       if (res.data?.token) {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        toast.success("Google Login Successful!");
-        navigate(`/dashboard/${res.data.user.role}`);
+        // Use the context login function for Google login token as well
+        login(res.data.token);
       } else toast.error("Google Login failed! Try again.");
     } catch (err) {
       console.error("Google login error:", err);
@@ -54,11 +53,12 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-100">
       <div className="max-w-md w-full bg-base-200 p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-200 text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
           Login to StyleDecor
         </h2>
 
         <form onSubmit={handleLogin} className="space-y-4">
+          {/* Input fields remain the same */}
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
@@ -85,19 +85,21 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full btn btn-primary"
+            className="w-full btn btn-primary bg-blue-600 hover:bg-blue-700 text-white"
             disabled={loading}
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <div className="divider my-6">OR</div>
+        <div className="divider my-6 text-gray-500">OR</div>
 
         <button
           onClick={handleGoogleLogin}
-          className="btn w-full btn-outline btn-secondary flex items-center justify-center gap-2 bg-white text-black border-[#e5e5e5]"
+          className="btn w-full btn-outline border-gray-300 hover:bg-gray-100 flex items-center justify-center gap-2 bg-white text-gray-700"
+          disabled={loading}
         >
+          {/* Google SVG */}
           <svg aria-label="Google logo" width="16" height="16" viewBox="0 0 512 512">
             <g>
               <path d="M0 0H512V512H0" fill="#fff"></path>
@@ -110,9 +112,9 @@ export default function Login() {
           Continue with Google
         </button>
 
-        <p className="text-sm text-center text-gray-200 mt-4">
+        <p className="text-sm text-center text-gray-500 mt-4">
           Don't have an account?{" "}
-          <a href="/register" className="text-blue-500 hover:underline">
+          <a href="/register" className="text-blue-500 hover:underline font-medium">
             Register here
           </a>
         </p>
