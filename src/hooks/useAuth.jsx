@@ -85,11 +85,11 @@ export const AuthProvider = ({ children }) => {
             
             // Redirect based on role
             if (decodedUser.role === 'admin') {
-                navigate('/dashboard/manage-services', { replace: true });
+                navigate('/dashboard/admin', { replace: true });
             } else if (decodedUser.role === 'decorator') {
                 navigate('/dashboard/decorator', { replace: true });
             } else {
-                navigate(redirectPath, { replace: true });
+                navigate('/dashboard', { replace: true });
             }
         } else {
             // If token cannot be decoded
