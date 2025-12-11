@@ -67,7 +67,17 @@ function CheckoutForm({ bookingId, amount, serviceName, onPaymentSuccess }) {
                     serviceName: serviceName, 
                 });
                 
-                toast.success('Payment successful! Booking updated.');
+                // Update booking status to Completed after payment
+                try {
+                    await API.put(`/bookings/${bookingId}`, { 
+                        status: 'Completed',
+                        paymentStatus: 'paid'
+                    });
+                } catch (updateErr) {
+                    console.error('Failed to update booking status:', updateErr);
+                }
+                
+                toast.success('Payment successful! Booking completed.');
                 onPaymentSuccess(result.paymentIntent.id);
 
             } else {
