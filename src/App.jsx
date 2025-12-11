@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFoundPage from "./pages/NotFoundPage";
+import ServiceCoverageMap from "./pages/ServiceCoverageMap";
 
 // Booking and Payment Pages
 import BookingPage from "./pages/BookingPage";
@@ -32,7 +33,8 @@ import MyBookingsPage from "./pages/Dashboard/MyBookingsPage";
 import UserProfile from "./pages/Dashboard/UserProfile";
 
 // Guards
-import PrivateRoute from "./routes/PrivateRoute"; 
+import PrivateRoute from "./routes/PrivateRoute";
+import RoleGuard from "./components/RoleGuard"; 
 
 function App() {
   return (
@@ -42,9 +44,10 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />
-        <Route path="/service/:id" element={<ServiceDetails />} />
+        <Route path="/services/:id" element={<ServiceDetails />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/coverage" element={<ServiceCoverageMap />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -63,16 +66,48 @@ function App() {
           <Route path="/dashboard/profile" element={<UserProfile />} />
 
           {/* Decorator Routes */}
-          <Route path="/dashboard/decorator" element={<PrivateRoute requiredRole={['decorator', 'admin']}><DecoratorDashboard /></PrivateRoute>} />
+          <Route path="/dashboard/decorator" element={
+            <RoleGuard allowedRoles={['decorator', 'admin']}>
+              <DecoratorDashboard />
+            </RoleGuard>
+          } />
 
           {/* Admin Routes */}
-          <Route path="/dashboard/admin" element={<PrivateRoute requiredRole={['admin']}><AdminDashboard /></PrivateRoute>} /> 
-          <Route path="/dashboard/admin/home" element={<PrivateRoute requiredRole={['admin']}><AdminDashboardHome /></PrivateRoute>} />
-          <Route path="/dashboard/admin/add-service" element={<PrivateRoute requiredRole={['admin']}><AddService /></PrivateRoute>} />
-          <Route path="/dashboard/admin/manage-users" element={<PrivateRoute requiredRole={['admin']}><AdminManageUsers /></PrivateRoute>} />
-          <Route path="/dashboard/admin/manage-decorators" element={<PrivateRoute requiredRole={['admin']}><AdminManageDecorators /></PrivateRoute>} />
-          <Route path="/dashboard/admin/manage-bookings" element={<PrivateRoute requiredRole={['admin']}><AdminManageBookings /></PrivateRoute>} />
-          <Route path="/dashboard/admin/analytics" element={<PrivateRoute requiredRole={['admin']}><AdminAnalytics /></PrivateRoute>} />
+          <Route path="/dashboard/admin" element={
+            <RoleGuard allowedRoles={['admin']}>
+              <AdminDashboard />
+            </RoleGuard>
+          } /> 
+          <Route path="/dashboard/admin/home" element={
+            <RoleGuard allowedRoles={['admin']}>
+              <AdminDashboardHome />
+            </RoleGuard>
+          } />
+          <Route path="/dashboard/admin/add-service" element={
+            <RoleGuard allowedRoles={['admin']}>
+              <AddService />
+            </RoleGuard>
+          } />
+          <Route path="/dashboard/admin/manage-users" element={
+            <RoleGuard allowedRoles={['admin']}>
+              <AdminManageUsers />
+            </RoleGuard>
+          } />
+          <Route path="/dashboard/admin/manage-decorators" element={
+            <RoleGuard allowedRoles={['admin']}>
+              <AdminManageDecorators />
+            </RoleGuard>
+          } />
+          <Route path="/dashboard/admin/manage-bookings" element={
+            <RoleGuard allowedRoles={['admin']}>
+              <AdminManageBookings />
+            </RoleGuard>
+          } />
+          <Route path="/dashboard/admin/analytics" element={
+            <RoleGuard allowedRoles={['admin']}>
+              <AdminAnalytics />
+            </RoleGuard>
+          } />
           
         </Route>
         {/* Protected Routes End */}

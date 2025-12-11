@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Forbidden = () => {
+const Forbidden = ({ message = "You are logged in, but you do not have the required permissions to access this resource." }) => {
   return (
     <div className="flex items-center justify-center min-h-[60vh] bg-gray-50 p-6">
       <div className="text-center p-8 bg-white shadow-xl rounded-lg max-w-lg w-full">
@@ -13,7 +13,7 @@ const Forbidden = () => {
         </h2>
         
         <p className="text-gray-600 mb-6">
-          You are logged in, but you do not have the required permissions to access this resource.
+          {message}
         </p>
         
         <Link 

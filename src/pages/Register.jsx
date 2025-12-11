@@ -8,10 +8,43 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const auth = getAuth();
   const googleProvider = new GoogleAuthProvider();
+
+  // ImageBB upload function
+  const uploadImageToImageBB = async (imageFile) => {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    
+    try {
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGEBB_API_KEY}`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      return data.success ? data.data.url : null;
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      return null;
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+      setProfileImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -22,7 +55,28 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const { data } = await API.post("/auth/register", { name, email, password });
+      let photoURL = null;
+      
+      // Upload image if selected
+      if (profileImage) {
+        setUploadingImage(true);
+        photoURL = await uploadImageToImageBB(profileImage);
+        setUploadingImage(false);
+        
+        if (!photoURL) {
+          toast.error('Failed to upload image. Please try again.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      const { data } = await API.post("/auth/register", { 
+        name, 
+        email, 
+        password,
+        photo: photoURL 
+      });
+      
       if (data?.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
@@ -81,6 +135,25 @@ export default function Register() {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-1">Profile Image (Optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full file-input file-input-bordered"
+            />
+            {imagePreview && (
+              <div className="mt-2">
+                <img 
+                  src={imagePreview} 
+                  alt="Preview" 
+                  className="w-20 h-20 rounded-full object-cover mx-auto"
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
@@ -119,9 +192,9 @@ export default function Register() {
           <button
             type="submit"
             className="w-full btn btn-primary"
-            disabled={loading}
+            disabled={loading || uploadingImage}
           >
-            {loading ? "Registering..." : "Register"}
+            {uploadingImage ? "Uploading Image..." : loading ? "Registering..." : "Register"}
           </button>
         </form>
 

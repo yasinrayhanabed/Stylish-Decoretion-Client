@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     }, []); 
 
     // Login Handler
-    const handleLogin = (token, redirectPath = '/dashboard/user') => {
+    const handleLogin = (token, redirectPath = '/dashboard') => {
         localStorage.setItem('token', token);
         const decodedUser = decodeUserFromToken(token);
         

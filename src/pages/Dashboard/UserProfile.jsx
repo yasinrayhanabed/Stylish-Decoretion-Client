@@ -1,24 +1,63 @@
-import React, { useState } from 'react';
-import { User, Mail, Phone, Lock, Save, Edit, X } from 'lucide-react'; // Importing icons from lucide-react
+import React, { useState, useEffect } from 'react';
+import { User, Mail, Phone, MapPin, Save, Edit, X } from 'lucide-react'; // Importing icons from lucide-react
 import toast from 'react-hot-toast'; // Importing react-hot-toast
+import useAuth from '../../hooks/useAuth';
 
 const UserProfilePage = () => {
-    // --- Demo Data: Your real user data should be loaded here ---
+    const { user, refetchUser } = useAuth();
+    
     const [userData, setUserData] = useState({
-        name: 'Sajid User',
-        email: 'sajid.user@example.com',
-        phone: '017xxxxxxxx',
-        address: 'Dhaka, Bangladesh',
-        memberSince: 'January 2021',
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        memberSince: '',
     });
+    
+    // Load user data when component mounts or user changes
+    useEffect(() => {
+        if (user) {
+            setUserData({
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                address: user.address || '',
+                memberSince: user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long' 
+                }) : 'N/A',
+            });
+        }
+    }, [user]);
 
     const [isEditing, setIsEditing] = useState(false);
 
-    const handleSave = () => {
-        // Implement save logic here (API call)
-        toast.success('Profile updated successfully!');
-        setIsEditing(false);
+    const handleSave = async () => {
+        try {
+            // TODO: Implement API call to update user profile
+            // await API.put('/users/profile', userData);
+            toast.success('Profile updated successfully!');
+            setIsEditing(false);
+            // Refetch user data to get updated info
+            refetchUser();
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            toast.error('Failed to update profile. Please try again.');
+        }
     };
+
+    // Show loading or no user message
+    if (!user) {
+        return (
+            <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg my-10">
+                <div className="text-center py-8">
+                    <User className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                    <h2 className="text-xl font-semibold text-gray-600 mb-2">No User Data Found</h2>
+                    <p className="text-gray-500">Please log in to view your profile.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg my-10">
