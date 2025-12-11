@@ -31,6 +31,8 @@ import AdminDashboardHome from "./pages/Dashboard/AdminDashboardHome";
 import AdminAnalytics from "./pages/Dashboard/AdminAnalytics";
 import MyBookingsPage from "./pages/Dashboard/MyBookingsPage";
 import UserProfile from "./pages/Dashboard/UserProfile";
+import UserDashboardHome from "./pages/Dashboard/UserDashboardHome";
+import PaymentHistory from "./pages/Dashboard/PaymentHistory";
 
 // Guards
 import PrivateRoute from "./routes/PrivateRoute";
@@ -61,9 +63,10 @@ function App() {
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
 
           {/* User Dashboard Routes */}
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/dashboard/my-bookings" element={<MyBookingsPage />} />
-          <Route path="/dashboard/profile" element={<UserProfile />} />
+          <Route path="/dashboard" element={<UserDashboard><UserDashboardHome /></UserDashboard>} />
+          <Route path="/dashboard/my-bookings" element={<UserDashboard><MyBookingsPage /></UserDashboard>} />
+          <Route path="/dashboard/profile" element={<UserDashboard><UserProfile /></UserDashboard>} />
+          <Route path="/dashboard/payment-history" element={<UserDashboard><PaymentHistory /></UserDashboard>} />
 
           {/* Decorator Routes */}
           <Route path="/dashboard/decorator" element={

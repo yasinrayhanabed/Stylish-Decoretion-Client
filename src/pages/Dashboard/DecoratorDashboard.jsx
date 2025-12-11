@@ -42,32 +42,67 @@ export default function DecoratorDashboard() {
       setLoading(true); 
       // Server endpoint to handle the status update
       const response = await API.put(`/bookings/${bookingId}`, { status: newStatus });
-      if (response.data.success) {
+      
+      if (response.data && (response.data.success || response.status === 200)) {
         toast.success(`Project status updated to: ${newStatus}`);
         setReloadTrigger((prev) => prev + 1); // Refetch data
       } else {
         toast.error("Failed to update status.");
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Status update failed due to server error.");
       console.error("Status update failed:", err);
+      
+      if (err.response?.status === 401) {
+        toast.error("Authentication failed. Please login again.");
+      } else if (err.response?.status === 403) {
+        toast.error("Access denied. You don't have permission to update this booking.");
+      } else if (err.response?.status === 404) {
+        toast.error("Booking not found.");
+      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+        toast.error("Network error. Please check server connection.");
+      } else {
+        toast.error(err.response?.data?.message || "Status update failed due to server error.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchAssignedBookings = () => { 
+    const fetchAssignedBookings = async () => { 
       setLoading(true);
-      // Fetch bookings assigned to the current logged-in decorator
-      API.get('/bookings/assigned-to-me') 
-        .then(r => setBookings(r.data || []))
-        .catch(err => {
-          console.error("Error fetching assigned bookings:", err);
-          toast.error("Failed to fetch assigned projects.");
+      try {
+        // Fetch bookings assigned to the current logged-in decorator
+        const response = await API.get('/bookings/assigned-to-me');
+        
+        // Check if response has data property
+        if (response.data && response.data.success) {
+          setBookings(response.data.data || []);
+        } else if (Array.isArray(response.data)) {
+          setBookings(response.data);
+        } else {
           setBookings([]);
-        })
-        .finally(() => setLoading(false));
+        }
+      } catch (err) {
+        console.error("Error fetching assigned bookings:", err);
+        
+        // More specific error messages
+        if (err.response?.status === 401) {
+          toast.error("Authentication failed. Please login again.");
+        } else if (err.response?.status === 403) {
+          toast.error("Access denied. Decorator role required.");
+        } else if (err.response?.status === 404) {
+          toast.error("API endpoint not found. Please check server configuration.");
+        } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+          toast.error("Network error. Please check if the server is running on http://localhost:5000");
+        } else {
+          toast.error(err.response?.data?.message || "Failed to fetch assigned projects.");
+        }
+        
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
     };
     
     // Fetch only if user is logged in AND is a decorator

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, MapPin, Save, Edit, X } from 'lucide-react'; // Importing icons from lucide-react
-import toast from 'react-hot-toast'; // Importing react-hot-toast
+import { motion } from 'framer-motion';
 import useAuth from '../../hooks/useAuth';
+import API from '../../api/axios';
+import { toast } from 'react-toastify';
 
 const UserProfilePage = () => {
     const { user, refetchUser } = useAuth();
@@ -34,11 +35,13 @@ const UserProfilePage = () => {
 
     const handleSave = async () => {
         try {
-            // TODO: Implement API call to update user profile
-            // await API.put('/users/profile', userData);
+            await API.put('/users/profile', {
+                name: userData.name,
+                phone: userData.phone,
+                address: userData.address
+            });
             toast.success('Profile updated successfully!');
             setIsEditing(false);
-            // Refetch user data to get updated info
             refetchUser();
         } catch (error) {
             console.error('Error updating profile:', error);
@@ -46,113 +49,154 @@ const UserProfilePage = () => {
         }
     };
 
-    // Show loading or no user message
     if (!user) {
         return (
-            <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg my-10">
-                <div className="text-center py-8">
-                    <User className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                    <h2 className="text-xl font-semibold text-gray-600 mb-2">No User Data Found</h2>
-                    <p className="text-gray-500">Please log in to view your profile.</p>
-                </div>
+            <div className="text-center py-16">
+                <div className="text-6xl mb-4">👤</div>
+                <h2 className="text-xl font-semibold mb-2">No User Data Found</h2>
+                <p className="text-base-content/70">Please log in to view your profile.</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg my-10">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center">
-                <User className="w-7 h-7 mr-3 text-indigo-600" /> User Profile
-            </h1>
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto"
+        >
+            <div className="card bg-base-100 shadow-xl">
+                <div className="card-body">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="card-title text-3xl">👤 My Profile</h2>
+                        {!isEditing && (
+                            <button 
+                                onClick={() => setIsEditing(true)}
+                                className="btn btn-primary btn-sm"
+                            >
+                                ✏️ Edit Profile
+                            </button>
+                        )}
+                    </div>
 
-            <div className="space-y-4">
-                {/* Name Field */}
-                <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                    <User className="w-5 h-5 text-gray-500" />
-                    <span className="font-medium text-gray-600 w-24">Name:</span>
                     {isEditing ? (
-                        <input 
-                            type="text" 
-                            value={userData.name} 
-                            onChange={(e) => setUserData({...userData, name: e.target.value})}
-                            className="flex-grow input input-bordered input-sm"
-                        />
+                        <div className="space-y-4">
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text">Name</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    value={userData.name}
+                                    onChange={(e) => setUserData({...userData, name: e.target.value})}
+                                    className="input input-bordered" 
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text">Email</span>
+                                </label>
+                                <input 
+                                    type="email" 
+                                    value={userData.email}
+                                    className="input input-bordered" 
+                                    disabled
+                                />
+                                <label className="label">
+                                    <span className="label-text-alt text-warning">Email cannot be changed</span>
+                                </label>
+                            </div>
+                            
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text">Phone</span>
+                                </label>
+                                <input 
+                                    type="tel" 
+                                    value={userData.phone}
+                                    onChange={(e) => setUserData({...userData, phone: e.target.value})}
+                                    className="input input-bordered" 
+                                />
+                            </div>
+                            
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text">Address</span>
+                                </label>
+                                <textarea 
+                                    value={userData.address}
+                                    onChange={(e) => setUserData({...userData, address: e.target.value})}
+                                    className="textarea textarea-bordered" 
+                                    rows="3"
+                                ></textarea>
+                            </div>
+                            
+                            <div className="flex gap-2 justify-end">
+                                <button 
+                                    onClick={() => setIsEditing(false)}
+                                    className="btn btn-ghost"
+                                >
+                                    ❌ Cancel
+                                </button>
+                                <button 
+                                    onClick={handleSave}
+                                    className="btn btn-primary"
+                                >
+                                    💾 Save Changes
+                                </button>
+                            </div>
+                        </div>
                     ) : (
-                        <span className="text-gray-900 flex-grow">{userData.name}</span>
-                    )}
-                </div>
-
-                {/* Email Field */}
-                <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                    <Mail className="w-5 h-5 text-gray-500" />
-                    <span className="font-medium text-gray-600 w-24">Email:</span>
-                    <span className="text-gray-900 flex-grow">{userData.email}</span>
-                </div>
-
-                {/* Phone Field */}
-                <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                    <Phone className="w-5 h-5 text-gray-500" />
-                    <span className="font-medium text-gray-600 w-24">Phone:</span>
-                    {isEditing ? (
-                        <input 
-                            type="tel" 
-                            value={userData.phone} 
-                            onChange={(e) => setUserData({...userData, phone: e.target.value})}
-                            className="flex-grow input input-bordered input-sm"
-                        />
-                    ) : (
-                        <span className="text-gray-900 flex-grow">{userData.phone}</span>
-                    )}
-                </div>
-
-                {/* Address Field */}
-                <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                    <MapPin className="w-5 h-5 text-gray-500" />
-                    <span className="font-medium text-gray-600 w-24">Address:</span>
-                    {isEditing ? (
-                        <input 
-                            type="text" 
-                            value={userData.address} 
-                            onChange={(e) => setUserData({...userData, address: e.target.value})}
-                            className="flex-grow input input-bordered input-sm"
-                        />
-                    ) : (
-                        <span className="text-gray-900 flex-grow">{userData.address}</span>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text font-semibold">Name</span>
+                                    </label>
+                                    <p className="text-lg">{userData.name || 'Not provided'}</p>
+                                </div>
+                                
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text font-semibold">Email</span>
+                                    </label>
+                                    <p className="text-lg">{userData.email || 'Not provided'}</p>
+                                </div>
+                                
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text font-semibold">Phone</span>
+                                    </label>
+                                    <p className="text-lg">{userData.phone || 'Not provided'}</p>
+                                </div>
+                                
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text font-semibold">Role</span>
+                                    </label>
+                                    <div className="badge badge-primary">{user?.role || 'user'}</div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label className="label">
+                                    <span className="label-text font-semibold">Address</span>
+                                </label>
+                                <p className="text-lg">{userData.address || 'Not provided'}</p>
+                            </div>
+                            
+                            <div className="divider"></div>
+                            
+                            <div className="text-sm text-base-content/70">
+                                <span className="font-semibold">Member Since:</span> {userData.memberSince}
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end mt-8 space-x-4">
-                {isEditing ? (
-                    <>
-                        <button 
-                            onClick={handleSave} 
-                            className="btn btn-success text-white flex items-center"
-                        >
-                            <Save className="w-5 h-5 mr-2" /> Save Changes
-                        </button>
-                        <button 
-                            onClick={() => setIsEditing(false)} 
-                            className="btn btn-ghost flex items-center"
-                        >
-                            <X className="w-5 h-5 mr-2" /> Cancel
-                        </button>
-                    </>
-                ) : (
-                    <button 
-                        onClick={() => setIsEditing(true)} 
-                        className="btn btn-primary text-white flex items-center"
-                    >
-                        <Edit className="w-5 h-5 mr-2" /> Edit Profile
-                    </button>
-                )}
-            </div>
-
-            <div className="mt-6 pt-4 border-t text-sm text-gray-500 text-right">
-                Member Since: {userData.memberSince}
-            </div>
-        </div>
+        </motion.div>
     );
 };
 

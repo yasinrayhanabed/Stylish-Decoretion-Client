@@ -64,7 +64,7 @@ export default function Navbar() {
                   <>
                     <li><Link to="/dashboard">My Dashboard</Link></li>
                     <li><Link to="/dashboard/my-bookings">My Bookings</Link></li>
-                    <li><Link to="/dashboard/profile">Profile</Link></li>
+                    <li><Link to="/dashboard/profile">My Profile</Link></li>
                   </>
                 )}
                 <div className="divider my-1"></div>

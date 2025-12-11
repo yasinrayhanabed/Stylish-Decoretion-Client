@@ -65,7 +65,17 @@ export default function ServiceDetails() {
 
       const res = await API.post("/bookings", booking);
       toast.success("Booking created successfully! Proceeding to payment.");
-      nav(`/payment/${res.data.bookingId}`);
+      
+      // Store booking data for payment page
+      localStorage.setItem('pendingBooking', JSON.stringify({
+        bookingId: res.data.bookingId || res.data._id,
+        serviceName: service.service_name,
+        amount: service.cost,
+        date: bookingData.date,
+        location: bookingData.location
+      }));
+      
+      nav('/payment');
     } catch (err) {
       console.error("Booking error:", err);
       toast.error(err.response?.data?.message || "Failed to create booking.");

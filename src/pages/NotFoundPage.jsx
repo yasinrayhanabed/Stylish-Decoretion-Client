@@ -1,16 +1,13 @@
-// src/pages/NotFoundPage.jsx
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const NotFoundPage = () => {
-  // একটি স্টাইল অবজেক্ট যা পেজটিকে মাঝখানে এবং সুন্দরভাবে দেখাতে সাহায্য করবে
   const containerStyle = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: '70vh', // ভিউপোর্ট হাইটের 70%
+    minHeight: '70vh', 
     textAlign: 'center',
     padding: '20px'
   };
@@ -18,7 +15,7 @@ const NotFoundPage = () => {
   const codeStyle = {
     fontSize: '6rem',
     fontWeight: 'bold',
-    color: '#dc3545', // বুটস্ট্র্যাপের মতো একটি লাল রং
+    color: '#dc3545', 
     marginBottom: '10px'
   };
 
@@ -30,12 +27,11 @@ const NotFoundPage = () => {
   return (
     <div style={containerStyle}>
       <p style={codeStyle}>404</p>
-      <h1 style={headingStyle}>পেজটি খুঁজে পাওয়া যায়নি!</h1>
+      <h1 style={headingStyle}>Page Not Found!</h1>
       <p style={{ fontSize: '1.1rem', marginBottom: '30px' }}>
-        আপনি যে ঠিকানাটি খুঁজছেন, তা হয় পরিবর্তন করা হয়েছে বা আর নেই।
+        This Page is not Available
       </p>
       
-      {/* Link to Homepage */}
       <Link 
         to="/" 
         style={{ 
@@ -49,7 +45,7 @@ const NotFoundPage = () => {
         onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
         onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
       >
-        হোমপেজে ফিরে যান
+        Back to Home
       </Link>
     </div>
   );

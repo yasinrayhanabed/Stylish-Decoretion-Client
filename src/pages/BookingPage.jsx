@@ -84,7 +84,15 @@ export default function BookingPage() {
       const res = await API.post("/bookings", bookingData);
       
       toast.success("Booking created successfully! Proceeding to payment.");
-      nav(`/payment/${res.data.bookingId}`); // Navigate to payment page
+      // Store booking data for payment page
+      localStorage.setItem('pendingBooking', JSON.stringify({
+        bookingId: res.data.bookingId || res.data._id,
+        serviceName: service.service_name,
+        amount: service.cost,
+        ...bookingData
+      }));
+      
+      nav('/payment'); // Navigate to payment page
 
     } catch (err) {
       console.error("Booking submission error:", err);

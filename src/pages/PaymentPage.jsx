@@ -111,33 +111,54 @@ export default function PaymentPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchBookingDetails = async () => {
-            if (!bookingId) {
-                setLoading(false);
-                toast.error("Booking ID not found in URL.");
-                return nav('/dashboard/my-bookings'); 
+        const loadBookingData = async () => {
+            // First try to get booking data from localStorage
+            const pendingBooking = localStorage.getItem('pendingBooking');
+            
+            if (pendingBooking) {
+                try {
+                    const bookingInfo = JSON.parse(pendingBooking);
+                    setBookingData({
+                        _id: bookingInfo.bookingId,
+                        cost: bookingInfo.amount,
+                        serviceName: bookingInfo.serviceName,
+                        date: bookingInfo.date,
+                        location: bookingInfo.location
+                    });
+                    setLoading(false);
+                    return;
+                } catch (err) {
+                    console.error('Failed to parse pending booking:', err);
+                }
             }
-            try {
-               
-                const res = await API.get(`/bookings/${bookingId}`); 
-                setBookingData(res.data);
-            } catch (error) {
-                console.error("Failed to fetch booking details:", error.response || error);
-                const errorMessage = error.response?.data?.message || "Failed to load booking details.";
-                toast.error(errorMessage);
-                setError(errorMessage);
-             
-                nav('/dashboard/my-bookings', { replace: true }); 
-            } finally {
-                setLoading(false);
+            
+            // Fallback: try URL parameter if available
+            if (bookingId) {
+                try {
+                    const res = await API.get(`/bookings/${bookingId}`); 
+                    setBookingData(res.data);
+                } catch (error) {
+                    console.error("Failed to fetch booking details:", error.response || error);
+                    const errorMessage = error.response?.data?.message || "Failed to load booking details.";
+                    toast.error(errorMessage);
+                    setError(errorMessage);
+                    nav('/dashboard/my-bookings', { replace: true }); 
+                }
+            } else {
+                // No booking data available
+                toast.error("No booking data found. Please select a booking to pay.");
+                nav('/dashboard/my-bookings', { replace: true });
             }
+            
+            setLoading(false);
         };
 
-        fetchBookingDetails();
+        loadBookingData();
     }, [bookingId, nav]);
 
     const handlePaymentSuccess = () => {
-        
+        // Clear the pending booking data
+        localStorage.removeItem('pendingBooking');
         nav('/dashboard/my-bookings', { replace: true }); 
     };
 
@@ -151,7 +172,7 @@ export default function PaymentPage() {
         <div className="max-w-md mx-auto py-10">
             <Elements stripe={stripePromise}>
                 <CheckoutForm 
-                    bookingId={bookingId} 
+                    bookingId={bookingData._id} 
                     amount={bookingData.cost} 
                     serviceName={bookingData.serviceName || "Selected Service"} 
                     onPaymentSuccess={handlePaymentSuccess}

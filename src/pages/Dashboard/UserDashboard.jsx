@@ -24,6 +24,13 @@ const DashboardSidebar = () => {
                     end
                     className={getNavLinkClass}
                 >
+                    <FaHome />
+                    <span>Dashboard</span>
+                </NavLink>
+                <NavLink 
+                    to="/dashboard/profile" 
+                    className={getNavLinkClass}
+                >
                     <FaUser />
                     <span>My Profile</span>
                 </NavLink>

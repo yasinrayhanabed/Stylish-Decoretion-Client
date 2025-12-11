@@ -1,21 +1,18 @@
-// src/pages/Dashboard/MyBookingsPage.jsx (FINAL FILE)
-
 import React, { useEffect, useState } from 'react';
-import { FaSpinner, FaCalendarCheck, FaTags, FaMapMarkerAlt, FaClock, FaDollarSign, FaTrash } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import API from '../../api/axios'; 
-import Swal from 'sweetalert2';
-import moment from 'moment';
+import Spinner from '../../components/Spinner';
 
 const getStatusColor = (status) => {
     switch (status) {
-        case 'Pending': return 'bg-yellow-100 text-yellow-800';
+        case 'Pending': return 'badge-warning';
         case 'Confirmed':
         case 'Planning Phase':
-        case 'Assigned': return 'bg-blue-100 text-blue-800';
-        case 'Completed': return 'bg-green-100 text-green-800';
-        case 'Canceled': return 'bg-red-100 text-red-800';
-        default: return 'bg-gray-100 text-gray-800';
+        case 'Assigned': return 'badge-info';
+        case 'Completed': return 'badge-success';
+        case 'Canceled': return 'badge-error';
+        default: return 'badge-ghost';
     }
 };
 
@@ -54,38 +51,23 @@ export default function MyBookingsPage() {
         }
     };
 
-    const handleDeleteBooking = async (id, status) => {
+    const handleCancelBooking = async (id, status) => {
         if (status !== 'Pending') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Cannot Cancel',
-                text: 'Only bookings with "Pending" status can be canceled.',
-                confirmButtonColor: '#3085d6',
-            });
+            toast.warning('Only bookings with "Pending" status can be canceled.');
             return;
         }
 
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this booking!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel it!'
-        });
+        if (!window.confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+            return;
+        }
 
-        if (result.isConfirmed) {
-            try {
-                // নিশ্চিত করুন: DELETE /api/bookings/:id রুটে কল করা হচ্ছে
-                await API.delete(`/bookings/${id}`); 
-                
-                setBookings(prev => prev.filter(b => b._id !== id)); 
-                Swal.fire('Canceled!', 'Your booking has been successfully canceled.', 'success');
-            } catch (err) {
-                console.error("Failed to delete booking:", err);
-                Swal.fire('Error!', 'Failed to cancel the booking. Please contact support.', 'error');
-            }
+        try {
+            await API.delete(`/bookings/${id}`);
+            setBookings(prev => prev.filter(b => b._id !== id));
+            toast.success('Booking canceled successfully!');
+        } catch (err) {
+            console.error('Failed to cancel booking:', err);
+            toast.error('Failed to cancel booking. Please try again.');
         }
     };
 
@@ -93,14 +75,7 @@ export default function MyBookingsPage() {
         fetchBookings();
     }, []);
 
-    if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center py-20 min-h-[50vh]">
-                <FaSpinner className="animate-spin text-5xl text-blue-500 mb-4" />
-                <p className="text-xl text-gray-700">Loading Your Bookings...</p>
-            </div>
-        );
-    }
+    if (loading) return <Spinner />;
 
     if (error) {
         return (
@@ -115,88 +90,139 @@ export default function MyBookingsPage() {
     }
 
     return (
-        <div className="p-4 md:p-8">
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-8 border-b pb-2 flex items-center space-x-3">
-                <FaCalendarCheck className="text-blue-600"/>
-                <span>My Service Bookings</span>
-            </h1>
-
-            {bookings.length === 0 && (
-                <div className="text-center bg-gray-50 p-10 rounded-lg border border-dashed border-gray-300">
-                    <p className="text-2xl text-gray-600 font-semibold mb-4">No Bookings Found</p>
-                    <p className="text-gray-500">It looks like you haven't booked any services yet. Start exploring our offerings!</p>
-                    <a href="/services" className="mt-6 inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
-                        Explore Services
-                    </a>
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 gap-6">
-                {bookings.map((booking) => (
-                    <div 
-                        key={booking._id} 
-                        className="bg-white p-6 border-l-4 shadow-lg rounded-lg transition duration-300 hover:shadow-xl"
-                        style={{ borderLeftColor: getStatusColor(booking.status).split(' ')[1].replace('text-', '#').replace('800', '600') }}
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <h2 className="text-2xl font-semibold text-gray-800 flex items-center space-x-2">
-                                <FaTags className="text-blue-500 text-xl"/>
-                                <span>{booking.serviceName || "Service Details Missing"}</span>
-                            </h2>
-                            <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(booking.status)}`}>
-                                {booking.status}
-                            </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600 border-t pt-4">
-                            <p className="flex items-center space-x-2">
-                                <FaClock className="text-indigo-500"/>
-                                <span className="font-medium">Date:</span>
-                                <span>{moment(booking.date).format('LL')}</span>
-                            </p>
-                            
-                            <p className="flex items-center space-x-2">
-                                <FaMapMarkerAlt className="text-indigo-500"/>
-                                <span className="font-medium">Location:</span>
-                                <span>{booking.location}</span>
-                            </p>
-                            
-                            <p className="flex items-center space-x-2">
-                                <FaDollarSign className="text-indigo-500"/>
-                                <span className="font-medium">Cost:</span>
-                                <span className="font-bold text-lg text-green-700">BDT {parseFloat(booking.cost).toFixed(2)}</span>
-                            </p>
-                            
-                            <p className="flex items-center space-x-2">
-                                <span className="font-medium text-gray-500">Booked On:</span>
-                                <span>{moment(booking.createdAt).format('MMM D, YY')}</span>
-                            </p>
-                        </div>
-                        
-                        <div className="mt-6 flex justify-end space-x-3 border-t pt-4">
-                            
-                            {(booking.paymentStatus === 'pending' || booking.status === 'Pending') && (
-                                <a 
-                                    href={`/payment/${booking._id}`}
-                                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
-                                >
-                                    Proceed to Pay
-                                </a>
-                            )}
-
-                            {booking.status === 'Pending' && (
-                                <button
-                                    onClick={() => handleDeleteBooking(booking._id, booking.status)}
-                                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center space-x-1"
-                                >
-                                    <FaTrash />
-                                    <span>Cancel Booking</span>
-                                </button>
-                            )}
-                        </div>
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mx-auto"
+        >
+            <div className="card bg-base-100 shadow-xl">
+                <div className="card-body">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="card-title text-3xl">📅 My Bookings</h2>
+                        <button 
+                            onClick={fetchBookings}
+                            className="btn btn-sm btn-outline"
+                            disabled={loading}
+                        >
+                            {loading ? 'Loading...' : '🔄 Refresh'}
+                        </button>
                     </div>
-                ))}
+                    
+                    {bookings.length === 0 ? (
+                        <div className="text-center py-16">
+                            <div className="text-6xl mb-4">📋</div>
+                            <p className="text-xl font-semibold mb-2">No bookings found</p>
+                            <p className="text-base-content/70 mb-4">You haven't booked any services yet</p>
+                            <a href="/services" className="btn btn-primary">
+                                Explore Services
+                            </a>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {bookings.map((booking, index) => (
+                                <motion.div
+                                    key={booking._id}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="card bg-base-200 shadow-md"
+                                >
+                                    <div className="card-body">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h3 className="card-title text-xl">{booking.serviceName}</h3>
+                                                <p className="text-base-content/70">{booking.serviceCategory}</p>
+                                            </div>
+                                            <div className={`badge ${getStatusColor(booking.status).replace('bg-', 'badge-').replace('-100', '').replace(' text-', ' badge-')}`}>
+                                                {booking.status}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                            <div>
+                                                <span className="font-semibold">📅 Date:</span>
+                                                <p>{new Date(booking.date).toLocaleDateString()}</p>
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold">📍 Location:</span>
+                                                <p>{booking.location}</p>
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold">💰 Cost:</span>
+                                                <p className="text-lg font-bold text-success">BDT {booking.cost}</p>
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold">💳 Payment:</span>
+                                                <p className={`font-semibold ${
+                                                    booking.paymentStatus === 'paid' ? 'text-success' : 'text-warning'
+                                                }`}>
+                                                    {booking.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold">📝 Booked:</span>
+                                                <p>{new Date(booking.createdAt).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="card-actions justify-end">
+                                            {(booking.paymentStatus !== 'paid' && booking.status !== 'Completed' && booking.status !== 'Canceled') && (
+                                                <button 
+                                                    onClick={() => {
+                                                        localStorage.setItem('pendingBooking', JSON.stringify({
+                                                            bookingId: booking._id,
+                                                            serviceName: booking.serviceName,
+                                                            amount: booking.cost,
+                                                            date: booking.date,
+                                                            location: booking.location
+                                                        }));
+                                                        window.location.href = '/payment';
+                                                    }}
+                                                    className="btn btn-success btn-sm"
+                                                >
+                                                    💳 Pay Now
+                                                </button>
+                                            )}
+                                            
+                                            {booking.status === 'Pending' && (
+                                                <button
+                                                    onClick={() => handleCancelBooking(booking._id, booking.status)}
+                                                    className="btn btn-error btn-sm"
+                                                >
+                                                    ❌ Cancel
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    {bookings.length > 0 && (
+                        <div className="mt-6 p-4 bg-base-300 rounded-lg">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                                <div>
+                                    <div className="text-2xl font-bold text-primary">{bookings.length}</div>
+                                    <div className="text-sm opacity-70">Total Bookings</div>
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-success">
+                                        {bookings.filter(b => b.status === 'Completed').length}
+                                    </div>
+                                    <div className="text-sm opacity-70">Completed</div>
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-warning">
+                                        {bookings.filter(b => b.status === 'Pending').length}
+                                    </div>
+                                    <div className="text-sm opacity-70">Pending</div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
