@@ -10,11 +10,14 @@ export default function AdminManageDecorators() {
   useEffect(() => {
     const fetchDecorators = async () => {
       try {
-        const res = await API.get("/admin/decorators");
-        setDecorators(res.data);
+        const res = await API.get("/users");
+        const allUsers = Array.isArray(res.data) ? res.data : [];
+        const decoratorUsers = allUsers.filter(user => user.role === 'decorator');
+        setDecorators(decoratorUsers);
         setLoading(false);
       } catch (err) {
-        setError("Failed to fetch decorators data.");
+        console.error("Failed to fetch decorators:", err);
+        setDecorators([]);
         setLoading(false);
       }
     };
@@ -24,7 +27,7 @@ export default function AdminManageDecorators() {
   const handleToggleStatus = async (id, currentStatus) => {
     const newStatus = !currentStatus;
     try {
-      await API.put(`/admin/decorators/${id}/status`, { isActive: newStatus });
+      await API.put(`/users/${id}/role`, { role: newStatus ? 'decorator' : 'user' });
       setDecorators((prev) =>
         prev.map((d) => (d._id === id ? { ...d, isActive: newStatus } : d))
       );
@@ -55,24 +58,16 @@ export default function AdminManageDecorators() {
                 <td className="text-gray-600">{decorator.name}</td>
                 <td className="text-gray-600">{decorator.email}</td>
                 <td>
-                  <span
-                    className={`badge ${
-                      decorator.isActive ? "badge-success" : "badge-error"
-                    }`}
-                  >
-                    {decorator.isActive ? "Active" : "Disabled"}
+                  <span className="badge badge-success">
+                    Active
                   </span>
                 </td>
                 <td>
                   <button
-                    onClick={() =>
-                      handleToggleStatus(decorator._id, decorator.isActive)
-                    }
-                    className={`btn btn-sm ${
-                      decorator.isActive ? "btn-warning" : "btn-success"
-                    }`}
+                    onClick={() => handleToggleStatus(decorator._id, true)}
+                    className="btn btn-sm btn-warning"
                   >
-                    {decorator.isActive ? "Disable" : "Approve"}
+                    Remove Decorator
                   </button>
                 </td>
               </tr>

@@ -15,6 +15,7 @@ import ServiceCoverageMap from "./pages/ServiceCoverageMap";
 
 // Booking and Payment Pages
 import BookingPage from "./pages/BookingPage";
+import { Outlet } from "react-router-dom";
 import CheckoutPage from "./pages/CheckoutPage";
 import PaymentPage from "./pages/PaymentPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
@@ -25,6 +26,7 @@ import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 import UserDashboard from "./pages/Dashboard/UserDashboard";
 import AddService from "./pages/Dashboard/AddService";
 import AdminManageUsers from "./pages/Dashboard/AdminManageUsers";
+import AdminManageServices from "./pages/Dashboard/AdminManageServices";
 import AdminManageDecorators from "./pages/Dashboard/AdminManageDecorators";
 import AdminManageBookings from "./pages/Dashboard/AdminManageBookings";
 import AdminDashboardHome from "./pages/Dashboard/AdminDashboardHome";
@@ -80,37 +82,15 @@ function App() {
             <RoleGuard allowedRoles={['admin']}>
               <AdminDashboard />
             </RoleGuard>
-          } /> 
-          <Route path="/dashboard/admin/home" element={
-            <RoleGuard allowedRoles={['admin']}>
-              <AdminDashboardHome />
-            </RoleGuard>
-          } />
-          <Route path="/dashboard/admin/add-service" element={
-            <RoleGuard allowedRoles={['admin']}>
-              <AddService />
-            </RoleGuard>
-          } />
-          <Route path="/dashboard/admin/manage-users" element={
-            <RoleGuard allowedRoles={['admin']}>
-              <AdminManageUsers />
-            </RoleGuard>
-          } />
-          <Route path="/dashboard/admin/manage-decorators" element={
-            <RoleGuard allowedRoles={['admin']}>
-              <AdminManageDecorators />
-            </RoleGuard>
-          } />
-          <Route path="/dashboard/admin/manage-bookings" element={
-            <RoleGuard allowedRoles={['admin']}>
-              <AdminManageBookings />
-            </RoleGuard>
-          } />
-          <Route path="/dashboard/admin/analytics" element={
-            <RoleGuard allowedRoles={['admin']}>
-              <AdminAnalytics />
-            </RoleGuard>
-          } />
+          }>
+            <Route index element={<AdminDashboardHome />} />
+            <Route path="add-service" element={<AddService />} />
+            <Route path="manage-users" element={<AdminManageUsers />} />
+            <Route path="manage-services" element={<AdminManageServices />} />
+            <Route path="manage-decorators" element={<AdminManageDecorators />} />
+            <Route path="manage-bookings" element={<AdminManageBookings />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+          </Route>
           
         </Route>
         {/* Protected Routes End */}

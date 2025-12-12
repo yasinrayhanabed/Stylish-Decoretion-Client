@@ -6,6 +6,7 @@ import Forbidden from "../../components/Forbidden";
 import BookingErrorBoundary from "../../components/BookingErrorBoundary";
 import { toast } from "react-toastify";
 import { formatBookingId, sanitizeBookingData, validateBookingData } from "../../utils/bookingUtils";
+import { FaPalette, FaClipboardList, FaBolt, FaCheckCircle, FaUser, FaCalendar, FaIdCard, FaSleigh, FaBullseye } from "react-icons/fa";
 
 const PROJECT_STATUSES = [
   "Assigned", 
@@ -89,11 +90,6 @@ export default function DecoratorDashboard() {
         
         // Sanitize and validate booking data
         const sanitizedBookings = bookingsData.map((booking, index) => {
-          const validation = validateBookingData(booking);
-          if (!validation.isValid) {
-            console.warn(`Booking validation failed for index ${index}:`, validation.errors);
-            toast.warn(`Booking data issue: ${validation.errors.join(', ')}`);
-          }
           return sanitizeBookingData(booking, index);
         });
         
@@ -140,13 +136,13 @@ export default function DecoratorDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-              Welcome, Decorator {user.name}! 🎨
+              <FaPalette className="inline mr-2" /> Welcome, Decorator {user.name}!
             </h1>
             <p className="text-gray-600 text-lg">Manage your projects and create beautiful decorations</p>
           </div>
           <div className="hidden md:block">
             <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-3xl text-white">🎭</span>
+              <FaPalette className="text-3xl text-white" />
             </div>
           </div>
         </div>
@@ -163,7 +159,7 @@ export default function DecoratorDashboard() {
               <div className="text-sm text-purple-500 font-medium">Total Projects</div>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-              <span className="text-2xl">📋</span>
+              <FaClipboardList className="text-2xl" />
             </div>
           </div>
         </div>
@@ -176,7 +172,7 @@ export default function DecoratorDashboard() {
               <div className="text-sm text-orange-500 font-medium">Ongoing Work</div>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-              <span className="text-2xl">⚡</span>
+              <FaBolt className="text-2xl" />
             </div>
           </div>
         </div>
@@ -189,7 +185,7 @@ export default function DecoratorDashboard() {
               <div className="text-sm text-green-500 font-medium">Completed Projects</div>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
-              <span className="text-2xl">✅</span>
+              <FaCheckCircle className="text-2xl" />
             </div>
           </div>
         </div>
@@ -200,7 +196,7 @@ export default function DecoratorDashboard() {
       <div className="bg-white rounded-2xl shadow-xl p-8">
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            My Projects 🎯
+            <FaBullseye className="inline mr-2" /> My Projects
           </h3>
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <span className="w-3 h-3 bg-green-500 rounded-full"></span>
@@ -211,7 +207,7 @@ export default function DecoratorDashboard() {
         {bookings.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-4xl">😴</span>
+              <FaSleigh className="text-4xl" />
             </div>
             <h4 className="text-xl font-semibold text-gray-700 mb-2">No Projects!</h4>
             <p className="text-gray-500">Currently no projects are assigned to you. Take a rest!</p>
@@ -231,15 +227,15 @@ export default function DecoratorDashboard() {
                     </h4>
                     <div className="text-sm text-gray-500 space-y-1">
                       <div className="flex items-center">
-                        <span className="mr-2">👤</span>
+                        <FaUser className="mr-2" />
                         <span>Client: {b.userName || 'Unknown User'}</span>
                       </div>
                       <div className="flex items-center">
-                        <span className="mr-2">📅</span>
+                        <FaCalendar className="mr-2" />
                         <span>Date: {new Date(b.date).toLocaleDateString('en-US')}</span>
                       </div>
                       <div className="flex items-center">
-                        <span className="mr-2">🆔</span>
+                        <FaIdCard className="mr-2" />
                         <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                           {formatBookingId(b._id, index)}
                         </span>

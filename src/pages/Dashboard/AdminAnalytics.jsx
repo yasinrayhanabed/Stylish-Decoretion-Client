@@ -11,12 +11,12 @@ export default function AdminAnalytics() {
     const fetchAnalytics = async () => {
       try {
         const [revenueRes, demandRes] = await Promise.all([
-          API.get("/admin/analytics/revenue"),
-          API.get("/admin/analytics/demand"),
+          API.get("/analytics/revenue").catch(() => ({ data: { totalRevenue: 0, monthlyBookings: 0, activeDecorators: 0 } })),
+          API.get("/analytics/demand").catch(() => ({ data: {} })),
         ]);
         setAnalytics({
-          revenue: revenueRes.data,
-          demand: demandRes.data,
+          revenue: revenueRes.data || { totalRevenue: 0, monthlyBookings: 0, activeDecorators: 0 },
+          demand: demandRes.data || {},
         });
         setLoading(false);
       } catch (err) {

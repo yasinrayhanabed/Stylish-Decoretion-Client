@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom'; 
+import { FaHome, FaUsers, FaPalette, FaUserTie, FaCalendarAlt, FaChartBar, FaCrown } from "react-icons/fa";
 
 // Removed getNavLinkClass as we're using inline styles now
 
@@ -7,18 +8,18 @@ import { NavLink, Outlet } from 'react-router-dom';
 export default function AdminDashboard() {
 
   return (
-    <div className="flex h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="flex h-screen w-full bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-72 bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-800 p-6 shadow-2xl flex-shrink-0 fixed h-full overflow-y-auto"> 
+      <aside className="w-72 bg-gray-800 p-6 shadow-lg flex-shrink-0"> 
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-              <span className="text-xl font-bold text-white">👑</span>
+            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+              <FaCrown className="text-xl font-bold text-white" />
             </div>
             <h2 className="text-2xl font-bold text-white">Admin Panel</h2>
           </div>
-          <div className="w-full h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"></div>
+          <div className="w-full h-1 bg-blue-600 rounded-full"></div>
         </div>
      
         <nav className="space-y-2">
@@ -27,14 +28,14 @@ export default function AdminDashboard() {
                 to="/dashboard/admin" 
                 end 
                 className={({ isActive }) => 
-                    `flex items-center space-x-3 w-full py-3 px-4 rounded-xl transition-all duration-200 ${
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
                         isActive 
-                            ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105" 
-                            : "text-gray-300 hover:text-white hover:bg-white/10 hover:transform hover:scale-105"
+                            ? "bg-blue-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
                     }`
                 }
             >
-                <span className="text-xl">🏠</span>
+                <span className="text-xl"><FaHome /></span>
                 <span className="font-medium">Dashboard Home</span>
             </NavLink>
            
@@ -47,56 +48,56 @@ export default function AdminDashboard() {
             <NavLink 
                 to="manage-users" 
                 className={({ isActive }) => 
-                    `flex items-center space-x-3 w-full py-3 px-4 rounded-xl transition-all duration-200 ${
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
                         isActive 
-                            ? "bg-gradient-to-r from-green-500 to-teal-600 text-white shadow-lg transform scale-105" 
-                            : "text-gray-300 hover:text-white hover:bg-white/10 hover:transform hover:scale-105"
+                            ? "bg-green-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
                     }`
                 }
             >
-                <span className="text-xl">👥</span>
+                <FaUsers className="text-xl" />
                 <span className="font-medium">User Management</span>
             </NavLink>
 
             <NavLink 
                 to="manage-services" 
                 className={({ isActive }) => 
-                    `flex items-center space-x-3 w-full py-3 px-4 rounded-xl transition-all duration-200 ${
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
                         isActive 
-                            ? "bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg transform scale-105" 
-                            : "text-gray-300 hover:text-white hover:bg-white/10 hover:transform hover:scale-105"
+                            ? "bg-pink-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
                     }`
                 }
             >
-                <span className="text-xl">🎨</span>
+                <FaPalette className="text-xl" />
                 <span className="font-medium">Services & Packages</span>
             </NavLink>
 
             <NavLink 
                 to="manage-decorators" 
                 className={({ isActive }) => 
-                    `flex items-center space-x-3 w-full py-3 px-4 rounded-xl transition-all duration-200 ${
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
                         isActive 
-                            ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg transform scale-105" 
-                            : "text-gray-300 hover:text-white hover:bg-white/10 hover:transform hover:scale-105"
+                            ? "bg-orange-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
                     }`
                 }
             >
-                <span className="text-xl">🎭</span>
+                <FaUserTie className="text-xl" />
                 <span className="font-medium">Decorator Management</span>
             </NavLink>
 
             <NavLink 
                 to="manage-bookings" 
                 className={({ isActive }) => 
-                    `flex items-center space-x-3 w-full py-3 px-4 rounded-xl transition-all duration-200 ${
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
                         isActive 
-                            ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg transform scale-105" 
-                            : "text-gray-300 hover:text-white hover:bg-white/10 hover:transform hover:scale-105"
+                            ? "bg-cyan-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
                     }`
                 }
             >
-                <span className="text-xl">📋</span>
+                <FaCalendarAlt className="text-xl" />
                 <span className="font-medium">Booking Management</span>
             </NavLink>
 
@@ -109,29 +110,23 @@ export default function AdminDashboard() {
             <NavLink 
                 to="analytics" 
                 className={({ isActive }) => 
-                    `flex items-center space-x-3 w-full py-3 px-4 rounded-xl transition-all duration-200 ${
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
                         isActive 
-                            ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg transform scale-105" 
-                            : "text-gray-300 hover:text-white hover:bg-white/10 hover:transform hover:scale-105"
+                            ? "bg-purple-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
                     }`
                 }
             >
-                <span className="text-xl">📊</span>
+                <FaChartBar className="text-xl" />
                 <span className="font-medium">Analytics & Revenue</span>
             </NavLink>
         </nav>
 
-        {/* Footer */}
-        <div className="absolute bottom-6 left-6 right-6">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-            <p className="text-xs text-gray-300">Stylish Decoration</p>
-            <p className="text-xs text-gray-400">Admin Panel v1.0</p>
-          </div>
-        </div>
+        
       </aside>
 
       {/* Main Content */}
-      <main className="flex-grow bg-white/50 backdrop-blur-sm overflow-y-auto ml-72">
+      <main className="flex-grow bg-white overflow-y-auto">
         <div className="p-8">
           <Outlet />
         </div>

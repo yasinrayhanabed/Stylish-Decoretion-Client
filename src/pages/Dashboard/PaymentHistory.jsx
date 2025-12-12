@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import API from '../../api/axios';
 import { toast } from 'react-toastify';
 import Spinner from '../../components/Spinner';
+import { FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 
 export default function PaymentHistory() {
   const [payments, setPayments] = useState([]);
@@ -90,11 +91,11 @@ export default function PaymentHistory() {
     >
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
-          <h2 className="card-title text-3xl mb-6">💳 Payment History</h2>
+          <h2 className="card-title text-3xl mb-6"><FaCreditCard className="mr-2" /> Payment History</h2>
           
           {payments.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-6xl mb-4">💸</div>
+              <div className="text-6xl mb-4"><FaMoneyBillWave /></div>
               <p className="text-xl font-semibold">No payment history found</p>
               <p className="text-base-content/70 mt-2">Your payment transactions will appear here</p>
             </div>

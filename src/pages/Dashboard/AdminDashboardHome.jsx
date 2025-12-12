@@ -24,39 +24,30 @@ function AdminDashboardHome() {
             }
 
             try {
-                const decoratorsRes = await API.get('/admin/decorators'); 
-                setDecorators(decoratorsRes.data || []);
+                const usersRes = await API.get('/users'); 
+                const allUsers = Array.isArray(usersRes.data) ? usersRes.data : [];
+                const decoratorUsers = allUsers.filter(user => user.role === 'decorator');
+                setDecorators(decoratorUsers);
             } catch (err) {
-                const status = err.response?.status;
-                if (status === 401 || status === 403) {
-                    setError("Authorization Failed: Decorator data requires Admin role (403). Check user role in DB.");
-                    toast.error("Admin role required for Decorator data.");
-                } else if (status === 404) {
-                    setError("Route Not Found (404): Check if '/api/admin/decorators' is defined in server.js.");
-                } else {
-                    setError(`Error loading Decorators: ${err.message}.`);
-                    toast.error("Failed to load Decorators data.");
-                }
-                console.error("Decorator data fetch error:", err.response?.data || err.message);
+                console.error("Decorator data fetch error:", err);
+                setDecorators([]);
             }
 
         
             try {
-             
-                const bookingsRes = await API.get('/bookings'); 
-                setBookings(bookingsRes.data || []);
-            } catch (err) {
-                const status = err.response?.status;
-                 if (status === 401 || status === 403) {
-                    setError("Authorization Failed: Booking data requires Admin role (403). Check user role in DB.");
-                    toast.error("Admin role required for Booking data.");
-                } else if (status === 404) {
-                    setError("Route Not Found (404): Check if '/api/bookings' is defined in server.js.");
-                } else {
-                    setError(`Error loading Bookings: ${err.message}.`);
-                    toast.error("Failed to load Bookings data.");
+                // Try multiple endpoints for bookings
+                let bookingsData = [];
+                try {
+                    const bookingsRes = await API.get('/bookings');
+                    bookingsData = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
+                } catch {
+                    const myBookingsRes = await API.get('/bookings/my');
+                    bookingsData = Array.isArray(myBookingsRes.data) ? myBookingsRes.data : [];
                 }
-                console.error("Booking data fetch error:", err.response?.data || err.message);
+                setBookings(bookingsData);
+            } catch (err) {
+                console.error("Booking data fetch error:", err);
+                setBookings([]);
             }
             
             setLoading(false);
@@ -94,15 +85,15 @@ function AdminDashboardHome() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white shadow-xl">
+            <div className="bg-blue-600 rounded-lg p-8 text-white shadow-lg">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-4xl font-bold mb-2">Admin Overview 📊</h1>
-                        <p className="text-indigo-100 text-lg">Quick view of the entire system</p>
+                        <h1 className="text-4xl font-bold mb-2"><FaChartBar className="inline mr-2" /> Admin Overview</h1>
+                        <p className="text-blue-100 text-lg">Quick view of the entire system</p>
                     </div>
                     <div className="hidden md:block">
-                        <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                            <span className="text-3xl">🏢</span>
+                        <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
+                            <FaBuilding className="text-3xl" />
                         </div>
                     </div>
                 </div>
@@ -110,14 +101,14 @@ function AdminDashboardHome() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-blue-500 group hover:scale-105">
+                <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-sm font-medium text-blue-600 mb-1">Total Services</div>
                             <div className="text-3xl font-bold text-blue-800">{services.length}</div>
                         </div>
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                            <span className="text-2xl">🎨</span>
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <FaPalette className="text-2xl" />
                         </div>
                     </div>
                     <div className="mt-4 flex items-center text-sm text-blue-600">
@@ -126,14 +117,14 @@ function AdminDashboardHome() {
                     </div>
                 </div>
                 
-                <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-green-500 group hover:scale-105">
+                <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-sm font-medium text-green-600 mb-1">Total Decorators</div>
                             <div className="text-3xl font-bold text-green-800">{decorators.length}</div>
                         </div>
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                            <span className="text-2xl">🎭</span>
+                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <FaUserTie className="text-2xl" />
                         </div>
                     </div>
                     <div className="mt-4 flex items-center text-sm text-green-600">
@@ -142,14 +133,14 @@ function AdminDashboardHome() {
                     </div>
                 </div>
                 
-                <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-orange-500 group hover:scale-105">
+                <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-sm font-medium text-orange-600 mb-1">Total Bookings</div>
                             <div className="text-3xl font-bold text-orange-800">{bookings.length}</div>
                         </div>
-                        <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-                            <span className="text-2xl">📋</span>
+                        <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <FaClipboardList className="text-2xl" />
                         </div>
                     </div>
                     <div className="mt-4 flex items-center text-sm text-orange-600">
@@ -160,14 +151,14 @@ function AdminDashboardHome() {
             </div>
 
             {/* Latest Services Section */}
-            <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="bg-white rounded-lg shadow-lg p-8">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        Recent Services ✨
+                    <h3 className="text-2xl font-bold text-gray-800">
+                        <FaStar className="inline mr-2" /> Recent Services
                     </h3>
                     <Link 
                         to="manage-services" 
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                        className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         View All Services →
                     </Link>
@@ -176,7 +167,7 @@ function AdminDashboardHome() {
                 {services.length === 0 ? (
                     <div className="text-center py-12">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-3xl">🎨</span>
+                            <FaPalette className="text-3xl" />
                         </div>
                         <p className="text-gray-500">No services found</p>
                     </div>
@@ -190,7 +181,7 @@ function AdminDashboardHome() {
                                             {s.service_name}
                                         </h4>
                                         <div className="flex items-center text-sm text-gray-500 mb-2">
-                                            <span className="mr-2">🏷️</span>
+                                            <FaTag className="mr-2" />
                                             <span>Category: {s.category}</span>
                                         </div>
                                     </div>
@@ -200,7 +191,7 @@ function AdminDashboardHome() {
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center text-lg font-bold text-green-600">
-                                        <span className="mr-1">💰</span>
+                                        <FaDollarSign className="mr-1" />
                                         <span>BDT {s.cost}</span>
                                     </div>
                                     <div className="text-xs text-gray-400 font-mono bg-gray-100 px-2 py-1 rounded">

@@ -3,6 +3,7 @@ import API from "../../api/axios";
 import Spinner from "../../components/Spinner";
 import { formatBookingId, sanitizeBookingData, validateBookingData } from "../../utils/bookingUtils";
 import { toast } from "react-toastify";
+import { FaClipboardList, FaTrendingUp, FaClipboard } from "react-icons/fa";
 
 export default function AdminManageBookings() {
   const [bookings, setBookings] = useState([]);
@@ -12,24 +13,20 @@ export default function AdminManageBookings() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [bookingsRes, decoratorsRes] = await Promise.all([
-          API.get("/admin/bookings"),
-          API.get("/admin/decorators"),
+        const [bookingsRes, usersRes] = await Promise.all([
+          API.get("/bookings").catch(() => API.get("/bookings/my")),
+          API.get("/users"),
         ]);
         
         // Sanitize and validate booking data
         const bookingsData = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
         const sanitizedBookings = bookingsData.map((booking, index) => {
-          const validation = validateBookingData(booking);
-          if (!validation.isValid) {
-            console.warn(`Booking validation failed for index ${index}:`, validation.errors);
-            toast.warn(`Booking data issue: ${validation.errors.join(', ')}`);
-          }
           return sanitizeBookingData(booking, index);
         });
         
         setBookings(sanitizedBookings);
-        setDecorators(decoratorsRes.data.filter(d => d.isActive)); // Only Active Decorators
+        const allUsers = Array.isArray(usersRes.data) ? usersRes.data : [];
+        setDecorators(allUsers.filter(user => user.role === 'decorator'));
         setLoading(false);
       } catch (err) {
         console.error("Failed to fetch data:", err);
@@ -41,7 +38,7 @@ export default function AdminManageBookings() {
 
   const handleAssignDecorator = async (bookingId, decoratorId) => {
     try {
-      await API.put(`/admin/bookings/${bookingId}/assign`, { decoratorId });
+      await API.put(`/bookings/${bookingId}/assign`, { decoratorId });
       setBookings((prev) =>
         prev.map((b) =>
           b._id === bookingId
@@ -69,12 +66,12 @@ export default function AdminManageBookings() {
       <div className="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 rounded-2xl p-8 text-white shadow-xl">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-4xl font-bold mb-2">Booking Management 📋</h2>
+            <h2 className="text-4xl font-bold mb-2"><FaClipboardList className="inline mr-2" /> Booking Management</h2>
             <p className="text-cyan-100 text-lg">All customer orders and decorator assignments</p>
           </div>
           <div className="hidden md:block">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <span className="text-2xl">📈</span>
+              <FaTrendingUp className="text-2xl" />
             </div>
           </div>
         </div>
@@ -97,7 +94,7 @@ export default function AdminManageBookings() {
         {bookings.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📋</span>
+              <FaClipboard className="text-3xl" />
             </div>
             <h4 className="text-xl font-semibold text-gray-700 mb-2">No Bookings!</h4>
             <p className="text-gray-500">No customers have made bookings yet</p>

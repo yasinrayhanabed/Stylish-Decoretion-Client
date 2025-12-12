@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import API from '../../api/axios'; 
 import Spinner from '../../components/Spinner';
+import { FaCalendarAlt, FaSync, FaClipboardList, FaPalette, FaMapMarkerAlt, FaDollarSign, FaCreditCard, FaCalendar, FaTimes } from 'react-icons/fa';
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -98,19 +99,19 @@ export default function MyBookingsPage() {
             <div className="card bg-base-100 shadow-xl">
                 <div className="card-body">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="card-title text-3xl">📅 My Bookings</h2>
+                        <h2 className="card-title text-3xl"><FaCalendarAlt className="mr-2" /> My Bookings</h2>
                         <button 
                             onClick={fetchBookings}
                             className="btn btn-sm btn-outline"
                             disabled={loading}
                         >
-                            {loading ? 'Loading...' : '🔄 Refresh'}
+                            {loading ? 'Loading...' : <><FaSync className="mr-1" /> Refresh</>}
                         </button>
                     </div>
                     
                     {bookings.length === 0 ? (
                         <div className="text-center py-16">
-                            <div className="text-6xl mb-4">📋</div>
+                            <div className="text-6xl mb-4"><FaClipboardList /></div>
                             <p className="text-xl font-semibold mb-2">No bookings found</p>
                             <p className="text-base-content/70 mb-4">You haven't booked any services yet</p>
                             <a href="/services" className="btn btn-primary">
@@ -140,19 +141,19 @@ export default function MyBookingsPage() {
                                         
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                             <div>
-                                                <span className="font-semibold">📅 Date:</span>
+                                                <span className="font-semibold"><FaCalendar className="inline mr-1" /> Date:</span>
                                                 <p>{new Date(booking.date).toLocaleDateString()}</p>
                                             </div>
                                             <div>
-                                                <span className="font-semibold">📍 Location:</span>
+                                                <span className="font-semibold"><FaMapMarkerAlt className="inline mr-1" /> Location:</span>
                                                 <p>{booking.location}</p>
                                             </div>
                                             <div>
-                                                <span className="font-semibold">💰 Cost:</span>
+                                                <span className="font-semibold"><FaDollarSign className="inline mr-1" /> Cost:</span>
                                                 <p className="text-lg font-bold text-success">BDT {booking.cost}</p>
                                             </div>
                                             <div>
-                                                <span className="font-semibold">💳 Payment:</span>
+                                                <span className="font-semibold"><FaCreditCard className="inline mr-1" /> Payment:</span>
                                                 <p className={`font-semibold ${
                                                     booking.paymentStatus === 'completed' ? 'text-success' : 'text-warning'
                                                 }`}>
@@ -160,7 +161,7 @@ export default function MyBookingsPage() {
                                                 </p>
                                             </div>
                                             <div>
-                                                <span className="font-semibold">📝 Booked:</span>
+                                                <span className="font-semibold"><FaCalendar className="inline mr-1" /> Booked:</span>
                                                 <p>{new Date(booking.createdAt).toLocaleDateString()}</p>
                                             </div>
                                         </div>
@@ -180,7 +181,7 @@ export default function MyBookingsPage() {
                                                     }}
                                                     className="btn btn-success btn-sm"
                                                 >
-                                                    💳 Pay Now
+                                                    <FaCreditCard className="mr-1" /> Pay Now
                                                 </button>
                                             )}
                                             
@@ -189,7 +190,7 @@ export default function MyBookingsPage() {
                                                     onClick={() => handleCancelBooking(booking._id, booking.status)}
                                                     className="btn btn-error btn-sm"
                                                 >
-                                                    ❌ Cancel
+                                                    <FaTimes className="mr-1" /> Cancel
                                                 </button>
                                             )}
                                         </div>

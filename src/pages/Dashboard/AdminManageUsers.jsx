@@ -12,11 +12,7 @@ export default function AdminManageUsers() {
  const [loading, setLoading] = useState(false);
  const [changing, setChanging] = useState(false);
 
- // 💡 Check for Admin Role
- if (user && user.role !== 'admin') {
- // If user is logged in but not admin, show Forbidden (403)
- return <Forbidden roleRequired="Admin" />;
- }
+
 
  const fetchUsers = async () => {
  setLoading(true);
@@ -27,11 +23,7 @@ const res = await API.get("/users");
 } catch (err) {
  console.error("Failed to fetch users:", err);
  // A 403 error might occur if the server-side role check fails
-if (err.response?.status === 403) {
- toast.error("Access Denied: Only Admins can manage users.");
- } else {
- toast.error("Failed to load users");
- }
+toast.error("Failed to load users");
  setUsers([]);
  } finally {
  setLoading(false);
@@ -39,9 +31,7 @@ if (err.response?.status === 403) {
  };
 
  useEffect(() => {
- if (user && user.role === 'admin') { // Only fetch if admin
  fetchUsers();
- }
  }, [user]); // user state change-এ ফ্লো ট্রিগার হবে
 
  const updateRole = async (id, role) => {

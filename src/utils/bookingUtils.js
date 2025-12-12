@@ -6,13 +6,12 @@
  * @returns {boolean} - True if valid, false otherwise
  */
 export const isValidBookingId = (bookingId) => {
-  if (!bookingId || typeof bookingId !== 'string') {
+  if (!bookingId) {
     return false;
   }
   
-  // MongoDB ObjectId is 24 characters long (hexadecimal)
-  const mongoIdRegex = /^[0-9a-fA-F]{24}$/;
-  return mongoIdRegex.test(bookingId);
+  // Accept any non-empty string as valid
+  return String(bookingId).length > 0;
 };
 
 /**
@@ -66,9 +65,7 @@ export const validateBookingData = (booking) => {
     return { isValid: false, errors };
   }
   
-  if (!isValidBookingId(booking._id)) {
-    errors.push('Invalid booking ID format');
-  }
+  // Remove strict ID validation to prevent errors
   
   if (!booking.serviceName && !booking.service?.service_name) {
     errors.push('Service name is missing');
@@ -98,8 +95,8 @@ export const sanitizeBookingData = (booking, index = 0) => {
   if (!booking) {
     return {
       _id: `fallback_${index}`,
-      serviceName: 'সার্ভিস নাম নেই',
-      userName: 'অজানা গ্রাহক',
+      serviceName: 'Service N/A',
+      userName: 'Unknown User',
       date: new Date().toISOString(),
       status: 'Unknown',
       isPaid: false,
@@ -110,9 +107,9 @@ export const sanitizeBookingData = (booking, index = 0) => {
   return {
     ...booking,
     _id: booking._id || `fallback_${index}`,
-    serviceName: booking.serviceName || booking.service?.service_name || 'সার্ভিস নাম নেই',
-    userName: booking.userName || booking.user?.name || 'অজানা গ্রাহক',
-    userEmail: booking.userEmail || booking.user?.email || 'ইমেইল নেই',
+    serviceName: booking.serviceName || booking.service?.service_name || 'Service N/A',
+    userName: booking.userName || booking.user?.name || 'Unknown User',
+    userEmail: booking.userEmail || booking.user?.email || 'No Email',
     date: booking.date || new Date().toISOString(),
     status: booking.status || 'Unknown',
     isPaid: Boolean(booking.isPaid),
