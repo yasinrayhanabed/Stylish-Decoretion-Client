@@ -72,9 +72,9 @@ const UserProfilePage = () => {
                         {!isEditing && (
                             <button 
                                 onClick={() => setIsEditing(true)}
-                                className="btn btn-primary btn-sm"
+                                className="btn btn-primary"
                             >
-                                ✏️ Edit Profile
+                                ✏️ Update Profile
                             </button>
                         )}
                     </div>

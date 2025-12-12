@@ -154,9 +154,9 @@ export default function MyBookingsPage() {
                                             <div>
                                                 <span className="font-semibold">💳 Payment:</span>
                                                 <p className={`font-semibold ${
-                                                    booking.paymentStatus === 'paid' ? 'text-success' : 'text-warning'
+                                                    booking.paymentStatus === 'completed' ? 'text-success' : 'text-warning'
                                                 }`}>
-                                                    {booking.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                                                    {booking.paymentStatus === 'completed' ? 'Paid' : 'Pending'}
                                                 </p>
                                             </div>
                                             <div>
@@ -166,7 +166,7 @@ export default function MyBookingsPage() {
                                         </div>
                                         
                                         <div className="card-actions justify-end">
-                                            {(booking.paymentStatus !== 'paid' && booking.status !== 'Completed' && booking.status !== 'Canceled') && (
+                                            {(booking.paymentStatus !== 'completed' && booking.status !== 'Completed' && booking.status !== 'Canceled') && (
                                                 <button 
                                                     onClick={() => {
                                                         localStorage.setItem('pendingBooking', JSON.stringify({
