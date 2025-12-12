@@ -3,7 +3,9 @@ import API from "../../api/axios";
 import Spinner from "../../components/Spinner";
 import useAuth from "../../hooks/useAuth"; 
 import Forbidden from "../../components/Forbidden"; 
+import BookingErrorBoundary from "../../components/BookingErrorBoundary";
 import { toast } from "react-toastify";
+import { formatBookingId, sanitizeBookingData, validateBookingData } from "../../utils/bookingUtils";
 
 const PROJECT_STATUSES = [
   "Assigned", 
@@ -13,6 +15,8 @@ const PROJECT_STATUSES = [
   "Setup in Progress", 
   "Completed"
 ];
+
+
 
 export default function DecoratorDashboard() {
   const { user, loading: authLoading } = useAuth(); 
@@ -76,13 +80,24 @@ export default function DecoratorDashboard() {
         const response = await API.get('/bookings/assigned-to-me');
         
         // Check if response has data property
+        let bookingsData = [];
         if (response.data && response.data.success) {
-          setBookings(response.data.data || []);
+          bookingsData = response.data.data || [];
         } else if (Array.isArray(response.data)) {
-          setBookings(response.data);
-        } else {
-          setBookings([]);
+          bookingsData = response.data;
         }
+        
+        // Sanitize and validate booking data
+        const sanitizedBookings = bookingsData.map((booking, index) => {
+          const validation = validateBookingData(booking);
+          if (!validation.isValid) {
+            console.warn(`Booking validation failed for index ${index}:`, validation.errors);
+            toast.warn(`Booking data issue: ${validation.errors.join(', ')}`);
+          }
+          return sanitizeBookingData(booking, index);
+        });
+        
+        setBookings(sanitizedBookings);
       } catch (err) {
         console.error("Error fetching assigned bookings:", err);
         
@@ -118,76 +133,145 @@ export default function DecoratorDashboard() {
   if (authLoading || loading || bookings === null) return <Spinner />;
 
   return (
-    <div className="p-4">
-      <h2 className="text-4xl text-blue-700 font-bold mb-8 border-b pb-3">
-        Welcome, Decorator {user.name}!
-      </h2>
+    <BookingErrorBoundary>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-6">
+      {/* Header Section */}
+      <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border-t-4 border-gradient-to-r from-purple-500 to-blue-500">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+              Welcome, Decorator {user.name}! 🎨
+            </h1>
+            <p className="text-gray-600 text-lg">Manage your projects and create beautiful decorations</p>
+          </div>
+          <div className="hidden md:block">
+            <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-3xl text-white">🎭</span>
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg shadow-md">
-          <div className="text-2xl font-bold text-blue-600">
-            {bookings.length}
+        <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-purple-500 group hover:scale-105">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-3xl font-bold text-purple-600 mb-1">
+                {bookings.length}
+              </div>
+              <div className="text-sm text-purple-500 font-medium">Total Projects</div>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+              <span className="text-2xl">📋</span>
+            </div>
           </div>
-          <div className="text-sm text-blue-500">Total Assigned Projects</div>
         </div>
-        <div className="p-6 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg shadow-md">
-          <div className="text-2xl font-bold text-yellow-600">
-            {bookings.filter(b => b.status !== 'Completed').length}
+        <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-orange-500 group hover:scale-105">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-3xl font-bold text-orange-600 mb-1">
+                {bookings.filter(b => b.status !== 'Completed').length}
+              </div>
+              <div className="text-sm text-orange-500 font-medium">Ongoing Work</div>
+            </div>
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+              <span className="text-2xl">⚡</span>
+            </div>
           </div>
-          <div className="text-sm text-yellow-500">In Progress</div>
         </div>
-        <div className="p-6 bg-green-50 border-l-4 border-green-500 rounded-lg shadow-md">
-          <div className="text-2xl font-bold text-green-600">
-            {bookings.filter(b => b.status === 'Completed').length}
+        <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-green-500 group hover:scale-105">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-3xl font-bold text-green-600 mb-1">
+                {bookings.filter(b => b.status === 'Completed').length}
+              </div>
+              <div className="text-sm text-green-500 font-medium">Completed Projects</div>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+              <span className="text-2xl">✅</span>
+            </div>
           </div>
-          <div className="text-sm text-green-500">Completed Projects</div>
         </div>
       </div>
 
 
-      <section className="mt-8">
-        <h3 className="text-2xl font-semibold mb-6 border-b pb-2">
-          My Assigned Projects
-        </h3>
+      {/* Projects Section */}
+      <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            My Projects 🎯
+          </h3>
+          <div className="flex items-center space-x-2 text-sm text-gray-500">
+            <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+            <span>Active Projects</span>
+          </div>
+        </div>
 
         {bookings.length === 0 ? (
-          <div className="text-center p-8 bg-gray-100 rounded-lg text-gray-600">
-            No projects currently assigned to you. Enjoy the break!
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">😴</span>
+            </div>
+            <h4 className="text-xl font-semibold text-gray-700 mb-2">No Projects!</h4>
+            <p className="text-gray-500">Currently no projects are assigned to you. Take a rest!</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {bookings.map((b) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {bookings.map((b, index) => (
               <div
                 key={b._id}
-                className="p-5 bg-white rounded-xl shadow-lg border-t-4 border-indigo-500"
+                className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-indigo-200 group"
               >
-                <div className="font-bold text-xl text-gray-800">
-                  {b.serviceName || 'Service N/A'}
-                </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  Customer: {b.userName || 'Unknown User'}
-                </div>
-                <div className="text-sm text-gray-500">
-                  Date: {new Date(b.date).toLocaleDateString()}
+                {/* Project Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-lg text-gray-800 mb-1 group-hover:text-indigo-600 transition-colors">
+                      {b.serviceName || 'Service N/A'}
+                    </h4>
+                    <div className="text-sm text-gray-500 space-y-1">
+                      <div className="flex items-center">
+                        <span className="mr-2">👤</span>
+                        <span>Client: {b.userName || 'Unknown User'}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-2">📅</span>
+                        <span>Date: {new Date(b.date).toLocaleDateString('en-US')}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-2">🆔</span>
+                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                          {formatBookingId(b._id, index)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                      {index + 1}
+                    </div>
+                  </div>
                 </div>
 
-                <div className={`mt-3 font-extrabold text-lg flex justify-between items-center`}>
-                  Status:
-                  <span
-                    className={`ml-2 px-3 py-1 text-xs rounded-full text-white font-bold ${getStatusColor(b.status)}`}
-                  >
-                    {b.status}
-                  </span>
+                {/* Status Badge */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">Status:</span>
+                    <span
+                      className={`px-3 py-1 text-xs rounded-full text-white font-bold ${getStatusColor(b.status)} shadow-sm`}
+                    >
+                      {b.status}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="mt-4 space-y-2">
-                  {/* Dropdown for status update */}
-                  <label className="label">
-                    <span className="label-text text-sm">Update Project Stage</span>
+                {/* Status Update Dropdown */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Update Project Status
                   </label>
                   <select
-                    className="select select-bordered select-sm w-full"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-sm"
                     value={b.status}
                     onChange={(e) => handleUpdateStatus(b._id, e.target.value)}
                     disabled={b.status === 'Completed' || b.status === 'Canceled' || loading}
@@ -199,10 +283,12 @@ export default function DecoratorDashboard() {
                     ))}
                   </select>
                 </div>
-              </div> ))}
+              </div>
+            ))}
           </div>
         )}
-      </section>
+      </div>
     </div>
+    </BookingErrorBoundary>
   );
 }

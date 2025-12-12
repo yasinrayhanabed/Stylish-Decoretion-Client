@@ -16,7 +16,7 @@ const DashboardSidebar = () => {
         }`;
 
     return (
-        <div className="w-64 bg-base-200 min-h-screen p-4 shadow-lg">
+        <div className="w-64 bg-base-200 min-h-screen p-4 shadow-lg fixed h-full overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6 text-primary">User Dashboard</h2>
             <nav className="space-y-2">
                 <NavLink 
@@ -75,7 +75,7 @@ export default function UserDashboard({ children }) {
     return (
         <div className="flex min-h-screen bg-base-100"> 
             <DashboardSidebar />
-            <div className="flex-grow p-6">
+            <div className="flex-grow p-6 ml-64">
                 {children}
             </div>
         </div>

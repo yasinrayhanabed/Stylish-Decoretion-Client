@@ -53,7 +53,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-100">
       <div className="max-w-md w-full bg-base-200 p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-200 text-center mb-6">
           Login to StyleDecor
         </h2>
 

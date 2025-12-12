@@ -25,11 +25,11 @@ export default function MyBookingsPage() {
         setLoading(true);
         setError(null);
         try {
-            // নিশ্চিত করুন: /api/bookings/my রুটে কল করা হচ্ছে
+            // Make sure: calling /api/bookings/my route
             const res = await API.get('/bookings/my'); 
             setBookings(res.data);
             if (res.data.length === 0) {
-                // টোস্ট বার্তা শুধুমাত্র একবার দেখানো উচিত, তাই এটি ঐচ্ছিক
+                // Toast message should only be shown once, so this is optional
                 // toast.info("You currently have no active bookings."); 
             }
         } catch (err) {

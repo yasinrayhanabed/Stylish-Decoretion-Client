@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../firebase/firebase.config.js";
 import API from "../api/axios";
+import useAuth from "../hooks/useAuth";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -12,9 +14,7 @@ export default function Register() {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-
-  const auth = getAuth();
-  const googleProvider = new GoogleAuthProvider();
+  const { login } = useAuth();
 
   // ImageBB upload function
   const uploadImageToImageBB = async (imageFile) => {
@@ -78,10 +78,7 @@ export default function Register() {
       });
       
       if (data?.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        toast.success("Registration Successful!");
-        window.location.href = "/";
+        login(data.token);
       } else {
         toast.error("Registration failed!");
       }
@@ -105,10 +102,7 @@ export default function Register() {
       });
 
       if (data?.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        toast.success("Google Login successful!");
-        window.location.href = "/";
+        login(data.token);
       }
     } catch (err) {
       console.error("Google login error:", err);

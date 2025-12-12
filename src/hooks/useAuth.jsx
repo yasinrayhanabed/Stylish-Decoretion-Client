@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     }, []); 
 
     // Login Handler
-    const handleLogin = (token, redirectPath = '/dashboard') => {
+    const handleLogin = (token, redirectPath = '/') => {
         localStorage.setItem('token', token);
         const decodedUser = decodeUserFromToken(token);
         
@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
             } else if (decodedUser.role === 'decorator') {
                 navigate('/dashboard/decorator', { replace: true });
             } else {
-                navigate('/dashboard', { replace: true });
+                navigate('/', { replace: true }); // Home page for regular users
             }
         } else {
             // If token cannot be decoded

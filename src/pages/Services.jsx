@@ -3,6 +3,7 @@ import API from "../api/axios";
 import { Link } from "react-router-dom";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { motion } from "framer-motion";
+import ServiceCard from "../components/ServiceCard";
 
 export default function Services() {
   const [services, setServices] = useState([]);
@@ -130,43 +131,10 @@ export default function Services() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {filteredServices.map((service, index) => (
-              <motion.div
-                key={service._id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
-              >
-                <figure className="relative overflow-hidden">
-                  <img
-                    src={(service.images && service.images[0]) || service.photo || "https://via.placeholder.com/400x250?text=Service+Image"}
-                    alt={service.service_name}
-                    className="w-full h-48 object-cover transition-transform duration-300 hover:scale-110"
-                  />
-                  <div className="absolute top-4 right-4 badge badge-primary font-bold">
-                    BDT {service.cost}
-                  </div>
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title text-lg">{service.service_name}</h2>
-                  <p className="text-base-content/70 text-sm line-clamp-2">{service.description}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="badge badge-outline text-xs">{service.category}</div>
-                    {service.unit && <div className="badge badge-ghost text-xs">{service.unit}</div>}
-                  </div>
-                  <div className="card-actions justify-end mt-4">
-                    <Link
-                      to={`/services/${service._id}`}
-                      className="btn btn-primary btn-sm"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
+              <ServiceCard key={service._id} service={service} index={index} />
             ))}
           </motion.div>
         )}

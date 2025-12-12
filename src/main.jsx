@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { AuthProvider } from './hooks/useAuth';
+import AuthWrapper from './components/AuthWrapper';
 import App from './App';
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,7 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
+      <AuthWrapper>
         <App />
         <ToastContainer
           position="top-right"
@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')).render(
           draggable
           pauseOnHover
         />
-      </AuthProvider>
+      </AuthWrapper>
     </BrowserRouter>
   </React.StrictMode>
 );

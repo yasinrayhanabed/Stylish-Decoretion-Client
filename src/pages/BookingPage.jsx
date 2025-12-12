@@ -1,4 +1,4 @@
-// src/pages/BookingPage.jsx (FIXED - Service Details Page এর Book Now button-এর মাধ্যমে আসা ফর্ম)
+// src/pages/BookingPage.jsx (FIXED - Form accessed via Book Now button from Service Details Page)
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/axios";
