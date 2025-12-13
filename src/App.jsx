@@ -1,44 +1,39 @@
 import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/Footer.jsx";
 
-// Public Pages
-import Home from "./pages/Home";
-import Services from "./pages/Services";
-import ServiceDetails from "./pages/ServiceDetails";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import NotFoundPage from "./pages/NotFoundPage";
-import ServiceCoverageMap from "./pages/ServiceCoverageMap";
+import Home from "./pages/Home.jsx";
+import Services from "./pages/Services.jsx";
+import ServiceDetails from "./pages/ServiceDetails.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
+import ServiceCoverageMap from "./pages/ServiceCoverageMap.jsx";
 
-// Booking and Payment Pages
-import BookingPage from "./pages/BookingPage";
-import { Outlet } from "react-router-dom";
-import CheckoutPage from "./pages/CheckoutPage";
-import PaymentPage from "./pages/PaymentPage";
-import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import BookingPage from "./pages/BookingPage.jsx";
+import CheckoutPage from "./pages/CheckoutPage.jsx";
+import PaymentPage from "./pages/PaymentPage.jsx";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage.jsx";
 
-// Dashboard Pages
-import DecoratorDashboard from "./pages/Dashboard/DecoratorDashboard";
-import AdminDashboard from "./pages/Dashboard/AdminDashboard";
-import UserDashboard from "./pages/Dashboard/UserDashboard";
-import AddService from "./pages/Dashboard/AddService";
-import AdminManageUsers from "./pages/Dashboard/AdminManageUsers";
-import AdminManageServices from "./pages/Dashboard/AdminManageServices";
-import AdminManageDecorators from "./pages/Dashboard/AdminManageDecorators";
-import AdminManageBookings from "./pages/Dashboard/AdminManageBookings";
-import AdminDashboardHome from "./pages/Dashboard/AdminDashboardHome";
-import AdminAnalytics from "./pages/Dashboard/AdminAnalytics";
-import MyBookingsPage from "./pages/Dashboard/MyBookingsPage";
-import UserProfile from "./pages/Dashboard/UserProfile";
-import UserDashboardHome from "./pages/Dashboard/UserDashboardHome";
-import PaymentHistory from "./pages/Dashboard/PaymentHistory";
+import DecoratorDashboard from "./pages/Dashboard/DecoratorDashboard.jsx";
+import AdminDashboard from "./pages/Dashboard/AdminDashboard.jsx";
+import UserDashboard from "./pages/Dashboard/UserDashboard.jsx";
+import AddService from "./pages/Dashboard/AddService.jsx";
+import AdminManageUsers from "./pages/Dashboard/AdminManageUsers.jsx";
+import AdminManageServices from "./pages/Dashboard/AdminManageServices.jsx";
+import AdminManageDecorators from "./pages/Dashboard/AdminManageDecorators.jsx";
+import AdminManageBookings from "./pages/Dashboard/AdminManageBookings.jsx";
+import AdminDashboardHome from "./pages/Dashboard/AdminDashboardHome.jsx";
+import AdminAnalytics from "./pages/Dashboard/AdminAnalytics.jsx";
+import MyBookingsPage from "./pages/Dashboard/MyBookingsPage.jsx";
+import UserProfile from "./pages/Dashboard/UserProfile.jsx";
+import UserDashboardHome from "./pages/Dashboard/UserDashboardHome.jsx";
+import PaymentHistory from "./pages/Dashboard/PaymentHistory.jsx";
 
-// Guards
-import PrivateRoute from "./routes/PrivateRoute";
-import RoleGuard from "./components/RoleGuard"; 
+import PrivateRoute from "./routes/PrivateRoute.jsx";
+import RoleGuard from "./components/RoleGuard.jsx"; 
 
 function App() {
   return (
@@ -77,7 +72,6 @@ function App() {
             </RoleGuard>
           } />
 
-          {/* Admin Routes */}
           <Route path="/dashboard/admin" element={
             <RoleGuard allowedRoles={['admin']}>
               <AdminDashboard />

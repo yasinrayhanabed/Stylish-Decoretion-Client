@@ -95,7 +95,7 @@ export default function PaymentHistory() {
           
           {payments.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-6xl mb-4"><FaMoneyBillWave /></div>
+              <div className="text-6xl flex items-center justify-center mb-4"><FaMoneyBillWave /></div>
               <p className="text-xl font-semibold">No payment history found</p>
               <p className="text-base-content/70 mt-2">Your payment transactions will appear here</p>
             </div>

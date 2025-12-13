@@ -86,6 +86,25 @@ export const validateBookingData = (booking) => {
 };
 
 /**
+ * Determines if a booking is paid based on multiple possible fields
+ * @param {object} booking - The booking object
+ * @returns {boolean} - True if payment is completed
+ */
+const determinePaymentStatus = (booking) => {
+  // Check multiple possible payment status fields
+  if (booking.isPaid === true || booking.isPaid === 'true' || booking.isPaid === 1) return true;
+  if (booking.paymentStatus === 'completed' || booking.paymentStatus === 'paid' || booking.paymentStatus === 'success') return true;
+  if (booking.payment_status === 'completed' || booking.payment_status === 'paid' || booking.payment_status === 'success') return true;
+  if (booking.paymentCompleted === true || booking.paymentCompleted === 'true') return true;
+  if (booking.paid === true || booking.paid === 'true') return true;
+  
+  // Check if there's a payment object with success status
+  if (booking.payment && (booking.payment.status === 'completed' || booking.payment.status === 'success')) return true;
+  
+  return false;
+};
+
+/**
  * Sanitizes booking data for safe display
  * @param {object} booking - The booking object to sanitize
  * @param {number} index - Fallback index
@@ -111,8 +130,9 @@ export const sanitizeBookingData = (booking, index = 0) => {
     userName: booking.userName || booking.user?.name || 'Unknown User',
     userEmail: booking.userEmail || booking.user?.email || 'No Email',
     date: booking.date || new Date().toISOString(),
-    status: booking.status || 'Unknown',
-    isPaid: Boolean(booking.isPaid),
-    assignedDecorator: booking.assignedDecorator || null
+    status: booking.status || 'Pending',
+    isPaid: determinePaymentStatus(booking),
+    assignedDecorator: booking.assignedDecorator || null,
+    amount: booking.amount || booking.cost || booking.price || null
   };
 };

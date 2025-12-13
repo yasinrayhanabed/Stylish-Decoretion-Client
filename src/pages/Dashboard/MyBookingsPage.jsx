@@ -3,7 +3,10 @@ import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import API from '../../api/axios'; 
 import Spinner from '../../components/Spinner';
-import { FaCalendarAlt, FaSync, FaClipboardList, FaPalette, FaMapMarkerAlt, FaDollarSign, FaCreditCard, FaCalendar, FaTimes } from 'react-icons/fa';
+import { useSearch } from '../../hooks/useSearch';
+import { usePagination } from '../../hooks/usePagination';
+import Pagination from '../../components/Pagination';
+import { FaCalendarAlt, FaSync, FaClipboardList, FaPalette, FaMapMarkerAlt, FaDollarSign, FaCreditCard, FaCalendar, FaTimes, FaSearch, FaSort, FaFilter } from 'react-icons/fa';
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -21,6 +24,68 @@ export default function MyBookingsPage() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [hookError, setHookError] = useState(null);
+
+    // Search and filter functionality with error handling
+    let searchHookResult;
+    try {
+        searchHookResult = useSearch(bookings || [], ['serviceName', 'status', 'location']);
+    } catch (err) {
+        console.error('Search hook error:', err);
+        setHookError('Search functionality error');
+        searchHookResult = {
+            searchTerm: '',
+            setSearchTerm: () => {},
+            sortBy: '',
+            setSortBy: () => {},
+            sortOrder: 'asc',
+            setSortOrder: () => {},
+            filters: {},
+            updateFilter: () => {},
+            clearFilters: () => {},
+            filteredData: bookings || []
+        };
+    }
+    
+    const {
+        searchTerm,
+        setSearchTerm,
+        sortBy,
+        setSortBy,
+        sortOrder,
+        setSortOrder,
+        filters,
+        updateFilter,
+        clearFilters,
+        filteredData: filteredBookings
+    } = searchHookResult;
+
+    // Pagination with error handling
+    let paginationResult;
+    try {
+        paginationResult = usePagination(filteredBookings || [], 5);
+    } catch (err) {
+        console.error('Pagination hook error:', err);
+        paginationResult = {
+            currentPage: 1,
+            totalPages: 1,
+            paginatedData: filteredBookings || [],
+            goToPage: () => {},
+            totalItems: (filteredBookings || []).length,
+            startIndex: 1,
+            endIndex: (filteredBookings || []).length
+        };
+    }
+    
+    const {
+        currentPage,
+        totalPages,
+        paginatedData: displayBookings,
+        goToPage,
+        totalItems,
+        startIndex,
+        endIndex
+    } = paginationResult;
 
     const fetchBookings = async () => {
         setLoading(true);
@@ -76,14 +141,23 @@ export default function MyBookingsPage() {
         fetchBookings();
     }, []);
 
+    // Reset pagination when filters change
+    useEffect(() => {
+        goToPage(1);
+    }, [searchTerm, filters, sortBy, sortOrder]);
+
     if (loading) return <Spinner />;
 
-    if (error) {
+    if (error || hookError) {
         return (
             <div className="text-center py-20 min-h-[50vh]">
                 <h2 className="text-3xl text-red-600 font-bold mb-4">Error</h2>
-                <p className="text-lg text-gray-600">{error}</p>
-                <button onClick={fetchBookings} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">
+                <p className="text-lg text-gray-600">{error || hookError}</p>
+                <button onClick={() => {
+                    setError(null);
+                    setHookError(null);
+                    fetchBookings();
+                }} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">
                     Try Again
                 </button>
             </div>
@@ -108,10 +182,105 @@ export default function MyBookingsPage() {
                             {loading ? 'Loading...' : <><FaSync className="mr-1" /> Refresh</>}
                         </button>
                     </div>
+
+                    {/* Search and Filter Section */}
+                    {bookings.length > 0 && (
+                        <div className="bg-base-200 rounded-lg p-4 mb-6">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div className="relative">
+                                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="🔍 Search bookings..."
+                                        value={searchTerm || ''}
+                                        onChange={(e) => {
+                                            try {
+                                                setSearchTerm(e.target.value);
+                                            } catch (err) {
+                                                console.error('Search error:', err);
+                                            }
+                                        }}
+                                        className="input input-bordered w-full pl-10"
+                                    />
+                                </div>
+                                <select
+                                    value={filters?.status || ''}
+                                    onChange={(e) => {
+                                        try {
+                                            updateFilter('status', e.target.value === '' ? null : e.target.value);
+                                        } catch (err) {
+                                            console.error('Filter update error:', err);
+                                        }
+                                    }}
+                                    className="select select-bordered"
+                                >
+                                    <option value="">🔍 All Status</option>
+                                    <option value="Pending">⏳ Pending</option>
+                                    <option value="Confirmed">✅ Confirmed</option>
+                                    <option value="Planning Phase">📋 Planning Phase</option>
+                                    <option value="Assigned">👤 Assigned</option>
+                                    <option value="Completed">🎉 Completed</option>
+                                    <option value="Canceled">❌ Canceled</option>
+                                </select>
+                                <select
+                                    value={sortBy || ''}
+                                    onChange={(e) => {
+                                        try {
+                                            setSortBy(e.target.value);
+                                        } catch (err) {
+                                            console.error('Sort error:', err);
+                                        }
+                                    }}
+                                    className="select select-bordered"
+                                >
+                                    <option value="">📈 Sort by</option>
+                                    <option value="date">📅 Date</option>
+                                    <option value="serviceName">🎨 Service</option>
+                                    <option value="status">📊 Status</option>
+                                    <option value="cost">💰 Cost</option>
+                                </select>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            try {
+                                                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                                            } catch (err) {
+                                                console.error('Sort order error:', err);
+                                            }
+                                        }}
+                                        className="btn btn-outline btn-sm flex-1"
+                                    >
+                                        <FaSort className="mr-1" />
+                                        {sortOrder === 'asc' ? '↑' : '↓'}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            try {
+                                                clearFilters();
+                                            } catch (err) {
+                                                console.error('Clear filters error:', err);
+                                                // Fallback manual clear
+                                                setSearchTerm('');
+                                                setSortBy('');
+                                                setSortOrder('asc');
+                                            }
+                                        }}
+                                        className="btn btn-outline btn-error btn-sm"
+                                    >
+                                        <FaFilter className="mr-1" />
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="mt-4 text-sm opacity-70">
+                                Showing {filteredBookings.length} of {bookings.length} bookings
+                            </div>
+                        </div>
+                    )}
                     
-                    {bookings.length === 0 ? (
+                    {filteredBookings.length === 0 ? (
                         <div className="text-center py-16">
-                            <div className="text-6xl mb-4"><FaClipboardList /></div>
+                            <div className="text-6xl flex items-center justify-center mb-4"><FaClipboardList /></div>
                             <p className="text-xl font-semibold mb-2">No bookings found</p>
                             <p className="text-base-content/70 mb-4">You haven't booked any services yet</p>
                             <a href="/services" className="btn btn-primary">
@@ -120,7 +289,7 @@ export default function MyBookingsPage() {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {bookings.map((booking, index) => (
+                            {displayBookings.map((booking, index) => (
                                 <motion.div
                                     key={booking._id}
                                     initial={{ opacity: 0, x: -20 }}
@@ -134,7 +303,7 @@ export default function MyBookingsPage() {
                                                 <h3 className="card-title text-xl">{booking.serviceName}</h3>
                                                 <p className="text-base-content/70">{booking.serviceCategory}</p>
                                             </div>
-                                            <div className={`badge ${getStatusColor(booking.status).replace('bg-', 'badge-').replace('-100', '').replace(' text-', ' badge-')}`}>
+                                            <div className={`badge ${getStatusColor(booking.status)}`}>
                                                 {booking.status}
                                             </div>
                                         </div>
@@ -200,9 +369,21 @@ export default function MyBookingsPage() {
                         </div>
                     )}
                     
+                    {/* Pagination */}
+                    {filteredBookings.length > 5 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={goToPage}
+                            totalItems={totalItems}
+                            startIndex={startIndex}
+                            endIndex={endIndex}
+                        />
+                    )}
+
                     {bookings.length > 0 && (
                         <div className="mt-6 p-4 bg-base-300 rounded-lg">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                                 <div>
                                     <div className="text-2xl font-bold text-primary">{bookings.length}</div>
                                     <div className="text-sm opacity-70">Total Bookings</div>
@@ -212,6 +393,12 @@ export default function MyBookingsPage() {
                                         {bookings.filter(b => b.status === 'Completed').length}
                                     </div>
                                     <div className="text-sm opacity-70">Completed</div>
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-info">
+                                        {bookings.filter(b => b.status === 'Assigned' || b.status === 'In Progress').length}
+                                    </div>
+                                    <div className="text-sm opacity-70">Assigned</div>
                                 </div>
                                 <div>
                                     <div className="text-2xl font-bold text-warning">

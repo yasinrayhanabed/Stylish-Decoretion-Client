@@ -5,7 +5,6 @@ import { CreditCard, MapPin, ShoppingBag } from 'lucide-react'; // Import icons 
 const CheckoutPage = () => {
     const navigate = useNavigate();
     
-    // --- Demo Data: Your real data should be loaded here ---
     const [billingInfo, setBillingInfo] = useState({
         name: '',
         email: '',
@@ -17,16 +16,14 @@ const CheckoutPage = () => {
 
     const [paymentMethod, setPaymentMethod] = useState('online');
 
-    // Demo Cart Items
     const cartItems = [
         { id: 1, name: 'Premium Event Decoration Package', price: 50000, qty: 1 },
         { id: 2, name: 'Photography & Videography Add-on', price: 15000, qty: 1 },
         { id: 3, name: 'Extra Lighting Setup', price: 5000, qty: 2 },
     ];
     
-    // --- Calculation Logic ---
     const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-    const taxRate = 0.05; // 5% VAT/Tax
+    const taxRate = 0.05; 
     const tax = subtotal * taxRate;
     const processingFee = 150;
     const total = subtotal + tax + processingFee;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../hooks/useAuth.jsx";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -55,8 +55,6 @@ export default function Navbar() {
                 {user.role === "admin" ? (
                   <>
                     <li><Link to="/dashboard/admin">Admin Dashboard</Link></li>
-                    <li><Link to="/dashboard/admin/manage-services">Manage Services</Link></li>
-                    <li><Link to="/dashboard/admin/manage-users">Manage Users</Link></li>
                   </>
                 ) : user.role === "decorator" ? (
                   <li><Link to="/dashboard/decorator">Decorator Dashboard</Link></li>

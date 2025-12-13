@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/axios';
 import ServiceCard from '../components/ServiceCard';
-import FallbackImage from '../components/FallbackImage';
+import TopDecorators from '../components/TopDecorators';
 import { motion } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,17 +10,13 @@ import Spinner from '../components/Spinner';
 
 export default function Home(){
   const [services, setServices] = useState(null);
-  const [decorators, setDecorators] = useState([]);
+
   
   useEffect(()=> {
     const fetchData = async () => {
       try {
-        const [servicesRes, decoratorsRes] = await Promise.all([
-          API.get('/services'),
-          API.get('/decorators').catch(() => ({ data: [] }))
-        ]);
+        const servicesRes = await API.get('/services');
         setServices(servicesRes.data);
-        setDecorators(decoratorsRes.data.slice(0, 4));
       } catch (error) {
         setServices([]);
         setDecorators([]);
@@ -149,85 +145,14 @@ export default function Home(){
             className="text-center mb-16"
           >
             <h2 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary to-accent bg-clip-text text-transparent mb-4">
-               Meet Our Top Decorators
+               আমাদের সেরা ডেকোরেটরদের সাথে পরিচিত হন
             </h2>
             <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
-              Talented professionals ready to transform your vision into reality
+              রেটিং অনুযায়ী সেরা পেশাদার ডেকোরেটর যারা আপনার স্বপ্নকে বাস্তবে রূপ দিতে প্রস্তুত
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary to-accent mx-auto mt-6 rounded-full"></div>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {decorators.length > 0 ? decorators.map((decorator, index) => (
-              <motion.div
-                key={decorator._id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                whileHover={{ y: -8, scale: 1.05 }}
-                viewport={{ once: true }}
-                className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 group"
-              >
-                <figure className="px-6 pt-6">
-                  <div className="relative">
-                    <FallbackImage
-                      src={decorator.photo}
-                      alt={decorator.name}
-                      fallbackSrc={`https://i.pravatar.cc/150?img=${index + 10}`}
-                      className="rounded-full w-28 h-28 object-cover border-4 border-primary/20 group-hover:border-primary/60 transition-all duration-300 shadow-lg"
-                    />
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-success rounded-full border-4 border-base-100 flex items-center justify-center">
-                      <span className="text-xs">✓</span>
-                    </div>
-                  </div>
-                </figure>
-                <div className="card-body text-center pb-6">
-                  <h3 className="card-title justify-center text-lg group-hover:text-primary transition-colors">{decorator.name}</h3>
-                  <p className="text-sm text-base-content/70 mb-2">{decorator.specialty || 'Decoration Expert'}</p>
-                  <div className="rating rating-sm mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <input key={i} type="radio" className="mask mask-star-2 bg-warning" defaultChecked={i < 4} disabled />
-                    ))}
-                  </div>
-                  <div className="badge badge-outline badge-sm"> Top Rated</div>
-                </div>
-              </motion.div>
-            )) : (
-              [...Array(4)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.6 }}
-                  whileHover={{ y: -8, scale: 1.05 }}
-                  viewport={{ once: true }}
-                  className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 group"
-                >
-                  <figure className="px-6 pt-6">
-                    <div className="relative">
-                      <FallbackImage
-                        src={`https://i.pravatar.cc/150?img=${i + 1}`}
-                        alt={`Decorator ${i + 1}`}
-                        className="rounded-full w-28 h-28 object-cover border-4 border-primary/20 group-hover:border-primary/60 transition-all duration-300 shadow-lg"
-                      />
-                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-success rounded-full border-4 border-base-100 flex items-center justify-center">
-                        <span className="text-xs">✓</span>
-                      </div>
-                    </div>
-                  </figure>
-                  <div className="card-body text-center pb-6">
-                    <h3 className="card-title justify-center text-lg group-hover:text-primary transition-colors">Expert Decorator</h3>
-                    <p className="text-sm text-base-content/70 mb-2">Decoration Specialist</p>
-                    <div className="rating rating-sm mb-2">
-                      {[...Array(5)].map((_, j) => (
-                        <input key={j} type="radio" className="mask mask-star-2 bg-warning" defaultChecked={j < 4} disabled />
-                      ))}
-                    </div>
-                    <div className="badge badge-outline badge-sm"> Top Rated</div>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
+          <TopDecorators />
         </div>
       </section>
 

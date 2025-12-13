@@ -17,7 +17,7 @@ export default function AdminDashboard() {
             <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
               <FaCrown className="text-xl font-bold text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-white">Admin Panel</h2>
+            <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
           </div>
           <div className="w-full h-1 bg-blue-600 rounded-full"></div>
         </div>
@@ -36,12 +36,12 @@ export default function AdminDashboard() {
                 }
             >
                 <span className="text-xl"><FaHome /></span>
-                <span className="font-medium">Dashboard Home</span>
+                <span className="font-medium">Overview</span>
             </NavLink>
            
             {/* Management Section */}
             <div className="pt-6 pb-2">
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4">Management</h3>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4">System Management</h3>
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent mt-2"></div>
             </div>
 
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
                 }
             >
                 <FaUsers className="text-xl" />
-                <span className="font-medium">User Management</span>
+                <span className="font-medium">Manage Users</span>
             </NavLink>
 
             <NavLink 
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
                 }
             >
                 <FaPalette className="text-xl" />
-                <span className="font-medium">Services & Packages</span>
+                <span className="font-medium">Manage Services</span>
             </NavLink>
 
             <NavLink 
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
                 }
             >
                 <FaUserTie className="text-xl" />
-                <span className="font-medium">Decorator Management</span>
+                <span className="font-medium">Manage Decorators</span>
             </NavLink>
 
             <NavLink 
@@ -98,12 +98,12 @@ export default function AdminDashboard() {
                 }
             >
                 <FaCalendarAlt className="text-xl" />
-                <span className="font-medium">Booking Management</span>
+                <span className="font-medium">Manage Bookings</span>
             </NavLink>
 
             {/* Analytics Section */}
             <div className="pt-6 pb-2">
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4">Analytics</h3>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4">Reports & Analytics</h3>
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent mt-2"></div>
             </div>
 
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
                 }
             >
                 <FaChartBar className="text-xl" />
-                <span className="font-medium">Analytics & Revenue</span>
+                <span className="font-medium">Business Analytics</span>
             </NavLink>
         </nav>
 

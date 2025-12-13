@@ -4,6 +4,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaUser, FaCalendarCheck, FaSignOutAlt, FaHome, FaCreditCard } from 'react-icons/fa';
 import useAuth from '../../hooks/useAuth';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 const DashboardSidebar = () => {
     const { logout } = useAuth();
@@ -76,7 +77,9 @@ export default function UserDashboard({ children }) {
         <div className="flex min-h-screen bg-base-100"> 
             <DashboardSidebar />
             <div className="flex-grow p-6">
-                {children}
+                <ErrorBoundary>
+                    {children}
+                </ErrorBoundary>
             </div>
         </div>
     );

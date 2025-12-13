@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom"; 
 import API from "../../api/axios"; 
 import Spinner from "../../components/Spinner"; 
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
+import { FaChartBar, FaBuilding, FaPalette, FaUserTie, FaClipboardList, FaStar, FaTag, FaDollarSign } from "react-icons/fa"; 
 
 function AdminDashboardHome() {
     const [services, setServices] = useState([]);
@@ -30,23 +31,31 @@ function AdminDashboardHome() {
                 setDecorators(decoratorUsers);
             } catch (err) {
                 console.error("Decorator data fetch error:", err);
+                if (err.response?.status === 403) {
+                    toast.error("Access denied. Admin role required to view users.");
+                } else if (err.response?.status === 401) {
+                    toast.error("Authentication failed. Please login as admin.");
+                } else {
+                    toast.error("Failed to load decorator data.");
+                }
                 setDecorators([]);
             }
 
         
             try {
-                // Try multiple endpoints for bookings
-                let bookingsData = [];
-                try {
-                    const bookingsRes = await API.get('/bookings');
-                    bookingsData = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
-                } catch {
-                    const myBookingsRes = await API.get('/bookings/my');
-                    bookingsData = Array.isArray(myBookingsRes.data) ? myBookingsRes.data : [];
-                }
+                // Try admin bookings endpoint first
+                const bookingsRes = await API.get('/bookings');
+                const bookingsData = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
                 setBookings(bookingsData);
             } catch (err) {
                 console.error("Booking data fetch error:", err);
+                if (err.response?.status === 403) {
+                    toast.error("Access denied. Admin role required to view all bookings.");
+                } else if (err.response?.status === 401) {
+                    toast.error("Authentication failed. Please login as admin.");
+                } else {
+                    toast.error("Failed to load booking data.");
+                }
                 setBookings([]);
             }
             
@@ -88,7 +97,10 @@ function AdminDashboardHome() {
             <div className="bg-blue-600 rounded-lg p-8 text-white shadow-lg">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-4xl font-bold mb-2"><FaChartBar className="inline mr-2" /> Admin Overview</h1>
+                        <h1 className="text-4xl font-bold mb-2 flex items-center">
+                            <FaChartBar className="mr-3" /> 
+                            Admin Overview
+                        </h1>
                         <p className="text-blue-100 text-lg">Quick view of the entire system</p>
                     </div>
                     <div className="hidden md:block">
@@ -108,7 +120,7 @@ function AdminDashboardHome() {
                             <div className="text-3xl font-bold text-blue-800">{services.length}</div>
                         </div>
                         <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                            <FaPalette className="text-2xl" />
+                            <FaPalette className="text-xl text-blue-600" />
                         </div>
                     </div>
                     <div className="mt-4 flex items-center text-sm text-blue-600">
@@ -124,7 +136,7 @@ function AdminDashboardHome() {
                             <div className="text-3xl font-bold text-green-800">{decorators.length}</div>
                         </div>
                         <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                            <FaUserTie className="text-2xl" />
+                            <FaUserTie className="text-xl text-green-600" />
                         </div>
                     </div>
                     <div className="mt-4 flex items-center text-sm text-green-600">
@@ -140,7 +152,7 @@ function AdminDashboardHome() {
                             <div className="text-3xl font-bold text-orange-800">{bookings.length}</div>
                         </div>
                         <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                            <FaClipboardList className="text-2xl" />
+                            <FaClipboardList className="text-xl text-orange-600" />
                         </div>
                     </div>
                     <div className="mt-4 flex items-center text-sm text-orange-600">
@@ -153,8 +165,9 @@ function AdminDashboardHome() {
             {/* Latest Services Section */}
             <div className="bg-white rounded-lg shadow-lg p-8">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-bold text-gray-800">
-                        <FaStar className="inline mr-2" /> Recent Services
+                    <h3 className="text-2xl font-bold text-gray-800 flex items-center">
+                        <FaStar className="mr-3 text-yellow-500" /> 
+                        Recent Services
                     </h3>
                     <Link 
                         to="manage-services" 
@@ -167,7 +180,7 @@ function AdminDashboardHome() {
                 {services.length === 0 ? (
                     <div className="text-center py-12">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FaPalette className="text-3xl" />
+                            <FaPalette className="text-2xl text-gray-400" />
                         </div>
                         <p className="text-gray-500">No services found</p>
                     </div>
@@ -181,7 +194,7 @@ function AdminDashboardHome() {
                                             {s.service_name}
                                         </h4>
                                         <div className="flex items-center text-sm text-gray-500 mb-2">
-                                            <FaTag className="mr-2" />
+                                            <FaTag className="mr-2 text-xs text-gray-400" />
                                             <span>Category: {s.category}</span>
                                         </div>
                                     </div>
@@ -191,7 +204,7 @@ function AdminDashboardHome() {
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center text-lg font-bold text-green-600">
-                                        <FaDollarSign className="mr-1" />
+                                        <FaDollarSign className="mr-1 text-sm text-green-500" />
                                         <span>BDT {s.cost}</span>
                                     </div>
                                     <div className="text-xs text-gray-400 font-mono bg-gray-100 px-2 py-1 rounded">

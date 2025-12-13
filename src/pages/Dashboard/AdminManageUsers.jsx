@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import API from "../../api/axios";
 import Spinner from "../../components/Spinner";
 import { toast } from "react-toastify";
-import useAuth from "../../hooks/useAuth"; // 💡 Added useAuth for protection
+import useAuth from "../../hooks/useAuth.jsx"; // 💡 Added useAuth for protection
 import Forbidden from "../../components/Forbidden"; // 💡 Assuming you have a Forbidden component for 403
+import { FaUsers, FaUserShield, FaUserTie, FaUser, FaCrown } from "react-icons/fa";
 
 export default function AdminManageUsers() {
  const { user } = useAuth(); // Get user and loading state
@@ -23,7 +24,13 @@ const res = await API.get("/users");
 } catch (err) {
  console.error("Failed to fetch users:", err);
  // A 403 error might occur if the server-side role check fails
-toast.error("Failed to load users");
+ if (err.response?.status === 403) {
+   toast.error("Access denied. Admin role required to manage users.");
+ } else if (err.response?.status === 401) {
+   toast.error("Authentication failed. Please login as admin.");
+ } else {
+   toast.error("Failed to load users. Please check server connection.");
+ }
  setUsers([]);
  } finally {
  setLoading(false);
@@ -64,10 +71,18 @@ console.error("Update user role error:", err);
 
  return (
  <div className="p-6 max-w-5xl mx-auto">
- <h2 className="text-3xl text-blue-700 font-bold mb-6">Manage Users ({users.length})</h2>
+ <h2 className="text-3xl text-blue-700 font-bold mb-6 flex items-center">
+   <FaUsers className="mr-3 text-blue-600" />
+   Manage Users ({users.length})
+ </h2>
 
  {users.length === 0 ? (
- <div className="text-center py-16 text-gray-400">No users found.</div>
+ <div className="text-center py-16">
+   <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+     <FaUsers className="text-3xl text-gray-400" />
+   </div>
+   <div className="text-gray-400 text-lg">No users found.</div>
+ </div>
  ) : (
  <div className="grid sm:grid-cols-2 gap-4">
  {users.map((u) => (
@@ -89,6 +104,7 @@ className={`text-sm px-3 py-1 rounded-full text-white font-bold ${
  u.role === 'admin' ? 'bg-red-500' : u.role === 'decorator' ? 'bg-green-500' : 'bg-blue-500'
  }`}
  >
+ {u.role === 'admin' ? <FaCrown className="mr-1 text-xs" /> : u.role === 'decorator' ? <FaUserTie className="mr-1 text-xs" /> : <FaUser className="mr-1 text-xs" />}
  {u.role.toUpperCase()}
  </div>
  </div>
@@ -99,7 +115,7 @@ className={`text-sm px-3 py-1 rounded-full text-white font-bold ${
  className="btn btn-sm btn-outline btn-success" // Changed class for better visibility
  disabled={changing || u._id === user._id} // Added safety for self-demotion
 >
- Make Decorator
+ <FaUserTie className="mr-1 text-xs" /> Make Decorator
  </button>
  ) : (
  <button
@@ -107,7 +123,7 @@ className={`text-sm px-3 py-1 rounded-full text-white font-bold ${
  className="btn btn-sm btn-warning"
  disabled={changing || u._id === user._id}
  >
- Remove Decorator
+ <FaUser className="mr-1 text-xs" /> Remove Decorator
 </button>
  )}
 {/* The logic below prevents current admin from losing admin status easily */}
@@ -117,7 +133,7 @@ className={`text-sm px-3 py-1 rounded-full text-white font-bold ${
  disabled={changing || u.role === "admin"}
  title="Promote to admin"
  >
- Make Admin
+ <FaUserShield className="mr-1 text-xs" /> Make Admin
  </button>
  </div>
  </div>
