@@ -31,6 +31,8 @@ import MyBookingsPage from "./pages/Dashboard/MyBookingsPage.jsx";
 import UserProfile from "./pages/Dashboard/UserProfile.jsx";
 import UserDashboardHome from "./pages/Dashboard/UserDashboardHome.jsx";
 import PaymentHistory from "./pages/Dashboard/PaymentHistory.jsx";
+import DecoratorRequest from "./pages/DecoratorRequest.jsx";
+import AdminDecoratorRequests from "./pages/Dashboard/AdminDecoratorRequests.jsx";
 
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 import RoleGuard from "./components/RoleGuard.jsx"; 
@@ -47,6 +49,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/coverage" element={<ServiceCoverageMap />} />
+        <Route path="/become-decorator" element={<DecoratorRequest />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -83,6 +86,7 @@ function App() {
             <Route path="manage-services" element={<AdminManageServices />} />
             <Route path="manage-decorators" element={<AdminManageDecorators />} />
             <Route path="manage-bookings" element={<AdminManageBookings />} />
+            <Route path="decorator-requests" element={<AdminDecoratorRequests />} />
             <Route path="analytics" element={<AdminAnalytics />} />
           </Route>
           

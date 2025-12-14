@@ -1,10 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
-import { FaUser, FaCalendarAlt, FaPalette, FaChartBar, FaEdit, FaPhone } from 'react-icons/fa';
+import { FaUser, FaCalendarAlt, FaPalette, FaChartBar, FaEdit, FaPhone, FaCreditCard } from 'react-icons/fa';
 
 export default function UserDashboardHome() {
     const { user } = useAuth();
+
+    // Format large numbers (millions, billions)
+    const formatAmount = (amount) => {
+        if (amount >= 1000000000) {
+            return (amount / 1000000000).toFixed(1) + 'B';
+        } else if (amount >= 1000000) {
+            return (amount / 1000000).toFixed(1) + 'M';
+        } else if (amount >= 1000) {
+            return (amount / 1000).toFixed(1) + 'K';
+        }
+        return amount.toString();
+    };
+
+    // Mock payment data - replace with actual API call
+    const totalPaid = 2500000; // Example: 2.5 million
 
     return (
         <div className="space-y-8">
@@ -77,6 +92,30 @@ export default function UserDashboardHome() {
                 </Link>
             </div>
 
+            {/* Payment History */}
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <FaCreditCard className="mr-3 text-green-600" />
+                    Payment History
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+                        <div className="text-sm font-medium text-green-600 mb-1">Total Paid</div>
+                        <div className="text-2xl font-bold text-green-800">৳{formatAmount(totalPaid)}</div>
+                        <div className="text-xs text-green-600 mt-1">All time payments</div>
+                    </div>
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                        <div className="text-sm font-medium text-blue-600 mb-1">This Month</div>
+                        <div className="text-2xl font-bold text-blue-800">৳{formatAmount(150000)}</div>
+                        <div className="text-xs text-blue-600 mt-1">Current month spending</div>
+                    </div>
+                </div>
+                <Link to="/dashboard/payment-history" className="inline-flex items-center mt-4 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                    <FaCreditCard className="mr-2" />
+                    View detailed payment history
+                </Link>
+            </div>
+
             {/* Stats and Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white rounded-2xl shadow-xl p-6">
@@ -86,17 +125,17 @@ export default function UserDashboardHome() {
                     </h3>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span className="font-medium">Account Status</span>
+                            <span className="font-medium text-gray-700">Account Status</span>
                             <span className="text-lg font-bold text-green-600">Active</span>
                         </div>
                         <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span className="font-medium">Member Since</span>
+                            <span className="font-medium text-gray-700">Member Since</span>
                             <span className="text-lg font-bold text-blue-600">
                                 {user?.createdAt ? new Date(user.createdAt).getFullYear() : 'N/A'}
                             </span>
                         </div>
                         <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span className="font-medium">Role</span>
+                            <span className="font-medium text-gray-700">Role</span>
                             <span className="text-lg font-bold text-purple-600 capitalize">{user?.role || 'User'}</span>
                         </div>
                     </div>

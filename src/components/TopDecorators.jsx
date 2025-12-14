@@ -94,11 +94,11 @@ export default function TopDecorators() {
               {decorator.name}
             </h3>
             <p className="text-sm text-base-content/70 mb-2">
-              {decorator.specialty || 'ডেকোরেশন এক্সপার্ট'}
+              {decorator.specialty || 'Decoration Expert'}
             </p>
             <StarRating rating={decorator.averageRating || 4.5} />
             <div className="badge badge-outline badge-sm mt-2">
-              {decorator.totalReviews ? `${decorator.totalReviews} রিভিউ` : 'টপ রেটেড'}
+              {decorator.totalReviews ? `${decorator.totalReviews} Reviews` : 'Top Rated'}
             </div>
             {decorator.completedProjects && (
               <div className="text-xs text-base-content/60 mt-1">
@@ -133,9 +133,9 @@ export default function TopDecorators() {
             </figure>
             <div className="card-body text-center pb-6">
               <h3 className="card-title justify-center text-lg group-hover:text-primary transition-colors">
-                Expert Decoretors
+                Expert Decorators
               </h3>
-              <p className="text-sm text-base-content/70 mb-2">Decoretors Specialist</p>
+              <p className="text-sm text-base-content/70 mb-2">Decoration Specialist</p>
               <StarRating rating={4.5} />
               <div className="badge badge-outline badge-sm mt-2">Top Rated</div>
             </div>

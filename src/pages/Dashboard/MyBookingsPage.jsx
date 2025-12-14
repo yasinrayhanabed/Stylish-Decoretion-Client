@@ -7,6 +7,7 @@ import { useSearch } from '../../hooks/useSearch';
 import { usePagination } from '../../hooks/usePagination';
 import Pagination from '../../components/Pagination';
 import { FaCalendarAlt, FaSync, FaClipboardList, FaPalette, FaMapMarkerAlt, FaDollarSign, FaCreditCard, FaCalendar, FaTimes, FaSearch, FaSort, FaFilter } from 'react-icons/fa';
+import { isPaymentCompleted } from '../../utils/bookingUtils';
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -324,9 +325,9 @@ export default function MyBookingsPage() {
                                             <div>
                                                 <span className="font-semibold"><FaCreditCard className="inline mr-1" /> Payment:</span>
                                                 <p className={`font-semibold ${
-                                                    booking.paymentStatus === 'completed' ? 'text-success' : 'text-warning'
+                                                    isPaymentCompleted(booking) ? 'text-success' : 'text-warning'
                                                 }`}>
-                                                    {booking.paymentStatus === 'completed' ? 'Paid' : 'Pending'}
+                                                    {isPaymentCompleted(booking) ? 'Paid' : 'Pending'}
                                                 </p>
                                             </div>
                                             <div>
@@ -336,7 +337,7 @@ export default function MyBookingsPage() {
                                         </div>
                                         
                                         <div className="card-actions justify-end">
-                                            {(booking.paymentStatus !== 'completed' && booking.status !== 'Completed' && booking.status !== 'Canceled') && (
+                                            {(!isPaymentCompleted(booking) && booking.status !== 'Completed' && booking.status !== 'Canceled') && (
                                                 <button 
                                                     onClick={() => {
                                                         localStorage.setItem('pendingBooking', JSON.stringify({

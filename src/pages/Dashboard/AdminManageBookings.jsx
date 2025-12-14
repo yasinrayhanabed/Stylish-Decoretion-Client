@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api/axios";
 import Spinner from "../../components/Spinner";
-import { formatBookingId, sanitizeBookingData, validateBookingData } from "../../utils/bookingUtils";
+import { formatBookingId, sanitizeBookingData, validateBookingData, isPaymentCompleted } from "../../utils/bookingUtils";
 import { toast } from "react-toastify";
 import { FaClipboardList, FaChartLine, FaClipboard, FaUser, FaCalendarAlt, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
@@ -11,6 +11,18 @@ export default function AdminManageBookings() {
   const [loading, setLoading] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
+
+  // Add refresh function
+  const refreshBookings = async () => {
+    try {
+      const bookingsRes = await API.get("/bookings").catch(() => API.get("/bookings/my"));
+      const bookingsData = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
+      const sanitizedBookings = bookingsData.map((booking, index) => sanitizeBookingData(booking, index));
+      setBookings(sanitizedBookings);
+    } catch (err) {
+      console.error("Failed to refresh bookings:", err);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,31 +35,16 @@ export default function AdminManageBookings() {
         // Sanitize and validate booking data
         const bookingsData = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
         
-        // Debug: Log first booking to see payment structure
-        if (bookingsData.length > 0) {
-          console.log('Sample booking data:', {
-            isPaid: bookingsData[0].isPaid,
-            paymentStatus: bookingsData[0].paymentStatus,
-            payment_status: bookingsData[0].payment_status,
-            paymentCompleted: bookingsData[0].paymentCompleted,
-            paid: bookingsData[0].paid,
-            payment: bookingsData[0].payment,
-            status: bookingsData[0].status,
-            fullBooking: bookingsData[0]
-          });
-        }
-        
         const sanitizedBookings = bookingsData.map((booking, index) => {
           const sanitized = sanitizeBookingData(booking, index);
-          // Debug payment status for first few bookings
-          if (index < 3) {
-            console.log(`Booking ${index + 1} payment status:`, {
-              original: booking.isPaid,
-              sanitized: sanitized.isPaid,
-              paymentStatus: booking.paymentStatus,
-              status: booking.status
-            });
+          
+          // Check localStorage for assignments
+          const assignments = JSON.parse(localStorage.getItem('decoratorAssignments') || '{}');
+          if (assignments[booking._id]) {
+            sanitized.assignedDecorator = assignments[booking._id].decoratorId;
+            sanitized.status = assignments[booking._id].status;
           }
+          
           return sanitized;
         });
         
@@ -72,15 +69,25 @@ export default function AdminManageBookings() {
     try {
       console.log('Assigning decorator:', selectedAssignment);
       
-      // Use PUT to update the booking with assigned decorator
-      const response = await API.put(`/bookings/${selectedAssignment.bookingId}`, { 
-        assignedDecorator: selectedAssignment.decoratorId,
-        status: 'Assigned'
-      });
+      // Try multiple API endpoints for assignment
+      let response;
+      try {
+        // First try: PUT to update booking
+        response = await API.put(`/bookings/${selectedAssignment.bookingId}`, { 
+          assignedDecorator: selectedAssignment.decoratorId,
+          status: 'Assigned'
+        });
+      } catch (putError) {
+        // Second try: PATCH for partial update
+        response = await API.patch(`/bookings/${selectedAssignment.bookingId}`, { 
+          assignedDecorator: selectedAssignment.decoratorId,
+          status: 'Assigned'
+        });
+      }
       
       console.log('Assignment response:', response);
       
-      // Update local state
+      // Update local state only after successful API call
       setBookings((prev) =>
         prev.map((b) =>
           b._id === selectedAssignment.bookingId
@@ -88,24 +95,26 @@ export default function AdminManageBookings() {
             : b
         )
       );
+      
+      // Save to localStorage as backup
+      const assignments = JSON.parse(localStorage.getItem('decoratorAssignments') || '{}');
+      assignments[selectedAssignment.bookingId] = {
+        decoratorId: selectedAssignment.decoratorId,
+        status: 'Assigned',
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('decoratorAssignments', JSON.stringify(assignments));
       
       toast.success(`Decorator ${selectedAssignment.decoratorName} assigned successfully!`);
       setShowConfirmModal(false);
       setSelectedAssignment(null);
       
+      // Refresh bookings to ensure data consistency
+      setTimeout(() => refreshBookings(), 1000);
+      
     } catch (err) {
       console.error("Assignment failed:", err);
-      
-      // For now, just update locally since backend endpoint doesn't exist
-      setBookings((prev) =>
-        prev.map((b) =>
-          b._id === selectedAssignment.bookingId
-            ? { ...b, assignedDecorator: selectedAssignment.decoratorId, status: 'Assigned' }
-            : b
-        )
-      );
-      
-      toast.success(`Decorator ${selectedAssignment.decoratorName} assigned (locally)!`);
+      toast.error(`Failed to assign decorator: ${err.response?.data?.message || err.message}`);
       setShowConfirmModal(false);
       setSelectedAssignment(null);
     }
@@ -256,24 +265,16 @@ export default function AdminManageBookings() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col space-y-1">
-                        <button
-                          onClick={() => {
-                            const newStatus = !booking.isPaid;
-                            setBookings(prev => prev.map(b => 
-                              b._id === booking._id ? {...b, isPaid: newStatus} : b
-                            ));
-                            toast.success(`Payment status updated to ${newStatus ? 'Paid' : 'Pending'}`);
-                          }}
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity ${
-                            booking.isPaid 
-                              ? 'bg-green-100 text-green-800 border border-green-200 hover:bg-green-200' 
-                              : 'bg-red-100 text-red-800 border border-red-200 hover:bg-red-200'
+                        <div
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            isPaymentCompleted(booking)
+                              ? 'bg-green-100 text-green-800 border border-green-200' 
+                              : 'bg-red-100 text-red-800 border border-red-200'
                           }`}
-                          title="Click to toggle payment status (Admin Override)"
                         >
-                          {booking.isPaid ? <FaCheckCircle className="mr-1 text-xs" /> : <FaTimesCircle className="mr-1 text-xs" />}
-                          {booking.isPaid ? 'Paid' : 'Pending'}
-                        </button>
+                          {isPaymentCompleted(booking) ? <FaCheckCircle className="mr-1 text-xs" /> : <FaTimesCircle className="mr-1 text-xs" />}
+                          {isPaymentCompleted(booking) ? 'Paid' : 'Pending'}
+                        </div>
                         {booking.amount && (
                           <div className="text-xs text-gray-500">
                             ৳{booking.amount}
@@ -320,7 +321,7 @@ export default function AdminManageBookings() {
                             Unassigned
                           </span>
                           
-                          {booking.isPaid && decorators.length > 0 ? (
+                          {isPaymentCompleted(booking) && decorators.length > 0 ? (
                             <select
                               className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
                               defaultValue=""
@@ -346,7 +347,7 @@ export default function AdminManageBookings() {
                                 </option>
                               ))}
                             </select>
-                          ) : !booking.isPaid ? (
+                          ) : !isPaymentCompleted(booking) ? (
                             <div className="text-xs text-gray-500">
                               ⏳ Awaiting Payment
                             </div>

@@ -136,3 +136,20 @@ export const sanitizeBookingData = (booking, index = 0) => {
     amount: booking.amount || booking.cost || booking.price || null
   };
 };
+
+/**
+ * Checks if payment is actually completed (not just clicked)
+ * @param {object} booking - The booking object
+ * @returns {boolean} - True if payment is genuinely completed
+ */
+export const isPaymentCompleted = (booking) => {
+  if (!booking) return false;
+  
+  // Only consider payment completed if paymentStatus is explicitly 'completed'
+  // or if there's a valid transaction ID indicating actual payment
+  return (
+    booking.paymentStatus === 'completed' || 
+    (booking.isPaid === true && booking.transactionId) ||
+    (booking.payment && booking.payment.transactionId && booking.payment.status === 'completed')
+  );
+};

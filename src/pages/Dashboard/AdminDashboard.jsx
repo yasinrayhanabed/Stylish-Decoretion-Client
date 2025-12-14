@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom'; 
-import { FaHome, FaUsers, FaPalette, FaUserTie, FaCalendarAlt, FaChartBar, FaCrown } from "react-icons/fa";
+import { FaHome, FaUsers, FaPalette, FaUserTie, FaCalendarAlt, FaChartBar, FaCrown, FaUserPlus } from "react-icons/fa";
 
 // Removed getNavLinkClass as we're using inline styles now
 
@@ -99,6 +99,20 @@ export default function AdminDashboard() {
             >
                 <FaCalendarAlt className="text-xl" />
                 <span className="font-medium">Manage Bookings</span>
+            </NavLink>
+
+            <NavLink 
+                to="decorator-requests" 
+                className={({ isActive }) => 
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
+                        isActive 
+                            ? "bg-indigo-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
+                    }`
+                }
+            >
+                <FaUserPlus className="text-xl" />
+                <span className="font-medium">Decorator Requests</span>
             </NavLink>
 
             {/* Analytics Section */}
