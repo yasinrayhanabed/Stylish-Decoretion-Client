@@ -36,16 +36,7 @@ export default function AdminManageBookings() {
         const bookingsData = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
         
         const sanitizedBookings = bookingsData.map((booking, index) => {
-          const sanitized = sanitizeBookingData(booking, index);
-          
-          // Check localStorage for assignments
-          const assignments = JSON.parse(localStorage.getItem('decoratorAssignments') || '{}');
-          if (assignments[booking._id]) {
-            sanitized.assignedDecorator = assignments[booking._id].decoratorId;
-            sanitized.status = assignments[booking._id].status;
-          }
-          
-          return sanitized;
+          return sanitizeBookingData(booking, index);
         });
         
         setBookings(sanitizedBookings);
@@ -67,27 +58,13 @@ export default function AdminManageBookings() {
     }
     
     try {
-      console.log('Assigning decorator:', selectedAssignment);
+      // Update booking with decorator assignment
+      await API.put(`/bookings/${selectedAssignment.bookingId}`, { 
+        assignedDecorator: selectedAssignment.decoratorId,
+        status: 'Assigned'
+      });
       
-      // Try multiple API endpoints for assignment
-      let response;
-      try {
-        // First try: PUT to update booking
-        response = await API.put(`/bookings/${selectedAssignment.bookingId}`, { 
-          assignedDecorator: selectedAssignment.decoratorId,
-          status: 'Assigned'
-        });
-      } catch (putError) {
-        // Second try: PATCH for partial update
-        response = await API.patch(`/bookings/${selectedAssignment.bookingId}`, { 
-          assignedDecorator: selectedAssignment.decoratorId,
-          status: 'Assigned'
-        });
-      }
-      
-      console.log('Assignment response:', response);
-      
-      // Update local state only after successful API call
+      // Update local state immediately
       setBookings((prev) =>
         prev.map((b) =>
           b._id === selectedAssignment.bookingId
@@ -96,21 +73,9 @@ export default function AdminManageBookings() {
         )
       );
       
-      // Save to localStorage as backup
-      const assignments = JSON.parse(localStorage.getItem('decoratorAssignments') || '{}');
-      assignments[selectedAssignment.bookingId] = {
-        decoratorId: selectedAssignment.decoratorId,
-        status: 'Assigned',
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('decoratorAssignments', JSON.stringify(assignments));
-      
       toast.success(`Decorator ${selectedAssignment.decoratorName} assigned successfully!`);
       setShowConfirmModal(false);
       setSelectedAssignment(null);
-      
-      // Refresh bookings to ensure data consistency
-      setTimeout(() => refreshBookings(), 1000);
       
     } catch (err) {
       console.error("Assignment failed:", err);

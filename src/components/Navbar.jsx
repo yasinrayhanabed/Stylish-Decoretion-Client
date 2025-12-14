@@ -23,7 +23,6 @@ export default function Navbar() {
             <li><NavLink to="/services">Services</NavLink></li>
             <li><NavLink to="/about">About</NavLink></li>
             <li><NavLink to="/contact">Contact</NavLink></li>
-            <li><NavLink to="/become-decorator">Become a Decorator</NavLink></li>
           </ul>
         </div>
         <Link to="/" className="btn btn-ghost normal-case text-xl">
@@ -36,7 +35,6 @@ export default function Navbar() {
           <li><NavLink to="/services" className={({ isActive }) => isActive ? "active" : ""}>Services</NavLink></li>
           <li><NavLink to="/about" className={({ isActive }) => isActive ? "active" : ""}>About</NavLink></li>
           <li><NavLink to="/contact" className={({ isActive }) => isActive ? "active" : ""}>Contact</NavLink></li>
-          <li><NavLink to="/become-decorator" className={({ isActive }) => isActive ? "active" : ""}>Become a Decorator</NavLink></li>
         </ul>
       </div>
       <div className="navbar-end">
@@ -64,6 +62,7 @@ export default function Navbar() {
                   <>
                     <li><Link to="/dashboard">My Dashboard</Link></li>
                     <li><Link to="/dashboard/profile">My Profile</Link></li>
+                    <li><Link to="/become-decorator">Become a Decorator</Link></li>
                   </>
                 )}
                 <div className="divider my-1"></div>

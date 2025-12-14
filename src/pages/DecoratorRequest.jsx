@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import API from '../api/axios';
-import { FaPalette, FaUser, FaPhone, FaMapMarkerAlt, FaFileAlt, FaImage, FaStar } from 'react-icons/fa';
+import { FaPalette, FaUser, FaPhone, FaMapMarkerAlt, FaFileAlt, FaImage, FaStar, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
 
 export default function DecoratorRequest() {
   const [formData, setFormData] = useState({
@@ -15,16 +15,27 @@ export default function DecoratorRequest() {
     expectedRate: ''
   });
   const [loading, setLoading] = useState(false);
+  const [requestStatus, setRequestStatus] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(true);
 
-  // Test backend connection
-  const testConnection = async () => {
+  useEffect(() => {
+    checkRequestStatus();
+  }, []);
+
+  const checkRequestStatus = async () => {
     try {
-      const response = await API.get('/health');
-      console.log('Backend connection successful:', response.data);
-      toast.success('Backend connection is working!');
+      const response = await API.get('/me');
+      const user = response.data;
+      if (user.decoratorRequestStatus) {
+        setRequestStatus({
+          status: user.decoratorRequestStatus,
+          data: user.decoratorRequest
+        });
+      }
     } catch (err) {
-      console.error('Backend connection failed:', err);
-      toast.error('Cannot connect to backend server!');
+      console.error('Failed to check request status:', err);
+    } finally {
+      setStatusLoading(false);
     }
   };
 
@@ -35,7 +46,7 @@ export default function DecoratorRequest() {
     try {
       const response = await API.post('/decorator-requests', formData);
       console.log('Success response:', response.data);
-      toast.success('Decorator request submitted successfully! We will review and contact you soon.');
+      toast.success(response.data.message || 'Decorator request submitted successfully! We will review and contact you soon.');
       setFormData({
         experience: '',
         specialty: '',
@@ -45,22 +56,12 @@ export default function DecoratorRequest() {
         location: '',
         expectedRate: ''
       });
+      // Refresh status after successful submission
+      checkRequestStatus();
     } catch (err) {
       console.error('Request submission failed:', err);
       
-      if (err.response?.status === 404) {
-        console.log('Backend route not found. Using mock response:', formData);
-        toast.success('Request submitted successfully! (Mock response - Please set up backend route)');
-        setFormData({
-          experience: '',
-          specialty: '',
-          portfolio: '',
-          description: '',
-          phone: '',
-          location: '',
-          expectedRate: ''
-        });
-      } else if (err.response) {
+      if (err.response) {
         const errorMessage = err.response.data?.message || err.response.data?.error || 'Server error occurred';
         toast.error(`Error: ${errorMessage}`);
         console.error('Server Error:', err.response.status, err.response.data);
@@ -82,6 +83,17 @@ export default function DecoratorRequest() {
       [e.target.name]: e.target.value
     });
   };
+
+  if (statusLoading) {
+    return (
+      <div className="min-h-screen bg-base-200 flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading loading-spinner loading-lg"></div>
+          <p className="mt-4 text-gray-600">Checking your decorator request status...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-base-200 py-12 px-4">
@@ -113,13 +125,53 @@ export default function DecoratorRequest() {
           </div>
         </motion.div>
 
-        {/* Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl p-8"
-        >
+        {/* Status Display */}
+        {requestStatus && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <div className={`p-6 rounded-2xl shadow-xl ${
+              requestStatus.status === 'approved' ? 'bg-green-50 border-l-4 border-green-500' :
+              requestStatus.status === 'rejected' ? 'bg-red-50 border-l-4 border-red-500' :
+              'bg-yellow-50 border-l-4 border-yellow-500'
+            }`}>
+              <div className="flex items-center mb-4">
+                {requestStatus.status === 'approved' && <FaCheckCircle className="text-2xl text-green-600 mr-3" />}
+                {requestStatus.status === 'rejected' && <FaTimesCircle className="text-2xl text-red-600 mr-3" />}
+                {requestStatus.status === 'pending' && <FaClock className="text-2xl text-yellow-600 mr-3" />}
+                <h3 className={`text-xl font-bold ${
+                  requestStatus.status === 'approved' ? 'text-green-800' :
+                  requestStatus.status === 'rejected' ? 'text-red-800' :
+                  'text-yellow-800'
+                }`}>
+                  {requestStatus.status === 'approved' && 'Request Approved! 🎉'}
+                  {requestStatus.status === 'rejected' && 'Request Rejected'}
+                  {requestStatus.status === 'pending' && 'Request Under Review'}
+                </h3>
+              </div>
+              <p className={`${
+                requestStatus.status === 'approved' ? 'text-green-700' :
+                requestStatus.status === 'rejected' ? 'text-red-700' :
+                'text-yellow-700'
+              }`}>
+                {requestStatus.status === 'approved' && 'Congratulations! Your decorator request has been approved. You can now access the decorator dashboard.'}
+                {requestStatus.status === 'rejected' && 'Unfortunately, your decorator request was not approved this time. You can submit a new request below.'}
+                {requestStatus.status === 'pending' && 'Your decorator request is currently being reviewed by our admin team. We will notify you once a decision is made.'}
+              </p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Form - Show only if no pending request or if rejected */}
+        {(!requestStatus || requestStatus.status === 'rejected') && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl shadow-xl p-8"
+          >
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Experience */}
@@ -250,16 +302,7 @@ export default function DecoratorRequest() {
               />
             </div>
 
-            {/* Debug Button (temporary) */}
-            <div className="text-center mb-4">
-              <button
-                type="button"
-                onClick={testConnection}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 mr-4"
-              >
-                Test Backend Connection
-              </button>
-            </div>
+
 
             {/* Submit Button */}
             <div className="text-center">
@@ -283,6 +326,7 @@ export default function DecoratorRequest() {
             </div>
           </form>
         </motion.div>
+        )}
       </div>
     </div>
   );
