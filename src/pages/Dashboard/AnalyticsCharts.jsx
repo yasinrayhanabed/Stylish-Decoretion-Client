@@ -3,6 +3,7 @@ import API from '../../api/axios';
 import Spinner from '../../components/Spinner';
 import { toast } from 'react-toastify';
 import { FaChartBar, FaChartPie, FaChartLine, FaUsers, FaServicestack, FaSync } from 'react-icons/fa';
+import { mockServiceDemand, mockUserBookings, mockRevenueData, simulateApiDelay, generateDynamicServiceDemand } from '../../utils/mockAnalyticsData';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -44,40 +45,53 @@ export default function AnalyticsCharts() {
     fetchChartsData(true);
   };
 
-  // Chart configurations
+  // Chart configurations - Service Demand Histogram
   const serviceHistogramData = {
-    labels: serviceDemand.map(service => service.name),
+    labels: serviceDemand.map(service => {
+      // Truncate long service names for better display
+      return service.name.length > 12 ? service.name.substring(0, 12) + '...' : service.name;
+    }),
     datasets: [
       {
-        label: 'Number of Bookings',
+        label: 'Service Bookings (Histogram)',
         data: serviceDemand.map(service => service.bookings),
-        backgroundColor: [
-          'rgba(147, 51, 234, 0.8)',
-          'rgba(59, 130, 246, 0.8)',
-          'rgba(16, 185, 129, 0.8)',
-          'rgba(245, 158, 11, 0.8)',
-          'rgba(239, 68, 68, 0.8)',
-          'rgba(99, 102, 241, 0.8)',
-          'rgba(236, 72, 153, 0.8)',
-          'rgba(107, 114, 128, 0.8)',
-          'rgba(249, 115, 22, 0.8)',
-          'rgba(20, 184, 166, 0.8)'
-        ],
-        borderColor: [
-          'rgba(147, 51, 234, 1)',
-          'rgba(59, 130, 246, 1)',
-          'rgba(16, 185, 129, 1)',
-          'rgba(245, 158, 11, 1)',
-          'rgba(239, 68, 68, 1)',
-          'rgba(99, 102, 241, 1)',
-          'rgba(236, 72, 153, 1)',
-          'rgba(107, 114, 128, 1)',
-          'rgba(249, 115, 22, 1)',
-          'rgba(20, 184, 166, 1)'
-        ],
+        backgroundColor: serviceDemand.map((_, index) => {
+          const colors = [
+            'rgba(147, 51, 234, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(245, 158, 11, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(99, 102, 241, 0.8)',
+            'rgba(236, 72, 153, 0.8)',
+            'rgba(107, 114, 128, 0.8)',
+            'rgba(249, 115, 22, 0.8)',
+            'rgba(20, 184, 166, 0.8)'
+          ];
+          return colors[index % colors.length];
+        }),
+        borderColor: serviceDemand.map((_, index) => {
+          const colors = [
+            'rgba(147, 51, 234, 1)',
+            'rgba(59, 130, 246, 1)',
+            'rgba(16, 185, 129, 1)',
+            'rgba(245, 158, 11, 1)',
+            'rgba(239, 68, 68, 1)',
+            'rgba(99, 102, 241, 1)',
+            'rgba(236, 72, 153, 1)',
+            'rgba(107, 114, 128, 1)',
+            'rgba(249, 115, 22, 1)',
+            'rgba(20, 184, 166, 1)'
+          ];
+          return colors[index % colors.length];
+        }),
         borderWidth: 2,
-        borderRadius: 8,
+        borderRadius: 6,
         borderSkipped: false,
+        barThickness: 'flex',
+        maxBarThickness: 60,
+        categoryPercentage: 0.8,
+        barPercentage: 0.9,
       }
     ]
   };
@@ -139,6 +153,117 @@ export default function AnalyticsCharts() {
         borderWidth: 2,
       }
     ]
+  };
+
+  // Histogram-specific chart options
+  const histogramOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+          font: {
+            size: 12,
+            weight: '600'
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        borderWidth: 1,
+        cornerRadius: 8,
+        displayColors: true,
+        padding: 15,
+        callbacks: {
+          title: function(context) {
+            const fullName = serviceDemand[context[0].dataIndex]?.name || context[0].label;
+            return fullName;
+          },
+          label: function(context) {
+            return `Bookings: ${context.parsed.y}`;
+          },
+          afterLabel: function(context) {
+            const total = serviceDemand.reduce((sum, service) => sum + service.bookings, 0);
+            const percentage = ((context.parsed.y / total) * 100).toFixed(1);
+            return `Share: ${percentage}% of total bookings`;
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: 'Service Demand Distribution (Histogram)',
+        font: {
+          size: 16,
+          weight: 'bold'
+        },
+        color: '#374151',
+        padding: {
+          top: 10,
+          bottom: 20
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Bookings',
+          font: {
+            size: 12,
+            weight: '600'
+          },
+          color: '#6B7280'
+        },
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)',
+          drawBorder: false
+        },
+        ticks: {
+          font: {
+            size: 11
+          },
+          color: '#6B7280',
+          stepSize: 1
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Services',
+          font: {
+            size: 12,
+            weight: '600'
+          },
+          color: '#6B7280'
+        },
+        grid: {
+          display: false
+        },
+        ticks: {
+          font: {
+            size: 10
+          },
+          color: '#6B7280',
+          maxRotation: 45,
+          minRotation: 0
+        }
+      }
+    },
+    interaction: {
+      intersect: false,
+      mode: 'index'
+    },
+    animation: {
+      duration: 1000,
+      easing: 'easeInOutQuart'
+    }
   };
 
   const chartOptions = {
@@ -293,10 +418,30 @@ export default function AnalyticsCharts() {
       
     } catch (err) {
       console.error('Failed to fetch charts data:', err);
-      if (err.response?.status === 403) {
-        toast.error('Access denied. Admin role required.');
-      } else {
-        toast.error('Failed to load charts data');
+      
+      // Use mock data as fallback
+      console.log('Using dynamic mock data for demonstration...');
+      try {
+        const mockData = await simulateApiDelay({
+          serviceDemand: generateDynamicServiceDemand(),
+          userBookings: mockUserBookings,
+          revenueData: mockRevenueData
+        }, 500);
+        
+        setServiceDemand(mockData.serviceDemand);
+        setBookingsByUser(mockData.userBookings);
+        setRevenueData(mockData.revenueData);
+        
+        if (!isRefresh) {
+          toast.info('Using demo data for charts visualization');
+        }
+      } catch (mockErr) {
+        console.error('Failed to load mock data:', mockErr);
+        if (err.response?.status === 403) {
+          toast.error('Access denied. Admin role required.');
+        } else {
+          toast.error('Failed to load charts data');
+        }
       }
     } finally {
       setLoading(false);
@@ -339,22 +484,51 @@ export default function AnalyticsCharts() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Service Demand Histogram */}
-        <div className="bg-white rounded-2xl shadow-xl p-6">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-            <FaServicestack className="mr-3 text-purple-600" />
-            Service Demand Chart (Histogram)
-          </h3>
-          <p className="text-gray-600 mb-6">Number of services booked by users - Dynamic Histogram</p>
+        <div className="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-purple-500">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800 flex items-center">
+                <FaServicestack className="mr-3 text-purple-600" />
+                Service Demand Histogram
+              </h3>
+              <p className="text-gray-600 mt-2">Dynamic histogram showing service booking frequency distribution</p>
+            </div>
+            <div className="bg-purple-100 p-3 rounded-full">
+              <FaChartBar className="text-2xl text-purple-600" />
+            </div>
+          </div>
           
-          <div className="h-80">
+          {serviceDemand.length > 0 && (
+            <div className="mb-4 p-3 bg-purple-50 rounded-lg">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-purple-700 font-medium">Total Services: {serviceDemand.length}</span>
+                <span className="text-purple-700 font-medium">
+                  Total Bookings: {serviceDemand.reduce((sum, service) => sum + service.bookings, 0)}
+                </span>
+                <span className="text-purple-700 font-medium">
+                  Avg per Service: {Math.round(serviceDemand.reduce((sum, service) => sum + service.bookings, 0) / serviceDemand.length)}
+                </span>
+              </div>
+            </div>
+          )}
+          
+          <div className="h-96">
             {serviceDemand.length > 0 ? (
-              <Bar data={serviceHistogramData} options={chartOptions} />
+              <Bar data={serviceHistogramData} options={histogramOptions} />
             ) : (
               <div className="flex items-center justify-center h-full text-gray-500">
                 <div className="text-center">
                   <FaServicestack className="mx-auto text-6xl mb-4 opacity-30" />
                   <h4 className="text-lg font-medium mb-2">No Service Data Available</h4>
-                  <p>Service demand histogram will appear here once bookings are made</p>
+                  <p className="text-sm">Service demand histogram will appear here once bookings are made</p>
+                  <div className="mt-4 p-3 bg-gray-100 rounded-lg">
+                    <p className="text-xs text-gray-500">This histogram will show:</p>
+                    <ul className="text-xs text-gray-500 mt-2 space-y-1">
+                      <li>• Service names on X-axis</li>
+                      <li>• Number of bookings on Y-axis</li>
+                      <li>• Color-coded bars for easy identification</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}

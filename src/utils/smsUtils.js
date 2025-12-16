@@ -1,54 +1,55 @@
-// Mock SMS Notification System
-export const sendSMS = async (phoneNumber, message, type = 'booking') => {
-  // Mock SMS sending - in production, integrate with SMS gateway
-  console.log(`📱 SMS Sent to ${phoneNumber}:`);
-  console.log(`Message: ${message}`);
+// SMS Notification System (Mock Implementation)
+export const sendSMS = async (phoneNumber, message, type = 'general') => {
+  // Mock SMS sending - replace with actual SMS service
+  console.log(`📱 SMS Sent to ${phoneNumber}:`, message);
   
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return {
-    success: true,
-    messageId: `SMS_${Date.now()}`,
-    timestamp: new Date().toISOString(),
-    type,
-    recipient: phoneNumber
-  };
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        messageId: `sms_${Date.now()}`,
+        timestamp: new Date().toISOString()
+      });
+    }, 1000);
+  });
 };
 
 export const smsTemplates = {
-  bookingConfirmation: (bookingId, serviceName, date) => 
-    `✅ Booking Confirmed! ID: ${bookingId}. Service: ${serviceName} on ${date}. Thank you for choosing StyleDecor!`,
+  booking_confirmed: (bookingId, serviceName, date) => 
+    `✅ Booking confirmed! ID: ${bookingId}. Service: ${serviceName} on ${date}. Thank you for choosing StyleDecor!`,
   
-  bookingReminder: (serviceName, date, time) => 
-    `⏰ Reminder: Your ${serviceName} appointment is tomorrow at ${time} on ${date}. We're excited to transform your space!`,
+  booking_reminder: (serviceName, date, time) => 
+    `⏰ Reminder: Your ${serviceName} is scheduled for ${date} at ${time}. Our decorator will contact you soon.`,
   
-  decoratorAssigned: (decoratorName, contactNumber) => 
-    `👨‍🎨 Decorator Assigned! ${decoratorName} will handle your project. Contact: ${contactNumber}`,
+  decorator_assigned: (decoratorName, phone) => 
+    `👨‍🎨 Decorator assigned! ${decoratorName} will handle your project. Contact: ${phone}`,
   
-  paymentReceived: (amount, bookingId) => 
-    `💳 Payment of ৳${amount} received for booking ${bookingId}. Thank you!`,
+  payment_received: (amount, bookingId) => 
+    `💰 Payment of ৳${amount} received for booking ${bookingId}. Thank you!`,
   
-  serviceCompleted: (serviceName, rating_link) => 
-    `🎉 Service completed! Hope you love your new ${serviceName}. Rate us: ${rating_link}`,
-  
-  couponCode: (code, discount, expiry) => 
-    `🎁 Special offer! Use code ${code} for ${discount}% off. Valid till ${expiry}. Book now!`
+  service_completed: (serviceName) => 
+    `🎉 Your ${serviceName} is complete! Please rate your experience. Thank you for choosing StyleDecor!`,
+    
+  serviceUpdate: (serviceName) => 
+    `🔄 Service Update: ${serviceName} has been updated with new features. Check it out now!`,
+    
+  bookingConfirmation: (serviceName, date, amount) => 
+    `✅ Booking Confirmed! Service: ${serviceName}, Date: ${date}, Amount: ৳${amount}. Thank you for choosing StyleDecor!`
 };
 
 export const sendBookingNotification = async (booking, type) => {
   const { userPhone, serviceName, bookingId, scheduledDate } = booking;
   
-  let message = '';
+  let message;
   switch (type) {
-    case 'confirmation':
-      message = smsTemplates.bookingConfirmation(bookingId, serviceName, scheduledDate);
+    case 'confirmed':
+      message = smsTemplates.booking_confirmed(bookingId, serviceName, scheduledDate);
       break;
     case 'reminder':
-      message = smsTemplates.bookingReminder(serviceName, scheduledDate, '10:00 AM');
+      message = smsTemplates.booking_reminder(serviceName, scheduledDate, '10:00 AM');
       break;
     case 'completed':
-      message = smsTemplates.serviceCompleted(serviceName, 'https://styledecor.com/rate');
+      message = smsTemplates.service_completed(serviceName);
       break;
     default:
       message = `Update for booking ${bookingId}: ${serviceName}`;

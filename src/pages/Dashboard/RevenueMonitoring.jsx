@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import API from '../../api/axios';
 import Spinner from '../../components/Spinner';
 import { toast } from 'react-toastify';
-import { FaDollarSign, FaChartLine, FaCalendarAlt, FaWallet, FaCreditCard, FaArrowUp, FaSync, FaTrendingUp } from 'react-icons/fa';
+import { FaDollarSign, FaChartLine, FaCalendarAlt, FaWallet, FaCreditCard, FaArrowUp, FaSync } from 'react-icons/fa';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -295,7 +295,7 @@ export default function RevenueMonitoring() {
             </button>
             <div className="hidden md:block">
               <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <FaTrendingUp className="text-3xl" />
+                <FaChartLine className="text-3xl" />
               </div>
             </div>
           </div>
@@ -487,7 +487,7 @@ export default function RevenueMonitoring() {
         {/* Revenue Performance Insights */}
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-            <FaTrendingUp className="mr-3 text-indigo-600" />
+            <FaChartLine className="mr-3 text-indigo-600" />
             Performance Insights
           </h3>
           <div className="space-y-6">

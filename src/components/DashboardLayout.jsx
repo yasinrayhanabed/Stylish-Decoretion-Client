@@ -21,8 +21,8 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen w-full bg-base-100">
-      {/* Fixed Sidebar - Full Height */}
-      <aside className={`w-64 ${sidebarColor} shadow-lg flex-shrink-0 fixed top-0 left-0 h-screen overflow-y-auto z-10`}>
+      {/* Fixed Sidebar - Between Navbar and Footer */}
+      <aside className={`w-64 ${sidebarColor} shadow-lg flex-shrink-0 fixed top-16 left-0 bottom-0 overflow-y-auto z-10`} style={{height: 'calc(100vh - 4rem)'}}>
         <div className="p-4">
           {/* Header */}
           <div className="mb-6">
@@ -71,7 +71,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content - Scrollable with margin for fixed sidebar */}
-      <main className="flex-1 bg-base-100 ml-64 min-h-screen">
+      <main className="flex-1 bg-base-100 ml-64" style={{minHeight: 'calc(100vh - 4rem)'}}>
         <div className="h-full overflow-y-auto">
           <div className="p-6">
             <Outlet />

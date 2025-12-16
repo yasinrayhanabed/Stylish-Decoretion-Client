@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom'; 
-import { FaHome, FaUsers, FaPalette, FaUserTie, FaCalendarAlt, FaChartBar, FaCrown, FaUserPlus, FaDollarSign } from "react-icons/fa";
+import { FaHome, FaUsers, FaPalette, FaUserTie, FaCalendarAlt, FaChartBar, FaCrown, FaUserPlus, FaDollarSign, FaChartLine } from "react-icons/fa";
 
 export default function AdminDashboard() {
   return (
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
                 }
             >
                 <FaChartBar className="text-xl" />
-                <span className="font-medium">Business Analytics</span>
+                <span className="font-medium">Analytics Overview</span>
             </NavLink>
 
             <NavLink 
@@ -156,8 +156,22 @@ export default function AdminDashboard() {
                     }`
                 }
             >
-                <FaChartBar className="text-xl" />
+                <FaChartLine className="text-xl" />
                 <span className="font-medium">Analytics Charts</span>
+            </NavLink>
+
+            <NavLink 
+                to="business-analytics" 
+                className={({ isActive }) => 
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
+                        isActive 
+                            ? "bg-indigo-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
+                    }`
+                }
+            >
+                <FaChartLine className="text-xl" />
+                <span className="font-medium">Business Dashboard</span>
             </NavLink>
         </nav>
         </div>

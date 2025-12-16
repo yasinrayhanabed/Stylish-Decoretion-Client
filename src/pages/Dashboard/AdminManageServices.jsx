@@ -4,13 +4,22 @@ import Spinner from "../../components/Spinner";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { useSearch } from "../../hooks/useSearch";
-import { FaPalette, FaPlus, FaEye, FaTrash, FaDollarSign, FaSearch, FaSort, FaFilter, FaChevronLeft, FaChevronRight, FaArrowUp, FaArrowDown, FaEdit } from "react-icons/fa";
+import { FaPalette, FaPlus, FaEye, FaTrash, FaDollarSign, FaSearch, FaSort, FaFilter, FaChevronLeft, FaChevronRight, FaArrowUp, FaArrowDown, FaEdit, FaSms, FaGift, FaUsers, FaRobot, FaCog } from "react-icons/fa";
+import { sendSMS, smsTemplates } from "../../utils/smsUtils";
+import { getAvailableCoupons } from "../../utils/couponUtils";
+import { subscriptionPlans } from "../../utils/subscriptionUtils";
+import { serviceAddons } from "../../utils/serviceAddons";
+import { getDecoratorRecommendations } from "../../utils/aiRecommendation";
 
 export default function AdminManageServices() {
   const [services, setServices] = useState(null);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingService, setEditingService] = useState(null);
+  const [showSMSModal, setShowSMSModal] = useState(false);
+  const [showCouponModal, setShowCouponModal] = useState(false);
+  const [showAddonsModal, setShowAddonsModal] = useState(false);
   const itemsPerPage = 6;
 
   // Search and filter functionality
@@ -75,6 +84,28 @@ export default function AdminManageServices() {
     }
   };
 
+  const handleUpdateService = async (serviceId, updates) => {
+    try {
+      const res = await API.put(`/services/${serviceId}`, updates);
+      if (res.data?.success) {
+        toast.success("Service updated successfully");
+        setServices(prev => prev.map(s => s._id === serviceId ? { ...s, ...updates } : s));
+        setEditingService(null);
+      }
+    } catch (err) {
+      toast.error("Failed to update service");
+    }
+  };
+
+  const sendServiceNotification = async (serviceId, message) => {
+    try {
+      await sendSMS("+8801234567890", message, "service_update");
+      toast.success("SMS notification sent!");
+    } catch (err) {
+      toast.error("Failed to send SMS");
+    }
+  };
+
   if (loading || services === null) return <Spinner />;
 
   return (
@@ -90,6 +121,18 @@ export default function AdminManageServices() {
             <p className="text-purple-100 text-lg">Oversee and manage decoration services</p>
           </div>
           <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => setShowCouponModal(true)}
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex items-center font-medium shadow-lg"
+            >
+              <FaGift className="mr-2" /> Coupons
+            </button>
+            <button 
+              onClick={() => setShowAddonsModal(true)}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center font-medium shadow-lg"
+            >
+              <FaCog className="mr-2" /> Add-ons
+            </button>
             <Link 
               to="/dashboard/admin/add-service" 
               className="px-6 py-3 bg-white text-purple-600 rounded-lg hover:bg-gray-100 transition-colors flex items-center font-medium shadow-lg"
@@ -266,10 +309,18 @@ export default function AdminManageServices() {
                           <FaEye />
                         </Link>
                         <button 
+                          onClick={() => setEditingService(s)}
                           className="w-10 h-10 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors flex items-center justify-center"
                           title="Edit Service"
                         >
                           <FaEdit />
+                        </button>
+                        <button 
+                          onClick={() => sendServiceNotification(s._id, smsTemplates.serviceUpdate(s.service_name))}
+                          className="w-10 h-10 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg transition-colors flex items-center justify-center"
+                          title="Send SMS Update"
+                        >
+                          <FaSms />
                         </button>
                       </div>
                       
@@ -330,6 +381,121 @@ export default function AdminManageServices() {
           </>
         )}
       </div>
+
+      {/* Edit Service Modal */}
+      {editingService && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-bold mb-4">Edit Service</h3>
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={editingService.service_name}
+                onChange={(e) => setEditingService({...editingService, service_name: e.target.value})}
+                className="w-full p-3 border rounded-lg"
+                placeholder="Service Name"
+              />
+              <textarea
+                value={editingService.description}
+                onChange={(e) => setEditingService({...editingService, description: e.target.value})}
+                className="w-full p-3 border rounded-lg h-24"
+                placeholder="Description"
+              />
+              <input
+                type="number"
+                value={editingService.cost}
+                onChange={(e) => setEditingService({...editingService, cost: Number(e.target.value)})}
+                className="w-full p-3 border rounded-lg"
+                placeholder="Cost"
+              />
+            </div>
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={() => handleUpdateService(editingService._id, editingService)}
+                className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+              >
+                Update
+              </button>
+              <button
+                onClick={() => setEditingService(null)}
+                className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Coupon Modal */}
+      {showCouponModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-4 flex items-center">
+              <FaGift className="mr-2 text-yellow-500" /> Available Coupons
+            </h3>
+            <div className="grid gap-4">
+              {getAvailableCoupons().map(coupon => (
+                <div key={coupon.code} className="border rounded-lg p-4 bg-gradient-to-r from-yellow-50 to-orange-50">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-bold text-lg">{coupon.title}</h4>
+                      <p className="text-gray-600">{coupon.description}</p>
+                      <p className="text-sm text-gray-500">Min: ৳{coupon.minAmount} | Expires: {coupon.expiry}</p>
+                    </div>
+                    <div className="bg-yellow-500 text-white px-3 py-1 rounded-full font-bold">
+                      {coupon.code}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowCouponModal(false)}
+              className="w-full mt-4 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add-ons Modal */}
+      {showAddonsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-4xl mx-4 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-4 flex items-center">
+              <FaCog className="mr-2 text-green-500" /> Service Add-ons
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {serviceAddons.map(addon => (
+                <div key={addon.id} className="border rounded-lg p-4 bg-gradient-to-br from-green-50 to-blue-50">
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">{addon.image}</div>
+                    <h4 className="font-bold">{addon.name}</h4>
+                    <p className="text-sm text-gray-600 mb-2">{addon.description}</p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-bold text-green-600">৳{addon.price}</span>
+                      <span className="text-gray-500">{addon.duration}</span>
+                    </div>
+                    {addon.popular && (
+                      <span className="inline-block bg-orange-500 text-white text-xs px-2 py-1 rounded-full mt-2">
+                        Popular
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowAddonsModal(false)}
+              className="w-full mt-4 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

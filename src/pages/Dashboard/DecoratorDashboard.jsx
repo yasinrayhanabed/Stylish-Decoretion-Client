@@ -331,11 +331,57 @@ export default function DecoratorDashboard() {
           </div>
         </div>
 
+        {/* Today's Schedule */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+            <FaCalendar className="mr-3 text-blue-600" />
+            Today's Schedule
+          </h3>
+          {(() => {
+            const today = new Date().toDateString();
+            const todayProjects = bookings?.filter(b => 
+              new Date(b.date).toDateString() === today && 
+              !isBookingCancelled(b) && 
+              b.status !== 'Completed'
+            ) || [];
+            
+            return todayProjects.length > 0 ? (
+              <div className="grid gap-4">
+                {todayProjects.map((project, index) => {
+                  const statusInfo = getStatusInfo(project.status);
+                  const StatusIcon = statusInfo.icon;
+                  return (
+                    <div key={project._id} className="flex items-center p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500">
+                      <div className={`w-12 h-12 ${statusInfo.color} rounded-full flex items-center justify-center mr-4`}>
+                        <StatusIcon className="text-white text-lg" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-800">{project.serviceName}</h4>
+                        <p className="text-sm text-gray-600">Client: {project.userName}</p>
+                        <p className="text-xs text-blue-600 font-medium">{statusInfo.text}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-gray-700">Today</div>
+                        <div className="text-xs text-gray-500">{new Date(project.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <FaCalendar className="mx-auto text-4xl text-gray-300 mb-3" />
+                <p className="text-gray-500">No projects scheduled for today</p>
+              </div>
+            );
+          })()}
+        </div>
+
         {/* Projects Section */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              <FaBullseye className="inline mr-2" /> My Projects
+              <FaBullseye className="inline mr-2" /> All My Projects
             </h3>
           </div>
 

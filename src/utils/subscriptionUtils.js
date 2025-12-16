@@ -1,74 +1,64 @@
-// Subscription Packages System
+// Subscription Packages for Regular Clients
 export const subscriptionPlans = [
   {
     id: 'basic',
     name: 'Basic Plan',
-    price: 2999,
-    duration: 'monthly',
+    price: 5000,
+    duration: 30,
     services: 2,
     discount: 10,
-    features: [
-      '2 decoration services per month',
-      '10% discount on all services',
-      'Priority booking',
-      'Basic consultation'
-    ],
+    features: ['2 services per month', '10% discount', 'Priority booking'],
     popular: false
   },
   {
     id: 'premium',
     name: 'Premium Plan',
-    price: 4999,
-    duration: 'monthly',
-    services: 4,
+    price: 12000,
+    duration: 30,
+    services: 5,
     discount: 15,
-    features: [
-      '4 decoration services per month',
-      '15% discount on all services',
-      'Priority booking & support',
-      'Free consultation',
-      'Service add-ons included'
-    ],
+    features: ['5 services per month', '15% discount', 'Free consultation', 'Priority support'],
     popular: true
   },
   {
     id: 'enterprise',
     name: 'Enterprise Plan',
-    price: 8999,
-    duration: 'monthly',
-    services: 8,
+    price: 25000,
+    duration: 30,
+    services: 12,
     discount: 20,
-    features: [
-      '8 decoration services per month',
-      '20% discount on all services',
-      'Dedicated account manager',
-      'Free consultation & planning',
-      'All service add-ons included',
-      'Multi-location support'
-    ],
+    features: ['12 services per month', '20% discount', 'Dedicated decorator', 'Free add-ons'],
     popular: false
   }
 ];
 
-export const calculateSubscriptionBenefit = (planId, serviceAmount) => {
+export const calculateSubscriptionSavings = (planId, regularPrice) => {
   const plan = subscriptionPlans.find(p => p.id === planId);
-  if (!plan) return { discount: 0, savings: 0 };
+  if (!plan) return 0;
   
-  const discount = (serviceAmount * plan.discount) / 100;
+  const discountAmount = (regularPrice * plan.discount) / 100;
+  return discountAmount;
+};
+
+export const getActiveSubscription = (userId) => {
+  // Mock subscription data
   return {
-    discount: plan.discount,
-    discountAmount: discount,
-    finalAmount: serviceAmount - discount,
-    savings: discount
+    id: 'sub_123',
+    userId,
+    planId: 'premium',
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
+    servicesUsed: 3,
+    servicesRemaining: 2,
+    status: 'active'
   };
 };
 
-export const checkSubscriptionEligibility = (userId, planId) => {
-  // Mock subscription check - integrate with backend
-  return {
-    eligible: true,
-    remainingServices: 3,
-    nextBillingDate: '2024-02-15',
-    status: 'active'
-  };
+export const canUseSubscription = (subscription) => {
+  if (!subscription || subscription.status !== 'active') return false;
+  
+  const now = new Date();
+  const endDate = new Date(subscription.endDate);
+  
+  return now <= endDate && subscription.servicesRemaining > 0;
 };

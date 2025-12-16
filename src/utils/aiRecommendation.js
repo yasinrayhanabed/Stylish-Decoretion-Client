@@ -1,96 +1,122 @@
-// AI-based Decorator Recommendation System
-export const getDecoratorRecommendations = (preferences = {}) => {
+// AI-based Recommended Decorator Feature
+export const decoratorProfiles = [
+  {
+    id: 'dec_001',
+    name: 'Ahmed Hassan',
+    specialties: ['wedding', 'traditional', 'luxury'],
+    rating: 4.9,
+    experience: 8,
+    completedProjects: 150,
+    location: 'dhaka',
+    priceRange: 'premium',
+    availability: 'high',
+    portfolio: ['wedding1.jpg', 'traditional1.jpg']
+  },
+  {
+    id: 'dec_002',
+    name: 'Fatima Rahman',
+    specialties: ['modern', 'minimalist', 'corporate'],
+    rating: 4.8,
+    experience: 6,
+    completedProjects: 120,
+    location: 'dhaka',
+    priceRange: 'mid',
+    availability: 'medium',
+    portfolio: ['modern1.jpg', 'corporate1.jpg']
+  },
+  {
+    id: 'dec_003',
+    name: 'Karim Ahmed',
+    specialties: ['birthday', 'kids', 'colorful'],
+    rating: 4.7,
+    experience: 5,
+    completedProjects: 90,
+    location: 'chittagong',
+    priceRange: 'budget',
+    availability: 'high',
+    portfolio: ['birthday1.jpg', 'kids1.jpg']
+  }
+];
+
+export const getRecommendedDecorators = (preferences) => {
   const {
-    serviceType = 'home',
-    budget = 'medium',
-    style = 'modern',
-    location = 'dhaka',
-    eventSize = 'small'
+    serviceType,
+    budget,
+    location,
+    style,
+    urgency = 'normal'
   } = preferences;
 
-  // Mock AI recommendation logic
-  const decorators = [
-    {
-      id: 'dec001',
-      name: 'Sarah Ahmed',
-      rating: 4.9,
-      specialties: ['modern', 'minimalist', 'home'],
-      experience: 8,
-      completedProjects: 150,
-      priceRange: 'medium',
-      location: 'dhaka',
-      matchScore: 95,
-      photo: 'https://i.pravatar.cc/150?img=1'
-    },
-    {
-      id: 'dec002', 
-      name: 'Rafiq Hassan',
-      rating: 4.8,
-      specialties: ['traditional', 'wedding', 'event'],
-      experience: 12,
-      completedProjects: 200,
-      priceRange: 'high',
-      location: 'dhaka',
-      matchScore: 88,
-      photo: 'https://i.pravatar.cc/150?img=2'
-    },
-    {
-      id: 'dec003',
-      name: 'Fatima Khan',
-      rating: 4.7,
-      specialties: ['contemporary', 'office', 'corporate'],
-      experience: 6,
-      completedProjects: 120,
-      priceRange: 'medium',
-      location: 'dhaka',
-      matchScore: 82,
-      photo: 'https://i.pravatar.cc/150?img=3'
+  let scores = decoratorProfiles.map(decorator => {
+    let score = 0;
+
+    // Specialty match (40% weight)
+    if (decorator.specialties.some(spec => 
+      spec.toLowerCase().includes(serviceType?.toLowerCase() || '') ||
+      spec.toLowerCase().includes(style?.toLowerCase() || '')
+    )) {
+      score += 40;
     }
-  ];
 
-  // AI matching algorithm (simplified)
-  const recommendations = decorators
-    .map(decorator => {
-      let score = decorator.matchScore;
-      
-      // Adjust score based on preferences
-      if (decorator.specialties.includes(serviceType)) score += 10;
-      if (decorator.specialties.includes(style)) score += 8;
-      if (decorator.priceRange === budget) score += 5;
-      if (decorator.location === location) score += 3;
-      
-      return { ...decorator, aiScore: Math.min(score, 100) };
-    })
-    .sort((a, b) => b.aiScore - a.aiScore)
+    // Location match (25% weight)
+    if (decorator.location === location) {
+      score += 25;
+    }
+
+    // Budget compatibility (20% weight)
+    const budgetMatch = {
+      'budget': ['budget', 'mid'],
+      'mid': ['budget', 'mid', 'premium'],
+      'premium': ['mid', 'premium']
+    };
+    if (budgetMatch[budget]?.includes(decorator.priceRange)) {
+      score += 20;
+    }
+
+    // Rating (10% weight)
+    score += decorator.rating * 2;
+
+    // Availability bonus (5% weight)
+    if (urgency === 'urgent' && decorator.availability === 'high') {
+      score += 5;
+    }
+
+    return { ...decorator, score };
+  });
+
+  return scores
+    .sort((a, b) => b.score - a.score)
     .slice(0, 3);
+};
 
+export const getDecoratorRecommendation = async (serviceId, userPreferences) => {
+  // Mock AI processing delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const recommendations = getRecommendedDecorators(userPreferences);
+      resolve({
+        recommendations,
+        confidence: 0.85,
+        reasoning: 'Based on service type, location, budget, and decorator ratings'
+      });
+    }, 1500);
+  });
+};
+
+export const getDecoratorRecommendations = (preferences) => {
+  const recommendations = getRecommendedDecorators(preferences);
   return {
-    recommendations,
-    confidence: 'high',
-    reasoning: `Based on your preference for ${style} ${serviceType} decoration with ${budget} budget, these decorators are the best match.`
+    recommendations: recommendations.map(decorator => ({
+      ...decorator,
+      photo: `/images/decorators/${decorator.id}.jpg`,
+      aiScore: Math.round(decorator.score)
+    })),
+    confidence: 0.85
   };
 };
 
-export const getMultipleDecoratorsForEvent = (eventDetails) => {
-  const { eventSize, budget, duration, services } = eventDetails;
-  
-  if (eventSize === 'large' || services?.length > 3) {
-    return {
-      recommended: true,
-      decoratorCount: eventSize === 'large' ? 3 : 2,
-      benefits: [
-        'Faster setup and completion',
-        'Specialized expertise for different areas',
-        'Better coordination for large events',
-        'Backup support if needed'
-      ],
-      estimatedTimeReduction: '40%',
-      additionalCost: eventSize === 'large' ? 1500 : 800
-    };
-  }
-  
-  return {
-    recommended: false,
-    reason: 'Single decorator sufficient for this event size'
-  };
+export const getMultipleDecoratorsForEvent = (guestCount, preferences) => {
+  const allDecorators = getRecommendedDecorators(preferences);
+  const decoratorsNeeded = Math.ceil(guestCount / 50);
+  return allDecorators.slice(0, decoratorsNeeded);
 };

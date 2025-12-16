@@ -29,12 +29,14 @@ import AdminDashboardHome from "./pages/Dashboard/AdminDashboardHome.jsx";
 import AdminAnalytics from "./pages/Dashboard/AdminAnalytics.jsx";
 import AnalyticsCharts from "./pages/Dashboard/AnalyticsCharts.jsx";
 import RevenueMonitoring from "./pages/Dashboard/RevenueMonitoring.jsx";
+import BusinessAnalytics from "./pages/Dashboard/BusinessAnalytics.jsx";
 import MyBookingsPage from "./pages/Dashboard/MyBookingsPage.jsx";
 import UserProfile from "./pages/Dashboard/UserProfile.jsx";
 import UserDashboardHome from "./pages/Dashboard/UserDashboardHome.jsx";
 import PaymentHistory from "./pages/Dashboard/PaymentHistory.jsx";
 import DecoratorRequest from "./pages/DecoratorRequest.jsx";
 import AdminDecoratorRequests from "./pages/Dashboard/AdminDecoratorRequests.jsx";
+import AdminServiceManager from "./pages/Dashboard/AdminServiceManager.jsx";
 
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 import RoleGuard from "./components/RoleGuard.jsx"; 
@@ -93,6 +95,8 @@ function App() {
             <Route path="revenue-monitoring" element={<RevenueMonitoring />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="analytics-charts" element={<AnalyticsCharts />} />
+            <Route path="business-analytics" element={<BusinessAnalytics />} />
+            <Route path="service-manager" element={<AdminServiceManager />} />
           </Route>
           
         </Route>
