@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import API from "../api/axios"; 
-import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify';
+import { formatAmountFull } from '../utils/formatCurrency'; 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY); 
 
 const cardElementOptions = {
@@ -97,7 +98,7 @@ function CheckoutForm({ bookingId, amount, serviceName, onPaymentSuccess }) {
         <h3 className="text-xl font-semibold mb-4 text-gray-700">
             Complete Payment for: <span className="text-blue-600">{serviceName}</span>
         </h3>
-        <p className="text-2xl font-bold mb-6 text-green-600">Total Payable: BDT {finalAmount}</p>
+        <p className="text-2xl font-bold mb-6 text-green-600">Total Payable: {formatAmountFull(finalAmount)}</p>
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="border p-3 rounded-lg bg-gray-50">
                 <CardElement options={cardElementOptions} />
@@ -106,7 +107,7 @@ function CheckoutForm({ bookingId, amount, serviceName, onPaymentSuccess }) {
                 disabled={!stripe || loading} 
                 className={`btn w-full ${loading ? 'btn-disabled bg-gray-400' : 'btn-primary bg-blue-600 hover:bg-blue-700 text-white'}`}
             >
-                {loading ? 'Processing...' : `Pay BDT ${finalAmount}`}
+                {loading ? 'Processing...' : `Pay ${formatAmountFull(finalAmount)}`}
             </button>
         </form>
     </div>

@@ -145,10 +145,10 @@ export default function Home(){
             className="text-center mb-16"
           >
             <h2 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary to-accent bg-clip-text text-transparent mb-4">
-               আমাদের সেরা ডেকোরেটরদের সাথে পরিচিত হন
+              Meet Our Top Rated Decorators
             </h2>
             <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
-              রেটিং অনুযায়ী সেরা পেশাদার ডেকোরেটর যারা আপনার স্বপ্নকে বাস্তবে রূপ দিতে প্রস্তুত
+              Expert interior designers with highest customer ratings, ready to transform your space into something extraordinary
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary to-accent mx-auto mt-6 rounded-full"></div>
           </motion.div>

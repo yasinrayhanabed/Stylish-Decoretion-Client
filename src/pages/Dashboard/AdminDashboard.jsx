@@ -1,26 +1,23 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom'; 
-import { FaHome, FaUsers, FaPalette, FaUserTie, FaCalendarAlt, FaChartBar, FaCrown, FaUserPlus } from "react-icons/fa";
-
-// Removed getNavLinkClass as we're using inline styles now
-
+import { FaHome, FaUsers, FaPalette, FaUserTie, FaCalendarAlt, FaChartBar, FaCrown, FaUserPlus, FaDollarSign } from "react-icons/fa";
 
 export default function AdminDashboard() {
-
   return (
-    <div className="flex h-screen w-full bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-72 bg-gray-800 p-6 shadow-lg flex-shrink-0"> 
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-              <FaCrown className="text-xl font-bold text-white" />
+    <div className="dashboard-layout bg-gray-100">
+      {/* Fixed Sidebar - Full Height */}
+      <aside className="dashboard-sidebar w-72 bg-gray-800 shadow-lg">
+        <div className="p-6">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                <FaCrown className="text-xl font-bold text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
             </div>
-            <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
+            <div className="w-full h-1 bg-blue-600 rounded-full"></div>
           </div>
-          <div className="w-full h-1 bg-blue-600 rounded-full"></div>
-        </div>
      
         <nav className="space-y-2">
             {/* Dashboard Home */}
@@ -122,6 +119,20 @@ export default function AdminDashboard() {
             </div>
 
             <NavLink 
+                to="revenue-monitoring" 
+                className={({ isActive }) => 
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
+                        isActive 
+                            ? "bg-emerald-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
+                    }`
+                }
+            >
+                <FaDollarSign className="text-xl" />
+                <span className="font-medium">Revenue Monitoring</span>
+            </NavLink>
+
+            <NavLink 
                 to="analytics" 
                 className={({ isActive }) => 
                     `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
@@ -134,13 +145,26 @@ export default function AdminDashboard() {
                 <FaChartBar className="text-xl" />
                 <span className="font-medium">Business Analytics</span>
             </NavLink>
-        </nav>
 
-        
+            <NavLink 
+                to="analytics-charts" 
+                className={({ isActive }) => 
+                    `flex items-center space-x-3 w-full py-3 px-4 rounded-lg transition-all duration-200 ${
+                        isActive 
+                            ? "bg-pink-600 text-white" 
+                            : "text-gray-300 hover:text-white hover:bg-gray-700"
+                    }`
+                }
+            >
+                <FaChartBar className="text-xl" />
+                <span className="font-medium">Analytics Charts</span>
+            </NavLink>
+        </nav>
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-grow bg-white overflow-y-auto">
+      {/* Main Content - Scrollable with margin for fixed sidebar */}
+      <main className="dashboard-main bg-white">
         <div className="p-8">
           <Outlet />
         </div>

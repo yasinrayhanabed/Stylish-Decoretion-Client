@@ -27,6 +27,8 @@ import AdminManageDecorators from "./pages/Dashboard/AdminManageDecorators.jsx";
 import AdminManageBookings from "./pages/Dashboard/AdminManageBookings.jsx";
 import AdminDashboardHome from "./pages/Dashboard/AdminDashboardHome.jsx";
 import AdminAnalytics from "./pages/Dashboard/AdminAnalytics.jsx";
+import AnalyticsCharts from "./pages/Dashboard/AnalyticsCharts.jsx";
+import RevenueMonitoring from "./pages/Dashboard/RevenueMonitoring.jsx";
 import MyBookingsPage from "./pages/Dashboard/MyBookingsPage.jsx";
 import UserProfile from "./pages/Dashboard/UserProfile.jsx";
 import UserDashboardHome from "./pages/Dashboard/UserDashboardHome.jsx";
@@ -49,7 +51,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/coverage" element={<ServiceCoverageMap />} />
-        <Route path="/become-decorator" element={<DecoratorRequest />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -67,6 +69,7 @@ function App() {
           <Route path="/dashboard/my-bookings" element={<UserDashboard><MyBookingsPage /></UserDashboard>} />
           <Route path="/dashboard/profile" element={<UserDashboard><UserProfile /></UserDashboard>} />
           <Route path="/dashboard/payment-history" element={<UserDashboard><PaymentHistory /></UserDashboard>} />
+          <Route path="/dashboard/become-decorator" element={<UserDashboard><DecoratorRequest /></UserDashboard>} />
 
           {/* Decorator Routes */}
           <Route path="/dashboard/decorator" element={
@@ -87,7 +90,9 @@ function App() {
             <Route path="manage-decorators" element={<AdminManageDecorators />} />
             <Route path="manage-bookings" element={<AdminManageBookings />} />
             <Route path="decorator-requests" element={<AdminDecoratorRequests />} />
+            <Route path="revenue-monitoring" element={<RevenueMonitoring />} />
             <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="analytics-charts" element={<AnalyticsCharts />} />
           </Route>
           
         </Route>

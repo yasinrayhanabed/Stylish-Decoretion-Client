@@ -262,8 +262,8 @@ export default function AdminManageBookings() {
                                 {decorators.find(d => d._id === booking.assignedDecorator)?.name || 'Assigned'}
                               </span>
                             </div>
-                            <div className="text-xs text-gray-500 font-mono">
-                              ID: {booking.assignedDecorator.substring(0, 8)}
+                            <div className="text-xs text-green-600 font-semibold">
+                              Assigned
                             </div>
                           </div>
                           

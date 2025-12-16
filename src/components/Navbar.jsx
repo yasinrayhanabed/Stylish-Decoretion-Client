@@ -62,7 +62,6 @@ export default function Navbar() {
                   <>
                     <li><Link to="/dashboard">My Dashboard</Link></li>
                     <li><Link to="/dashboard/profile">My Profile</Link></li>
-                    <li><Link to="/become-decorator">Become a Decorator</Link></li>
                   </>
                 )}
                 <div className="divider my-1"></div>

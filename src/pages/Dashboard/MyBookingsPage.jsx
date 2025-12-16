@@ -14,11 +14,25 @@ const getStatusColor = (status) => {
         case 'Pending': return 'badge-warning';
         case 'Confirmed':
         case 'Planning Phase':
+        case 'In Progress':
         case 'Assigned': return 'badge-info';
         case 'Completed': return 'badge-success';
         case 'Canceled': return 'badge-error';
         default: return 'badge-ghost';
     }
+};
+
+const getDisplayStatus = (booking) => {
+    // If decorator is assigned, show 'Assigned'
+    if (booking.assignedDecorator) {
+        return booking.status || 'Assigned';
+    }
+    // If paid but no decorator assigned, show 'In Progress'
+    if (isPaymentCompleted(booking) && !booking.assignedDecorator) {
+        return 'In Progress';
+    }
+    // Otherwise show the actual status
+    return booking.status || 'Pending';
 };
 
 export default function MyBookingsPage() {
@@ -217,8 +231,7 @@ export default function MyBookingsPage() {
                                 >
                                     <option value="">🔍 All Status</option>
                                     <option value="Pending">⏳ Pending</option>
-                                    <option value="Confirmed">✅ Confirmed</option>
-                                    <option value="Planning Phase">📋 Planning Phase</option>
+                                    <option value="In Progress">🔄 In Progress</option>
                                     <option value="Assigned">👤 Assigned</option>
                                     <option value="Completed">🎉 Completed</option>
                                     <option value="Canceled">❌ Canceled</option>
@@ -304,8 +317,8 @@ export default function MyBookingsPage() {
                                                 <h3 className="card-title text-xl">{booking.serviceName}</h3>
                                                 <p className="text-base-content/70">{booking.serviceCategory}</p>
                                             </div>
-                                            <div className={`badge ${getStatusColor(booking.status)}`}>
-                                                {booking.status}
+                                            <div className={`badge ${getStatusColor(getDisplayStatus(booking))}`}>
+                                                {getDisplayStatus(booking)}
                                             </div>
                                         </div>
                                         
@@ -384,7 +397,7 @@ export default function MyBookingsPage() {
 
                     {bookings.length > 0 && (
                         <div className="mt-6 p-4 bg-base-300 rounded-lg">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-center">
                                 <div>
                                     <div className="text-2xl font-bold text-primary">{bookings.length}</div>
                                     <div className="text-sm opacity-70">Total Bookings</div>
@@ -397,7 +410,13 @@ export default function MyBookingsPage() {
                                 </div>
                                 <div>
                                     <div className="text-2xl font-bold text-info">
-                                        {bookings.filter(b => b.status === 'Assigned' || b.status === 'In Progress').length}
+                                        {bookings.filter(b => getDisplayStatus(b) === 'In Progress').length}
+                                    </div>
+                                    <div className="text-sm opacity-70">In Progress</div>
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-primary">
+                                        {bookings.filter(b => getDisplayStatus(b) === 'Assigned').length}
                                     </div>
                                     <div className="text-sm opacity-70">Assigned</div>
                                 </div>

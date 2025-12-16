@@ -60,3 +60,28 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Dashboard Layout Utilities */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.dashboard-sidebar {
+  width: 16rem;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.dashboard-main {
+  flex: 1;
+  margin-left: 16rem;
+  min-height: 100vh;
+  overflow-y: auto;
+}

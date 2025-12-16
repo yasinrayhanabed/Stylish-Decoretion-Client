@@ -4,6 +4,7 @@ import API from '../../api/axios';
 import { toast } from 'react-toastify';
 import Spinner from '../../components/Spinner';
 import { FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
+import { formatAmountDisplay, formatAmountFull } from '../../utils/formatCurrency';
 
 export default function PaymentHistory() {
   const [payments, setPayments] = useState([]);
@@ -23,23 +24,40 @@ export default function PaymentHistory() {
         if (paymentErr.response?.status === 404) {
           // Fallback to bookings endpoint to get payment info
           res = await API.get('/bookings/my');
-          // Filter only paid bookings and transform to payment format
+          // Transform all bookings to payment format (both paid and pending)
           const bookings = Array.isArray(res.data) ? res.data : res.data?.data || [];
-          const paidBookings = bookings.filter(b => 
-            b.paymentStatus === 'paid' || 
-            b.status === 'Completed' || 
-            b.status === 'Planning Phase' ||
-            b.status === 'Assigned'
-          );
-          setPayments(paidBookings.map(booking => ({
-            _id: booking._id,
-            serviceName: booking.serviceName,
-            amount: booking.cost || booking.totalAmount || booking.price,
-            status: 'completed',
-            createdAt: booking.createdAt || booking.date,
-            paymentMethod: 'Stripe',
-            transactionId: booking.paymentId || booking.transactionId || 'N/A'
-          })));
+          const allBookings = bookings.map(booking => {
+            let paymentStatus = 'pending';
+            
+            // Determine payment status based on booking status and payment info
+            if (booking.paymentStatus === 'paid' || 
+                booking.paymentStatus === 'completed' ||
+                booking.isPaid === true ||
+                booking.status === 'Completed' || 
+                booking.status === 'Planning Phase' ||
+                booking.status === 'Assigned') {
+              paymentStatus = 'completed';
+            } else if (booking.paymentStatus === 'failed' || booking.status === 'Cancelled') {
+              paymentStatus = 'failed';
+            } else if (booking.status === 'Pending' || 
+                      booking.paymentStatus === 'pending' ||
+                      !booking.isPaid) {
+              paymentStatus = 'pending';
+            }
+            
+            return {
+              _id: booking._id,
+              serviceName: booking.serviceName,
+              amount: parseFloat(booking.cost || booking.totalAmount || booking.price || 0),
+              status: paymentStatus,
+              createdAt: booking.createdAt || booking.date,
+              paymentMethod: booking.paymentMethod || 'Stripe',
+              transactionId: booking.paymentId || booking.transactionId || 'N/A',
+              currency: 'BDT'
+            };
+          });
+          
+          setPayments(allBookings);
           return;
         } else {
           throw paymentErr;
@@ -48,9 +66,19 @@ export default function PaymentHistory() {
       
       // Handle payment endpoint response
       if (res.data && res.data.success) {
-        setPayments(res.data.data || []);
+        const paymentsData = res.data.data || [];
+        // Ensure amount is properly parsed as number
+        const formattedPayments = paymentsData.map(payment => ({
+          ...payment,
+          amount: parseFloat(payment.amount || 0)
+        }));
+        setPayments(formattedPayments);
       } else if (Array.isArray(res.data)) {
-        setPayments(res.data);
+        const formattedPayments = res.data.map(payment => ({
+          ...payment,
+          amount: parseFloat(payment.amount || 0)
+        }));
+        setPayments(formattedPayments);
       } else {
         setPayments([]);
       }
@@ -80,6 +108,19 @@ export default function PaymentHistory() {
     };
     return statusClasses[status?.toLowerCase()] || 'badge-ghost';
   };
+
+
+
+  // Get all payments including pending ones from bookings
+  const getAllPayments = () => {
+    // This should include both completed and pending payments
+    return payments;
+  };
+
+  const completedPayments = payments.filter(p => p.status === 'completed');
+  const pendingPayments = payments.filter(p => p.status === 'pending');
+  const totalPaid = completedPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+  const totalPending = pendingPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
 
   if (loading) return <Spinner />;
 
@@ -120,19 +161,22 @@ export default function PaymentHistory() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <td>{new Date(payment.createdAt || payment.date).toLocaleDateString()}</td>
+                      <td>{new Date(payment.createdAt || payment.date).toLocaleDateString('en-GB')}</td>
                       <td>
                         <div>
                           <div className="font-semibold">{payment.serviceName || payment.description}</div>
                           <div className="text-sm opacity-70">{payment.serviceCategory || 'Service'}</div>
                         </div>
                       </td>
-                      <td className="font-bold">
-                        {payment.currency?.toUpperCase() || 'BDT'} {payment.amount}
+                      <td className="font-bold" title={formatAmountFull(payment.amount)}>
+                        {formatAmountDisplay(payment.amount)}
                       </td>
                       <td>
                         <div className={`badge ${getStatusBadge(payment.status)}`}>
-                          {payment.status}
+                          {payment.status === 'completed' ? 'Paid' : 
+                           payment.status === 'pending' ? 'Pending' :
+                           payment.status === 'failed' ? 'Failed' :
+                           payment.status}
                         </div>
                       </td>
                       <td>{payment.paymentMethod || payment.payment_method || 'Stripe'}</td>
@@ -159,27 +203,44 @@ export default function PaymentHistory() {
           )}
           
           {payments.length > 0 && (
-            <div className="mt-6 p-4 bg-base-200 rounded-lg">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-primary">
-                    {payments.filter(p => p.status === 'completed').length}
-                  </div>
-                  <div className="text-sm opacity-70">Completed Payments</div>
+            <div className="mt-6 space-y-4">
+              {/* Payment Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="stat bg-primary text-primary-content rounded-lg p-4">
+                  <div className="stat-value text-2xl">{completedPayments.length}</div>
+                  <div className="stat-title text-primary-content opacity-80">Completed</div>
+                  <div className="stat-desc text-primary-content opacity-60">Successful payments</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-success">
-                    BDT {payments
-                      .filter(p => p.status === 'completed')
-                      .reduce((sum, p) => sum + p.amount, 0)}
+                
+                <div className="stat bg-success text-success-content rounded-lg p-4">
+                  <div className="stat-value text-xl" title={formatAmountFull(totalPaid)}>
+                    {formatAmountDisplay(totalPaid)}
                   </div>
-                  <div className="text-sm opacity-70">Total Paid</div>
+                  <div className="stat-title text-success-content opacity-80">Total Paid</div>
+                  <div className="stat-desc text-success-content opacity-60">Amount received</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-warning">
-                    {payments.filter(p => p.status === 'pending').length}
+                
+                <div className="stat bg-warning text-warning-content rounded-lg p-4">
+                  <div className="stat-value text-2xl">{pendingPayments.length}</div>
+                  <div className="stat-title text-warning-content opacity-80">Pending</div>
+                  <div className="stat-desc text-warning-content opacity-60">Awaiting payment</div>
+                </div>
+                
+                <div className="stat bg-orange-500 text-white rounded-lg p-4">
+                  <div className="stat-value text-xl" title={formatAmountFull(totalPending)}>
+                    {formatAmountDisplay(totalPending)}
                   </div>
-                  <div className="text-sm opacity-70">Pending Payments</div>
+                  <div className="stat-title text-white opacity-80">Total Pending</div>
+                  <div className="stat-desc text-white opacity-60">Amount due</div>
+                </div>
+              </div>
+              
+              {/* Additional Summary Info */}
+              <div className="bg-base-200 rounded-lg p-4">
+                <div className="flex flex-wrap justify-between items-center text-sm">
+                  <span>Total Transactions: <strong>{payments.length}</strong></span>
+                  <span>Success Rate: <strong>{payments.length > 0 ? ((completedPayments.length / payments.length) * 100).toFixed(1) : 0}%</strong></span>
+                  <span>Total Amount: <strong title={formatAmountFull(totalPaid + totalPending)}>{formatAmountDisplay(totalPaid + totalPending)}</strong></span>
                 </div>
               </div>
             </div>

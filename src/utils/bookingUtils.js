@@ -119,11 +119,12 @@ export const sanitizeBookingData = (booking, index = 0) => {
       date: new Date().toISOString(),
       status: 'Unknown',
       isPaid: false,
-      assignedDecorator: null
+      assignedDecorator: null,
+      canDecoratorUpdate: false
     };
   }
   
-  return {
+  const sanitizedBooking = {
     ...booking,
     _id: booking._id || `fallback_${index}`,
     serviceName: booking.serviceName || booking.service?.service_name || 'Service N/A',
@@ -135,6 +136,11 @@ export const sanitizeBookingData = (booking, index = 0) => {
     assignedDecorator: booking.assignedDecorator || null,
     amount: booking.amount || booking.cost || booking.price || null
   };
+  
+  // Add decorator update permission
+  sanitizedBooking.canDecoratorUpdate = canDecoratorUpdateStatus(sanitizedBooking);
+  
+  return sanitizedBooking;
 };
 
 /**
@@ -152,4 +158,24 @@ export const isPaymentCompleted = (booking) => {
     (booking.isPaid === true && booking.transactionId) ||
     (booking.payment && booking.payment.transactionId && booking.payment.status === 'completed')
   );
+};
+
+/**
+ * Checks if a booking is cancelled
+ * @param {object} booking - The booking object
+ * @returns {boolean} - True if booking is cancelled
+ */
+export const isBookingCancelled = (booking) => {
+  if (!booking) return false;
+  return booking.status === 'Cancelled' || booking.status === 'Canceled';
+};
+
+/**
+ * Checks if decorator can update booking status
+ * @param {object} booking - The booking object
+ * @returns {boolean} - True if decorator can update status
+ */
+export const canDecoratorUpdateStatus = (booking) => {
+  if (!booking) return false;
+  return !isBookingCancelled(booking) && booking.status !== 'Completed';
 };

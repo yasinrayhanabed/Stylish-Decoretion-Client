@@ -5,9 +5,9 @@ import useAuth from "../../hooks/useAuth";
 import Forbidden from "../../components/Forbidden"; 
 import BookingErrorBoundary from "../../components/BookingErrorBoundary";
 import { toast } from "react-toastify";
-import { formatBookingId, sanitizeBookingData } from "../../utils/bookingUtils";
+import { formatBookingId, sanitizeBookingData, isBookingCancelled, canDecoratorUpdateStatus } from "../../utils/bookingUtils";
 import { useSearch } from "../../hooks/useSearch";
-import { FaPalette, FaClipboardList, FaBolt, FaCheckCircle, FaUser, FaCalendar, FaIdCard, FaSleigh, FaBullseye, FaSearch, FaFilter, FaDollarSign, FaClock, FaMapMarkerAlt, FaPhone, FaArrowUp, FaArrowDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaPalette, FaClipboardList, FaBolt, FaCheckCircle, FaUser, FaCalendar, FaIdCard, FaSleigh, FaBullseye, FaSearch, FaFilter, FaDollarSign, FaClock, FaMapMarkerAlt, FaPhone, FaArrowUp, FaArrowDown, FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 
 const PROJECT_STATUSES = [
   "Assigned", 
@@ -66,12 +66,25 @@ export default function DecoratorDashboard() {
       "On the Way to Venue": { color: "bg-yellow-500", icon: FaMapMarkerAlt, text: "En Route" },
       "Setup in Progress": { color: "bg-orange-500", icon: FaBolt, text: "Setting Up" },
       "Completed": { color: "bg-green-500", icon: FaCheckCircle, text: "Completed" },
-      "Canceled": { color: "bg-red-500", icon: FaUser, text: "Canceled" }
+      "Canceled": { color: "bg-red-500", icon: FaUser, text: "Canceled" },
+      "Cancelled": { color: "bg-red-500", icon: FaUser, text: "Cancelled" }
     };
     return statusMap[status] || { color: "bg-gray-500", icon: FaClock, text: status };
   };
 
   const handleUpdateStatus = async (bookingId, newStatus) => {
+    // Check if booking is cancelled - prevent status updates
+    const booking = bookings.find(b => b._id === bookingId);
+    if (booking && isBookingCancelled(booking)) {
+      toast.error('Cannot update status for cancelled bookings');
+      return;
+    }
+    
+    if (!canDecoratorUpdateStatus(booking)) {
+      toast.error('Status update not allowed for this booking');
+      return;
+    }
+    
     if (!window.confirm(`Are you sure you want to change status to "${newStatus}"?`)) return;
     
     try {
@@ -161,7 +174,7 @@ export default function DecoratorDashboard() {
         </div>
         
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-purple-500 group hover:scale-105">
             <div className="flex items-center justify-between">
               <div>
@@ -179,7 +192,7 @@ export default function DecoratorDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-orange-600 mb-1">
-                  {bookings?.filter(b => b.status !== 'Completed').length || 0}
+                  {bookings?.filter(b => b.status !== 'Completed' && !isBookingCancelled(b)).length || 0}
                 </div>
                 <div className="text-sm text-orange-500 font-medium">Ongoing Work</div>
               </div>
@@ -198,6 +211,19 @@ export default function DecoratorDashboard() {
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
                 <FaCheckCircle className="text-2xl" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-red-500 group hover:scale-105">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-red-600 mb-1">
+                  {bookings?.filter(b => isBookingCancelled(b)).length || 0}
+                </div>
+                <div className="text-sm text-red-500 font-medium">Cancelled Projects</div>
+              </div>
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                <FaTimes className="text-2xl" />
               </div>
             </div>
           </div>
@@ -257,6 +283,7 @@ export default function DecoratorDashboard() {
                   </option>
                 );
               })}
+              <option value="Cancelled">Cancelled</option>
             </select>
             
             <select
@@ -334,8 +361,8 @@ export default function DecoratorDashboard() {
                   const statusInfo = getStatusInfo(b.status);
                   const StatusIcon = statusInfo.icon;
                   const isCompleted = b.status === 'Completed';
-                  const isCanceled = b.status === 'Canceled';
-                  const canUpdate = !isCompleted && !isCanceled;
+                  const isCanceled = isBookingCancelled(b);
+                  const canUpdate = canDecoratorUpdateStatus(b);
                   
                   return (
                     <div
@@ -404,7 +431,7 @@ export default function DecoratorDashboard() {
                             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm font-medium bg-white shadow-sm"
                             value={b.status}
                             onChange={(e) => handleUpdateStatus(b._id, e.target.value)}
-                            disabled={loading}
+                            disabled={loading || isCanceled}
                           >
                             {PROJECT_STATUSES.map(s => {
                               const optionInfo = getStatusInfo(s);
@@ -422,7 +449,7 @@ export default function DecoratorDashboard() {
                           }`}>
                             {isCompleted ? '✅ Project Completed' : '❌ Project Canceled'}
                             <div className="text-xs mt-1 opacity-75">
-                              {isCompleted ? 'No further updates needed' : 'Cannot be updated'}
+                              {isCompleted ? 'No further updates needed' : 'Status updates blocked for cancelled bookings'}
                             </div>
                           </div>
                         )}

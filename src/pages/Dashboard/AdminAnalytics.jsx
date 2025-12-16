@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import API from '../../api/axios';
 import Spinner from '../../components/Spinner';
 import { toast } from 'react-toastify';
@@ -213,114 +214,65 @@ export default function AdminAnalytics() {
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Service Demand Chart */}
-        <div className="bg-white rounded-2xl shadow-xl p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+      {/* Quick Charts Preview */}
+      <div className="bg-white rounded-2xl shadow-xl p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-gray-800 flex items-center">
             <FaChartPie className="mr-3 text-purple-600" />
-            Service Demand Chart
+            Charts Overview
           </h3>
-          <div className="space-y-3">
-            {serviceDemand.length > 0 ? serviceDemand.map((service, index) => {
-              const maxBookings = Math.max(...serviceDemand.map(s => s.bookings));
-              const percentage = (service.bookings / maxBookings) * 100;
-              const colors = ['bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-indigo-500', 'bg-pink-500', 'bg-gray-500'];
-              
-              return (
-                <div key={index} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-700 truncate">{service.name}</span>
-                    <span className="text-sm font-bold text-gray-900">{service.bookings} bookings</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className={`h-3 rounded-full ${colors[index % colors.length]} transition-all duration-500`}
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              );
-            }) : (
-              <div className="text-center py-8 text-gray-500">
-                <FaChartPie className="mx-auto text-4xl mb-2 opacity-50" />
-                <p>No service data available</p>
-              </div>
-            )}
-          </div>
+          <Link 
+            to="/dashboard/admin/analytics-charts" 
+            className="btn btn-primary btn-sm"
+          >
+            View Detailed Charts
+          </Link>
         </div>
-
-        {/* User Booking Histogram */}
-        <div className="bg-white rounded-2xl shadow-xl p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-            <FaChartLine className="mr-3 text-blue-600" />
-            User Booking Histogram
-          </h3>
-          <div className="space-y-3">
-            {bookingsByUser.length > 0 ? bookingsByUser.map((user, index) => {
-              const maxBookings = Math.max(...bookingsByUser.map(u => u.bookings));
-              const percentage = (user.bookings / maxBookings) * 100;
-              const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-red-500', 'bg-indigo-500', 'bg-pink-500', 'bg-gray-500', 'bg-orange-500', 'bg-teal-500'];
-              
-              return (
-                <div key={index} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-700 truncate">{user.name}</span>
-                    <span className="text-sm font-bold text-gray-900">{user.bookings} bookings</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className={`h-3 rounded-full ${colors[index % colors.length]} transition-all duration-500`}
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              );
-            }) : (
-              <div className="text-center py-8 text-gray-500">
-                <FaChartLine className="mx-auto text-4xl mb-2 opacity-50" />
-                <p>No user booking data available</p>
-              </div>
-            )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+            <FaChartPie className="mx-auto text-3xl text-purple-600 mb-3" />
+            <h4 className="font-semibold text-purple-800 mb-2">Service Demand Chart</h4>
+            <p className="text-sm text-purple-600">View detailed service booking analytics</p>
+          </div>
+          <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+            <FaChartLine className="mx-auto text-3xl text-blue-600 mb-3" />
+            <h4 className="font-semibold text-blue-800 mb-2">User Booking Histogram</h4>
+            <p className="text-sm text-blue-600">Analyze user engagement patterns</p>
           </div>
         </div>
       </div>
 
-      {/* Summary Statistics */}
+      {/* Business Summary */}
       <div className="bg-white rounded-2xl shadow-xl p-6">
         <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
           <FaChartLine className="mr-3 text-indigo-600" />
-          Business Insights
+          Business Summary
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
-            <div className="text-2xl font-bold text-purple-600 mb-2">
-              {serviceDemand.length > 0 ? serviceDemand[0]?.name : 'N/A'}
+          <div className="text-center p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl">
+            <div className="text-2xl font-bold text-emerald-600 mb-2">
+              {analytics.totalBookings > 0 ? Math.round((analytics.completedBookings / analytics.totalBookings) * 100) : 0}%
             </div>
-            <div className="text-sm text-purple-500 font-medium">Most Popular Service</div>
-            <div className="text-xs text-purple-400 mt-1">
-              {serviceDemand.length > 0 ? `${serviceDemand[0]?.bookings} bookings` : 'No data'}
+            <div className="text-sm text-emerald-500 font-medium">Success Rate</div>
+            <div className="text-xs text-emerald-400 mt-1">
+              {analytics.completedBookings} of {analytics.totalBookings} completed
             </div>
           </div>
           
           <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
             <div className="text-2xl font-bold text-blue-600 mb-2">
-              {bookingsByUser.length > 0 ? bookingsByUser[0]?.name : 'N/A'}
+              ৳{analytics.totalBookings > 0 ? Math.round(analytics.totalRevenue / analytics.totalBookings).toLocaleString() : 0}
             </div>
-            <div className="text-sm text-blue-500 font-medium">Top Customer</div>
-            <div className="text-xs text-blue-400 mt-1">
-              {bookingsByUser.length > 0 ? `${bookingsByUser[0]?.bookings} bookings` : 'No data'}
-            </div>
+            <div className="text-sm text-blue-500 font-medium">Avg. Order Value</div>
+            <div className="text-xs text-blue-400 mt-1">Per Booking Revenue</div>
           </div>
           
-          <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
-            <div className="text-2xl font-bold text-green-600 mb-2">
-              {analytics.totalBookings > 0 ? Math.round((analytics.completedBookings / analytics.totalBookings) * 100) : 0}%
+          <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+            <div className="text-2xl font-bold text-purple-600 mb-2">
+              {analytics.activeDecorators > 0 ? Math.round(analytics.totalBookings / analytics.activeDecorators) : 0}
             </div>
-            <div className="text-sm text-green-500 font-medium">Success Rate</div>
-            <div className="text-xs text-green-400 mt-1">
-              {analytics.completedBookings} of {analytics.totalBookings} completed
-            </div>
+            <div className="text-sm text-purple-500 font-medium">Bookings per Decorator</div>
+            <div className="text-xs text-purple-400 mt-1">Average Workload</div>
           </div>
         </div>
       </div>
