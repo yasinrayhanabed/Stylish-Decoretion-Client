@@ -19,10 +19,47 @@ export default function Navbar() {
             </svg>
           </label>
           <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-            <li><NavLink to="/">Home</NavLink></li>
-            <li><NavLink to="/services">Services</NavLink></li>
-            <li><NavLink to="/about">About</NavLink></li>
-            <li><NavLink to="/contact">Contact</NavLink></li>
+            <li>
+              <NavLink 
+                to="/" 
+                end
+                className={({ isActive }) => 
+                  isActive ? "bg-primary text-primary-content" : ""
+                }
+              >
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink 
+                to="/services" 
+                className={({ isActive }) => 
+                  isActive ? "bg-primary text-primary-content" : ""
+                }
+              >
+                Services
+              </NavLink>
+            </li>
+            <li>
+              <NavLink 
+                to="/about" 
+                className={({ isActive }) => 
+                  isActive ? "bg-primary text-primary-content" : ""
+                }
+              >
+                About
+              </NavLink>
+            </li>
+            <li>
+              <NavLink 
+                to="/contact" 
+                className={({ isActive }) => 
+                  isActive ? "bg-primary text-primary-content" : ""
+                }
+              >
+                Contact
+              </NavLink>
+            </li>
           </ul>
         </div>
         <Link to="/" className="btn btn-ghost normal-case text-xl">
@@ -31,10 +68,47 @@ export default function Navbar() {
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
-          <li><NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>Home</NavLink></li>
-          <li><NavLink to="/services" className={({ isActive }) => isActive ? "active" : ""}>Services</NavLink></li>
-          <li><NavLink to="/about" className={({ isActive }) => isActive ? "active" : ""}>About</NavLink></li>
-          <li><NavLink to="/contact" className={({ isActive }) => isActive ? "active" : ""}>Contact</NavLink></li>
+          <li>
+            <NavLink 
+              to="/" 
+              end
+              className={({ isActive }) => 
+                isActive ? "bg-primary text-primary-content font-semibold" : "hover:bg-base-300"
+              }
+            >
+              Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/services" 
+              className={({ isActive }) => 
+                isActive ? "bg-primary text-primary-content font-semibold" : "hover:bg-base-300"
+              }
+            >
+              Services
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/about" 
+              className={({ isActive }) => 
+                isActive ? "bg-primary text-primary-content font-semibold" : "hover:bg-base-300"
+              }
+            >
+              About
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/contact" 
+              className={({ isActive }) => 
+                isActive ? "bg-primary text-primary-content font-semibold" : "hover:bg-base-300"
+              }
+            >
+              Contact
+            </NavLink>
+          </li>
         </ul>
       </div>
       <div className="navbar-end">

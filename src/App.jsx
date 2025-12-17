@@ -75,10 +75,9 @@ function App() {
 
           {/* Decorator Routes */}
           <Route path="/dashboard/decorator" element={
-            <RoleGuard allowedRoles={['decorator', 'admin']}>
-              <DecoratorDashboard />
-            </RoleGuard>
-          } />
+            <DecoratorDashboard />
+          }>
+          </Route>
 
           <Route path="/dashboard/admin" element={
             <RoleGuard allowedRoles={['admin']}>

@@ -8,6 +8,7 @@ import { usePagination } from '../../hooks/usePagination';
 import Pagination from '../../components/Pagination';
 import { FaCalendarAlt, FaSync, FaClipboardList, FaPalette, FaMapMarkerAlt, FaDollarSign, FaCreditCard, FaCalendar, FaTimes, FaSearch, FaSort, FaFilter } from 'react-icons/fa';
 import { isPaymentCompleted } from '../../utils/bookingUtils';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -333,7 +334,7 @@ export default function MyBookingsPage() {
                                             </div>
                                             <div>
                                                 <span className="font-semibold"><FaDollarSign className="inline mr-1" /> Cost:</span>
-                                                <p className="text-lg font-bold text-success">BDT {booking.cost}</p>
+                                                <p className="text-lg font-bold text-success">{formatCurrency(booking.cost, { currency: '৳', showCurrency: true })}</p>
                                             </div>
                                             <div>
                                                 <span className="font-semibold"><FaCreditCard className="inline mr-1" /> Payment:</span>

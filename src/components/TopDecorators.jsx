@@ -4,22 +4,22 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import API from '../api/axios';
 import FallbackImage from './FallbackImage';
 
-const StarRating = ({ rating, size = 'sm' }) => {
+const StarRating = ({ rating }) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   return (
-    <div className={`flex items-center gap-1`}>
+    <div className="flex items-center justify-center gap-1">
       {[...Array(fullStars)].map((_, i) => (
-        <FaStar key={i} className={`text-warning ${size === 'lg' ? 'text-lg' : 'text-sm'}`} />
+        <FaStar key={i} className="text-warning text-sm" />
       ))}
-      {hasHalfStar && <FaStarHalfAlt className={`text-warning ${size === 'lg' ? 'text-lg' : 'text-sm'}`} />}
+      {hasHalfStar && <FaStarHalfAlt className="text-warning text-sm" />}
       {[...Array(emptyStars)].map((_, i) => (
-        <FaRegStar key={i} className={`text-base-300 ${size === 'lg' ? 'text-lg' : 'text-sm'}`} />
+        <FaRegStar key={i} className="text-base-300 text-sm" />
       ))}
-      <span className={`ml-2 text-base-content/70 ${size === 'lg' ? 'text-base' : 'text-sm'}`}>
-        ({rating.toFixed(1)})
+      <span className="ml-1 text-xs text-base-content/70">
+        {rating.toFixed(1)}
       </span>
     </div>
   );
@@ -36,50 +36,11 @@ export default function TopDecorators() {
   const fetchTopDecorators = async () => {
     try {
       const response = await API.get('/decorators/top-rated');
-      const topDecorators = (response.data?.data || response.data || []).slice(0, 4);
+      const topDecorators = (response.data?.data || response.data || []);
       setDecorators(topDecorators);
     } catch (error) {
       console.error('Failed to fetch top decorators:', error);
-      // Set fallback data if API fails
-      const fallbackDecorators = [
-        {
-          _id: 'dec_001',
-          name: 'Ahmed Hassan',
-          specialty: 'Wedding & Event Decoration',
-          averageRating: 4.9,
-          totalReviews: 150,
-          completedProjects: 200,
-          photo: 'https://i.pravatar.cc/150?img=1'
-        },
-        {
-          _id: 'dec_002',
-          name: 'Fatima Rahman',
-          specialty: 'Modern Interior Design',
-          averageRating: 4.8,
-          totalReviews: 120,
-          completedProjects: 180,
-          photo: 'https://i.pravatar.cc/150?img=2'
-        },
-        {
-          _id: 'dec_003',
-          name: 'Karim Ahmed',
-          specialty: 'Birthday & Kids Party',
-          averageRating: 4.7,
-          totalReviews: 90,
-          completedProjects: 150,
-          photo: 'https://i.pravatar.cc/150?img=3'
-        },
-        {
-          _id: 'dec_004',
-          name: 'Rashida Begum',
-          specialty: 'Corporate Events',
-          averageRating: 4.6,
-          totalReviews: 85,
-          completedProjects: 140,
-          photo: 'https://i.pravatar.cc/150?img=4'
-        }
-      ];
-      setDecorators(fallbackDecorators);
+      setDecorators([]);
     } finally {
       setLoading(false);
     }
@@ -87,16 +48,16 @@ export default function TopDecorators() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="card bg-base-100 shadow-xl animate-pulse">
-            <figure className="px-6 pt-6">
-              <div className="w-28 h-28 bg-base-300 rounded-full"></div>
+          <div key={i} className="card bg-base-100 shadow-lg animate-pulse">
+            <figure className="pt-6">
+              <div className="w-20 h-20 bg-base-300 rounded-full mx-auto"></div>
             </figure>
-            <div className="card-body text-center pb-6">
-              <div className="h-6 bg-base-300 rounded mb-2"></div>
+            <div className="card-body text-center p-6">
               <div className="h-4 bg-base-300 rounded mb-2"></div>
-              <div className="h-4 bg-base-300 rounded"></div>
+              <div className="h-3 bg-base-300 rounded mb-2"></div>
+              <div className="h-3 bg-base-300 rounded"></div>
             </div>
           </div>
         ))}
@@ -104,91 +65,48 @@ export default function TopDecorators() {
     );
   }
 
+  if (decorators.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-base-content/60">No decorators available at the moment</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {decorators.length > 0 ? decorators.map((decorator, index) => (
+    <div className={`grid gap-6 ${decorators.length === 1 ? 'grid-cols-1 max-w-sm mx-auto' : decorators.length === 2 ? 'grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto' : decorators.length === 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
+      {decorators.slice(0, 4).map((decorator, index) => (
         <motion.div
           key={decorator._id}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1, duration: 0.6 }}
-          whileHover={{ y: -8, scale: 1.05 }}
+          transition={{ delay: index * 0.1, duration: 0.4 }}
           viewport={{ once: true }}
-          className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 group"
+          whileHover={{ y: -4 }}
+          className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
         >
-          <figure className="px-6 pt-6">
-            <div className="relative">
-              <FallbackImage
-                src={decorator.photo}
-                alt={decorator.name}
-                fallbackSrc={`https://i.pravatar.cc/150?img=${index + 10}`}
-                className="rounded-full w-28 h-28 object-cover border-4 border-primary/20 group-hover:border-primary/60 transition-all duration-300 shadow-lg"
-              />
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-success rounded-full border-4 border-base-100 flex items-center justify-center">
-                <span className="text-xs">✓</span>
-              </div>
-            </div>
+          <figure className="pt-6">
+            <FallbackImage
+              src={decorator.photo}
+              alt={decorator.name}
+              fallbackSrc={`https://i.pravatar.cc/150?img=${index + 1}`}
+              className="rounded-full w-20 h-20 object-cover"
+            />
           </figure>
-          <div className="card-body text-center pb-6">
-            <h3 className="card-title justify-center text-lg group-hover:text-primary transition-colors">
-              {decorator.name || `Top Decorator ${index + 1}`}
+          <div className="card-body text-center p-6">
+            <h3 className="font-semibold text-base">
+              {decorator.name}
             </h3>
-            <p className="text-sm text-base-content/70 mb-2">
-              {decorator.specialty || decorator.specialization || 'Professional Interior Designer'}
+            <p className="text-sm text-base-content/70 mb-3">
+              {decorator.specialty || decorator.specialization || 'Interior Designer'}
             </p>
             <StarRating rating={decorator.averageRating || 4.5} />
-            <div className="badge badge-outline badge-sm mt-2">
-              {decorator.totalReviews ? `${decorator.totalReviews} Reviews` : 'Top Rated Professional'}
-            </div>
-            <div className="text-xs text-base-content/60 mt-1 font-semibold">
-              Decorator ID: {decorator._id ? decorator._id.slice(-8).toUpperCase() : `STD${(index + 1).toString().padStart(4, '0')}`}
-            </div>
-            <div className="text-xs text-base-content/60 mt-1">
-              {decorator.completedProjects || decorator.totalProjects || (75 + index * 15)}+ Projects Completed
+            <div className="text-xs text-base-content/60 mt-2">
+              {decorator.totalReviews || 25}+ Reviews
             </div>
           </div>
         </motion.div>
-      )) : (
-        // Fallback decorators if no data
-        [...Array(4)].map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, duration: 0.6 }}
-            whileHover={{ y: -8, scale: 1.05 }}
-            viewport={{ once: true }}
-            className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 group"
-          >
-            <figure className="px-6 pt-6">
-              <div className="relative">
-                <FallbackImage
-                  src={`https://i.pravatar.cc/150?img=${i + 1}`}
-                  alt={`Decorator ${i + 1}`}
-                  className="rounded-full w-28 h-28 object-cover border-4 border-primary/20 group-hover:border-primary/60 transition-all duration-300 shadow-lg"
-                />
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-success rounded-full border-4 border-base-100 flex items-center justify-center">
-                  <span className="text-xs">✓</span>
-                </div>
-              </div>
-            </figure>
-            <div className="card-body text-center pb-6">
-              <h3 className="card-title justify-center text-lg group-hover:text-primary transition-colors">
-                Top Decorator {i + 1}
-              </h3>
-              <p className="text-sm text-base-content/70 mb-2">Professional Interior Designer</p>
-              <StarRating rating={4.5} />
-              <div className="badge badge-outline badge-sm mt-2">Top Rated Professional</div>
-              <div className="text-xs text-base-content/60 mt-1 font-semibold">
-                Decorator ID: STD{(i + 1).toString().padStart(4, '0')}
-              </div>
-              <div className="text-xs text-base-content/60 mt-1">
-                {75 + i * 15}+ Projects Completed
-              </div>
-            </div>
-          </motion.div>
-        ))
-      )}
+      ))}
     </div>
   );
 }

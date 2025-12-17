@@ -1,105 +1,167 @@
-# 🎨 StyleDecor - Professional Decoration Service Platform
+# 🎨 StyleDecor - Stylish Decoration Services Platform
 
 ## 📋 Project Overview
 
-**StyleDecor** is a comprehensive web application that connects customers with professional decorators for various decoration services. The platform provides a seamless booking experience, payment processing, and project management system.
+**StyleDecor** is a modern, full-featured decoration services platform that connects customers with professional decorators for various events and occasions. Built with React and modern web technologies, it provides a seamless experience for booking decoration services, managing bookings, and handling payments.
 
 ## 🌐 Live URL
-[StyleDecor Live Demo](https://your-live-url.com) *(Replace with actual deployment URL)*
+
+**Frontend:** [https://stylish-decoration.netlify.app](https://stylish-decoration.netlify.app)  
+**Backend API:** [https://stylish-decoration-api.herokuapp.com](https://stylish-decoration-api.herokuapp.com)
 
 ## ✨ Key Features
 
-### 🏠 **For Customers**
-- Browse decoration packages and services with advanced filtering
-- Select preferred date & time slots for bookings
-- Secure online payment processing with Stripe integration
-- Real-time booking status tracking
-- Payment history and booking management
-- User dashboard with personalized experience
+### 🔐 Authentication & Authorization
+- **Email/Password Registration & Login**
+- **Google OAuth Social Login** (Firebase)
+- **JWT Token-based Authentication**
+- **Role-based Access Control** (Admin, Decorator, User)
+- **Profile Image Upload** (ImageBB integration)
 
-### 👨‍🎨 **For Decorators**
-- Dedicated decorator dashboard
-- Today's schedule with project overview
-- Step-by-step project status updates (Assigned → Planning → Materials → On the Way → Setup → Completed)
-- Earnings summary and payment history
-- Project management tools
+### 👥 User Management
+- **Multi-role System** (Admin, Decorator, User)
+- **Admin Dashboard** for user management
+- **Decorator Application System**
+- **Profile Management**
 
-### 🔧 **For Administrators**
-- Comprehensive admin dashboard with analytics
-- User, decorator, and service management
-- Booking management with decorator assignment
-- Business analytics with interactive charts
-- Revenue monitoring and reporting
-- Service management with CRUD operations
+### 🎨 Service Management
+- **Service Catalog** with detailed descriptions
+- **Advanced Search & Filtering**
+- **Price Range Filtering**
+- **Service Categories**
+- **Image Gallery**
 
-### 🎯 **Core Features**
-- **Authentication System**: Secure login/registration with role-based access
-- **Payment Integration**: Stripe payment gateway for secure transactions
-- **Real-time Updates**: Live status updates and notifications
-- **Responsive Design**: Mobile-first approach with DaisyUI components
-- **Search & Filter**: Advanced search and filtering capabilities
-- **Dashboard Analytics**: Comprehensive business insights and charts
+### 📅 Booking System
+- **Real-time Booking Management**
+- **Date & Time Selection**
+- **Service Customization**
+- **Booking Status Tracking**
+- **Cancellation Protection**
 
-## 📦 NPM Packages Used
+### 💳 Payment Integration
+- **Stripe Payment Gateway**
+- **Secure Payment Processing**
+- **Payment History**
+- **Invoice Generation**
+- **Refund Management**
 
-### **Frontend Dependencies**
+### 📊 Analytics & Reporting
+- **Revenue Monitoring**
+- **Business Analytics**
+- **Booking Statistics**
+- **Performance Charts**
+- **Data Visualization**
+
+### 📱 Modern UI/UX
+- **Responsive Design**
+- **DaisyUI Components**
+- **Framer Motion Animations**
+- **Clean & Modern Interface**
+- **Consistent Design System**
+
+### 🔧 Additional Features
+- **SMS Notifications**
+- **Email Notifications**
+- **Coupon System**
+- **Service Add-ons**
+- **AI Recommendations**
+- **Service Coverage Map**
+
+## 🛠️ NPM Packages Used
+
+### Core Dependencies
 ```json
 {
-  "@stripe/react-stripe-js": "^2.4.0",
-  "@stripe/stripe-js": "^2.4.0",
-  "chart.js": "^4.4.1",
-  "framer-motion": "^10.16.16",
-  "react": "^18.2.0",
-  "react-chartjs-2": "^5.2.0",
-  "react-dom": "^18.2.0",
-  "react-icons": "^4.12.0",
-  "react-router-dom": "^6.20.1",
-  "react-toastify": "^9.1.3",
-  "axios": "^1.6.2"
+  "react": "^19.2.0",
+  "react-dom": "^19.2.0",
+  "react-router-dom": "^7.10.1",
+  "vite": "^7.2.4"
 }
 ```
 
-### **Development Dependencies**
+### UI & Styling
 ```json
 {
-  "@types/react": "^18.2.37",
-  "@types/react-dom": "^18.2.15",
-  "@vitejs/plugin-react": "^4.1.1",
-  "autoprefixer": "^10.4.16",
-  "daisyui": "^4.4.19",
-  "eslint": "^8.53.0",
-  "eslint-plugin-react": "^7.33.2",
-  "eslint-plugin-react-hooks": "^4.6.0",
-  "eslint-plugin-react-refresh": "^0.4.4",
-  "postcss": "^8.4.32",
-  "tailwindcss": "^3.3.6",
-  "vite": "^4.5.0"
+  "tailwindcss": "^4.1.17",
+  "daisyui": "^5.5.8",
+  "react-icons": "^5.5.0",
+  "framer-motion": "^12.23.25",
+  "motion": "^12.23.26"
 }
 ```
 
-### **UI & Styling**
-- **TailwindCSS**: Utility-first CSS framework
-- **DaisyUI**: Component library for Tailwind CSS
-- **React Icons**: Popular icon library
-- **Framer Motion**: Animation library for smooth transitions
+### Authentication & Security
+```json
+{
+  "firebase": "^12.6.0",
+  "jwt-decode": "^4.0.0",
+  "axios": "^1.13.2"
+}
+```
 
-### **State Management & API**
-- **Axios**: HTTP client for API requests
-- **React Router DOM**: Client-side routing
-- **React Toastify**: Toast notifications
+### Payment Processing
+```json
+{
+  "@stripe/react-stripe-js": "^5.4.1",
+  "@stripe/stripe-js": "^8.5.3"
+}
+```
 
-### **Payment & Charts**
-- **Stripe**: Payment processing integration
-- **Chart.js**: Data visualization library
-- **React Chart.js 2**: React wrapper for Chart.js
+### Data Visualization
+```json
+{
+  "chart.js": "^4.5.1",
+  "react-chartjs-2": "^5.3.1"
+}
+```
+
+### Maps & Location
+```json
+{
+  "leaflet": "^1.9.4",
+  "react-leaflet": "^5.0.0"
+}
+```
+
+### Notifications & Alerts
+```json
+{
+  "react-toastify": "^11.0.5",
+  "react-hot-toast": "^2.6.0",
+  "sweetalert2": "^11.26.4"
+}
+```
+
+### Utilities
+```json
+{
+  "moment": "^2.30.1",
+  "lucide-react": "^0.559.0",
+  "cors": "^2.8.5",
+  "express": "^4.22.1",
+  "concurrently": "^8.2.2"
+}
+```
+
+### Development Dependencies
+```json
+{
+  "@vitejs/plugin-react": "^5.1.1",
+  "@tailwindcss/vite": "^4.1.17",
+  "eslint": "^9.39.1",
+  "eslint-plugin-react-hooks": "^7.0.1",
+  "eslint-plugin-react-refresh": "^0.4.24"
+}
+```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn package manager
+- Node.js (v18 or higher)
+- npm or yarn
+- Firebase account
+- Stripe account
 - MongoDB database
-- Stripe account for payments
 
 ### Installation
 
@@ -115,7 +177,11 @@ npm install
 ```
 
 3. **Environment Setup**
-Create a `.env` file in the root directory:
+```bash
+cp .env.example .env
+```
+
+4. **Configure Environment Variables**
 ```env
 # Firebase Configuration
 VITE_FIREBASE_API_KEY=your_firebase_api_key
@@ -125,65 +191,71 @@ VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 
-# MongoDB Configuration
-MONGODB_URI=mongodb://localhost:27017/styledecor
-# OR for MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/styledecor
+# ImageBB Configuration
+VITE_IMAGEBB_API_KEY=your_imagebb_api_key
 
 # Stripe Configuration
-VITE_STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
 
 # API Configuration
 VITE_API_BASE_URL=http://localhost:5000/api
 ```
 
-4. **Start the development server**
+5. **Start Development Server**
 ```bash
 npm run dev
 ```
 
-5. **Build for production**
+6. **Start with Mock Server**
 ```bash
-npm run build
+npm run dev:full
 ```
 
-## 🏗️ Project Structure
+## 📁 Project Structure
 
 ```
 src/
-├── api/                    # API configuration
-├── components/             # Reusable components
-├── pages/                  # Page components
-│   ├── Dashboard/         # Dashboard pages
-│   └── ...               # Other pages
-├── hooks/                 # Custom React hooks
-├── utils/                 # Utility functions
-├── styles/                # CSS and styling
-└── firebase/              # Firebase configuration
+├── api/                 # API configuration
+├── assets/             # Static assets
+├── components/         # Reusable components
+├── firebase/           # Firebase configuration
+├── hooks/              # Custom React hooks
+├── pages/              # Page components
+│   ├── Dashboard/      # Dashboard pages
+│   └── ...            # Other pages
+├── routes/             # Route configurations
+├── styles/             # CSS styles
+└── utils/              # Utility functions
 ```
 
-## 🎨 UI/UX Design Principles
+## 🔒 Security Features
 
-- **Modern DaisyUI-based Interface**: Clean, professional design
-- **Beautiful Accent Colors**: Purple, blue, and indigo gradient themes
-- **Consistent Spacing**: Uniform padding and margins throughout
-- **Clear Visual Hierarchy**: Proper typography and layout structure
-- **Responsive Design**: Mobile-first approach
-- **Smooth Animations**: Framer Motion for enhanced user experience
+- **Environment Variables** for sensitive data
+- **JWT Token Authentication**
+- **Role-based Access Control**
+- **Input Validation & Sanitization**
+- **Secure Payment Processing**
+- **CORS Protection**
 
-## 🔐 Security Features
+## 🎨 Design System
 
-- Environment variables for sensitive data
-- Secure authentication with Firebase
-- Protected routes with role-based access
-- Secure payment processing with Stripe
-- Input validation and sanitization
+- **Color Palette:** Purple, Blue, Indigo gradients
+- **Typography:** Clean, modern fonts
+- **Spacing:** Consistent 4px grid system
+- **Components:** DaisyUI-based design system
+- **Animations:** Smooth Framer Motion transitions
+
+## 📱 Responsive Design
+
+- **Mobile-first approach**
+- **Tablet optimization**
+- **Desktop enhancement**
+- **Cross-browser compatibility**
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
@@ -192,7 +264,7 @@ src/
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Developer
+## 👨‍💻 Author
 
 **Your Name**
 - GitHub: [@yourusername](https://github.com/yourusername)
@@ -200,12 +272,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- DaisyUI for the beautiful component library
-- Stripe for secure payment processing
+- React team for the amazing framework
+- DaisyUI for beautiful components
 - Firebase for authentication services
-- Chart.js for data visualization
-- All contributors and testers
+- Stripe for payment processing
+- All contributors and supporters
 
 ---
 
-**Made with ❤️ for professional decoration services**
+**Made with ❤️ for beautiful decorations**

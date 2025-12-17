@@ -4,6 +4,7 @@ import API from '../../api/axios';
 import Spinner from '../../components/Spinner';
 import { toast } from 'react-toastify';
 import { FaChartBar, FaDollarSign, FaUsers, FaClipboardList, FaUserTie, FaChartLine, FaCalendarAlt, FaCheckCircle, FaChartPie } from 'react-icons/fa';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 export default function AdminAnalytics() {
   const [analytics, setAnalytics] = useState({
@@ -102,7 +103,7 @@ export default function AdminAnalytics() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-medium text-green-600 mb-1">Total Revenue</div>
-              <div className="text-3xl font-bold text-green-800">৳{analytics.totalRevenue.toLocaleString()}</div>
+              <div className="text-3xl font-bold text-green-800">{formatCurrency(analytics.totalRevenue, { currency: '৳', showCurrency: true })}</div>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
               <FaDollarSign className="text-2xl text-green-600" />
@@ -180,13 +181,13 @@ export default function AdminAnalytics() {
             <div className="flex justify-between items-center p-3 bg-blue-100 rounded-lg">
               <span className="font-medium text-gray-700">Average Revenue per Booking</span>
               <span className="text-lg font-bold text-blue-600">
-                ৳{analytics.totalBookings > 0 ? Math.round(analytics.totalRevenue / analytics.totalBookings) : 0}
+                {formatCurrency(analytics.totalBookings > 0 ? Math.round(analytics.totalRevenue / analytics.totalBookings) : 0, { currency: '৳', showCurrency: true })}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-purple-100 rounded-lg">
               <span className="font-medium text-gray-700">Revenue per Decorator</span>
               <span className="text-lg font-bold text-purple-600">
-                ৳{analytics.activeDecorators > 0 ? Math.round(analytics.totalRevenue / analytics.activeDecorators) : 0}
+                {formatCurrency(analytics.activeDecorators > 0 ? Math.round(analytics.totalRevenue / analytics.activeDecorators) : 0, { currency: '৳', showCurrency: true })}
               </span>
             </div>
           </div>
@@ -200,15 +201,15 @@ export default function AdminAnalytics() {
           <div className="space-y-4">
             <div className="flex justify-between items-center p-3 bg-green-100 rounded-lg">
               <span className="font-medium text-gray-700">Total Revenue</span>
-              <span className="text-lg font-bold text-green-600">৳{analytics.totalRevenue.toLocaleString()}</span>
+              <span className="text-lg font-bold text-green-600">{formatCurrency(analytics.totalRevenue, { currency: '৳', showCurrency: true })}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-blue-100 rounded-lg">
               <span className="font-medium text-gray-700">Platform Fee (5%)</span>
-              <span className="text-lg font-bold text-blue-600">৳{Math.round(analytics.totalRevenue * 0.05).toLocaleString()}</span>
+              <span className="text-lg font-bold text-blue-600">{formatCurrency(Math.round(analytics.totalRevenue * 0.05), { currency: '৳', showCurrency: true })}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-purple-100 rounded-lg">
               <span className="font-medium text-gray-700">Decorator Earnings (95%)</span>
-              <span className="text-lg font-bold text-purple-600">৳{Math.round(analytics.totalRevenue * 0.95).toLocaleString()}</span>
+              <span className="text-lg font-bold text-purple-600">{formatCurrency(Math.round(analytics.totalRevenue * 0.95), { currency: '৳', showCurrency: true })}</span>
             </div>
           </div>
         </div>
@@ -261,7 +262,7 @@ export default function AdminAnalytics() {
           
           <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
             <div className="text-2xl font-bold text-blue-600 mb-2">
-              ৳{analytics.totalBookings > 0 ? Math.round(analytics.totalRevenue / analytics.totalBookings).toLocaleString() : 0}
+              {formatCurrency(analytics.totalBookings > 0 ? Math.round(analytics.totalRevenue / analytics.totalBookings) : 0, { currency: '৳', showCurrency: true })}
             </div>
             <div className="text-sm text-blue-500 font-medium">Avg. Order Value</div>
             <div className="text-xs text-blue-400 mt-1">Per Booking Revenue</div>
