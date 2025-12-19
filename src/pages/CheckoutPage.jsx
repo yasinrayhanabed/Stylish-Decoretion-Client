@@ -37,16 +37,10 @@ const CheckoutPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // This is only a frontend action.
-        // In a real project, you must send data to the server and redirect to the payment gateway.
-        
         console.log('Order Data:', { billingInfo, paymentMethod, total });
-        
-        // Redirect to success page as a demo
         navigate('/payment/success'); 
     };
 
-    // --- Checkout Page Design ---
     return (
         <div className="min-h-screen bg-gray-50 py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,10 +51,8 @@ const CheckoutPage = () => {
 
                 <form onSubmit={handleSubmit} className="lg:grid lg:grid-cols-3 lg:gap-10">
                     
-                    {/* Left Column: Address and Payment Info */}
                     <div className="lg:col-span-2 space-y-8">
                         
-                        {/* 1. Contact Information */}
                         <div className="bg-white p-6 shadow-xl rounded-xl border border-gray-100">
                             <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
                                 <MapPin className="w-6 h-6 mr-3 text-indigo-500" />

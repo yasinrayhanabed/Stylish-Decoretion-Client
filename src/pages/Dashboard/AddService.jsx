@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../api/axios";
 import { toast } from "react-toastify";
+import useAuth from "../../hooks/useAuth";
 
 export default function AddService() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!user || user.role !== "admin") navigate("/");
-  }, [user, navigate]);
+    if (!authLoading && (!user || user.role !== "admin")) navigate("/");
+  }, [user, authLoading, navigate]);
 
   const [serviceName, setServiceName] = useState("");
   const [cost, setCost] = useState("");
@@ -47,12 +48,8 @@ export default function AddService() {
 
       if (response.data.success) {
         toast.success("Service added successfully!");
-        setServiceName("");
-        setCost("");
-        setUnit("");
-        setCategory("");
-        setDescription("");
-        setPhoto(null);
+        // Redirect to the manage services page after successful addition
+        navigate("/dashboard/admin/manage-services");
       } else {
         toast.error("Failed to add service");
       }
@@ -64,9 +61,13 @@ export default function AddService() {
     }
   };
 
+  if (authLoading) return null; // or a spinner
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-base-200 shadow-md rounded-md mt-10">
-      <h2 className="text-2xl font-bold mx-auto flex items-center justify-center mb-6">Add a New Service</h2>
+      <h2 className="text-2xl font-bold mx-auto flex items-center justify-center mb-6">
+        Add a New Service
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block font-semibold">Service Name</label>
@@ -110,10 +111,18 @@ export default function AddService() {
             required
           >
             <option value="">Select a category</option>
-            <option value="wedding" className="text-gray-800">Wedding</option>
-            <option value="home" className="text-gray-800">Home</option>
-            <option value="corporate" className="text-gray-800">Corporate</option>
-            <option value="seminar" className="text-gray-800">Seminar</option>
+            <option value="wedding" className="text-gray-800">
+              Wedding
+            </option>
+            <option value="home" className="text-gray-800">
+              Home
+            </option>
+            <option value="corporate" className="text-gray-800">
+              Corporate
+            </option>
+            <option value="seminar" className="text-gray-800">
+              Seminar
+            </option>
           </select>
         </div>
         <div>
@@ -136,7 +145,7 @@ export default function AddService() {
             required
           ></textarea>
         </div>
-        
+
         <button
           type="submit"
           disabled={loading}

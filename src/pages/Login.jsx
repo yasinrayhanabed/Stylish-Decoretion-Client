@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 // NOTE: Assuming firebase.config is at src/firebase/firebase.config.js or .jsx
-import { auth, googleProvider } from "../firebase/firebase.config.js"; 
+import { auth, googleProvider } from "../firebase/firebase.config.js";
 import { signInWithPopup } from "firebase/auth";
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
@@ -19,9 +19,18 @@ export default function Login() {
     setLoading(true);
     try {
       const { data } = await API.post("/auth/login", { email, password });
-      if (data?.token) {
-        // Use the context login function which handles token storage and redirection
-        login(data.token); 
+      if (data?.token && data?.user) {
+        const fetched = await login(data.token, false);
+
+        const role = fetched?.role ?? data.user.role;
+        if (role === "admin") {
+          navigate("/dashboard/admin");
+        } else if (role === "decorator") {
+          navigate("/dashboard/decorator-dashboard");
+        } else {
+          navigate("/dashboard/my-bookings");
+        }
+        toast.success("Login successful!");
       } else toast.error("Login failed! Check credentials.");
     } catch (err) {
       console.error("Login error:", err);
@@ -40,13 +49,22 @@ export default function Login() {
         photo: user.photoURL,
         uid: user.uid,
       });
-      if (res.data?.token) {
-        // Use the context login function for Google login token as well
-        login(res.data.token);
+      if (res.data?.token && res.data?.user) {
+        const fetched = await login(res.data.token, false);
+        const role = fetched?.role ?? res.data.user.role;
+        if (role === "admin") {
+          navigate("/dashboard/admin");
+        } else if (role === "decorator") {
+          navigate("/dashboard/decorator-dashboard");
+        } else {
+          navigate("/dashboard/my-bookings");
+        }
       } else toast.error("Google Login failed! Try again.");
     } catch (err) {
       console.error("Google login error:", err);
-      toast.error(err.response?.data?.message || "Google Login Failed! Try again.");
+      toast.error(
+        err.response?.data?.message || "Google Login Failed! Try again."
+      );
     }
   };
 
@@ -58,7 +76,6 @@ export default function Login() {
         </h2>
 
         <form onSubmit={handleLogin} className="space-y-4">
-          {/* Input fields remain the same */}
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
@@ -100,13 +117,30 @@ export default function Login() {
           disabled={loading}
         >
           {/* Google SVG */}
-          <svg aria-label="Google logo" width="16" height="16" viewBox="0 0 512 512">
+          <svg
+            aria-label="Google logo"
+            width="16"
+            height="16"
+            viewBox="0 0 512 512"
+          >
             <g>
               <path d="M0 0H512V512H0" fill="#fff"></path>
-              <path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path>
-              <path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path>
-              <path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path>
-              <path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path>
+              <path
+                fill="#34a853"
+                d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"
+              ></path>
+              <path
+                fill="#4285f4"
+                d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"
+              ></path>
+              <path
+                fill="#fbbc02"
+                d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"
+              ></path>
+              <path
+                fill="#ea4335"
+                d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"
+              ></path>
             </g>
           </svg>
           Continue with Google
@@ -114,7 +148,10 @@ export default function Login() {
 
         <p className="text-sm text-center text-gray-500 mt-4">
           Don't have an account?{" "}
-          <a href="/register" className="text-blue-500 hover:underline font-medium">
+          <a
+            href="/register"
+            className="text-blue-500 hover:underline font-medium"
+          >
             Register here
           </a>
         </p>

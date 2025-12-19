@@ -1,29 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { FaGift, FaPlus, FaMinus, FaMapMarkerAlt, FaCrown, FaRobot, FaUsers } from 'react-icons/fa';
-import { serviceAddons, getRecommendedAddons, calculateAddonTotal } from '../utils/serviceAddons';
-import { applyCoupon } from '../utils/couponUtils';
-import { subscriptionPlans } from '../utils/subscriptionUtils';
-import { getDecoratorRecommendations, getMultipleDecoratorsForEvent } from '../utils/aiRecommendation';
-import { sendSMS, smsTemplates } from '../utils/smsUtils';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import {
+  FaGift,
+  FaPlus,
+  FaMinus,
+  FaMapMarkerAlt,
+  FaCrown,
+  FaRobot,
+  FaUsers,
+} from "react-icons/fa";
+import {
+  getRecommendedAddons,
+  calculateAddonTotal,
+} from "../utils/serviceAddons";
+import { applyCoupon } from "../utils/couponUtils";
+import { subscriptionPlans } from "../utils/subscriptionUtils";
+import {
+  getDecoratorRecommendations,
+  getMultipleDecoratorsForEvent,
+} from "../utils/aiRecommendation";
+import { sendSMS, smsTemplates } from "../utils/smsUtils";
 
 export default function EnhancedBookingForm({ service, onSubmit }) {
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
-    date: '',
-    time: '',
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    date: "",
+    time: "",
     guests: 50,
-    budget: 'medium',
-    serviceType: service?.category || 'home',
-    location: 'dhaka-central',
-    subscription: null
+    budget: "medium",
+    serviceType: service?.category || "home",
+    location: "dhaka-central",
+    subscription: null,
   });
 
   const [selectedAddons, setSelectedAddons] = useState([]);
-  const [couponCode, setCouponCode] = useState('');
+  const [couponCode, setCouponCode] = useState("");
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [aiRecommendations, setAiRecommendations] = useState(null);
@@ -31,9 +45,9 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
   const [showSubscriptions, setShowSubscriptions] = useState(false);
 
   const locations = [
-    { id: 'dhaka-central', name: 'Dhaka Central', available: true },
-    { id: 'chittagong', name: 'Chittagong Branch', available: true },
-    { id: 'sylhet', name: 'Sylhet Office', available: false }
+    { id: "dhaka-central", name: "Dhaka Central", available: true },
+    { id: "chittagong", name: "Chittagong Branch", available: true },
+    { id: "sylhet", name: "Sylhet Office", available: false },
   ];
 
   const basePrice = service?.price || 5000;
@@ -46,19 +60,17 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
     const recommendations = getDecoratorRecommendations({
       serviceType: formData.serviceType,
       budget: formData.budget,
-      style: 'modern'
+      style: "modern",
     });
     setAiRecommendations(recommendations);
 
     // Check if multiple decorators needed
-    if (formData.guests > 100) {
-      setMultipleDecorators(true);
-    }
+    setMultipleDecorators(getMultipleDecoratorsForEvent(formData.guests));
   }, [formData.serviceType, formData.budget, formData.guests]);
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
-    
+
     try {
       const result = await applyCoupon(couponCode, subtotal);
       if (result.valid) {
@@ -69,27 +81,27 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
         toast.error(result.error);
       }
     } catch (error) {
-      toast.error('Failed to apply coupon');
+      toast.error("Failed to apply coupon");
     }
   };
 
   const toggleAddon = (addonId) => {
-    setSelectedAddons(prev => 
-      prev.includes(addonId) 
-        ? prev.filter(id => id !== addonId)
+    setSelectedAddons((prev) =>
+      prev.includes(addonId)
+        ? prev.filter((id) => id !== addonId)
         : [...prev, addonId]
     );
   };
 
   const handleSubscriptionSelect = (plan) => {
-    setFormData(prev => ({ ...prev, subscription: plan.id }));
+    setFormData((prev) => ({ ...prev, subscription: plan.id }));
     setShowSubscriptions(false);
     toast.success(`${plan.name} subscription selected!`);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const bookingData = {
       ...formData,
       addons: selectedAddons,
@@ -99,29 +111,37 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
       discount: couponDiscount,
       finalAmount,
       aiRecommendations: aiRecommendations?.recommendations?.[0],
-      multipleDecorators
+      multipleDecorators,
     };
 
     // Send SMS notification
     try {
-      await sendSMS(formData.phone, smsTemplates.bookingConfirmation(
-        service?.name || 'Decoration Service',
-        formData.date,
-        finalAmount
-      ));
+      await sendSMS(
+        formData.phone,
+        smsTemplates.bookingConfirmation(
+          service?.name || "Decoration Service",
+          formData.date,
+          finalAmount
+        )
+      );
     } catch (error) {
-      console.log('SMS notification failed:', error);
+      console.log("SMS notification failed:", error);
     }
 
     onSubmit(bookingData);
   };
 
-  const recommendedAddons = getRecommendedAddons(formData.serviceType, formData.budget);
+  const recommendedAddons = getRecommendedAddons(
+    formData.serviceType,
+    formData.budget
+  );
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
-      <h2 className="text-3xl font-bold mb-8 text-center">Enhanced Booking Form</h2>
-      
+      <h2 className="text-3xl font-bold mb-8 text-center">
+        Enhanced Booking Form
+      </h2>
+
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -129,7 +149,9 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
             type="text"
             placeholder="Full Name"
             value={formData.name}
-            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, name: e.target.value }))
+            }
             className="w-full p-3 border rounded-lg"
             required
           />
@@ -137,7 +159,9 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
             type="tel"
             placeholder="Phone Number"
             value={formData.phone}
-            onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, phone: e.target.value }))
+            }
             className="w-full p-3 border rounded-lg"
             required
           />
@@ -145,14 +169,18 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
             type="email"
             placeholder="Email Address"
             value={formData.email}
-            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, email: e.target.value }))
+            }
             className="w-full p-3 border rounded-lg"
             required
           />
           <input
             type="date"
             value={formData.date}
-            onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, date: e.target.value }))
+            }
             className="w-full p-3 border rounded-lg"
             required
           />
@@ -165,16 +193,18 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
           </label>
           <select
             value={formData.location}
-            onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, location: e.target.value }))
+            }
             className="w-full p-3 border rounded-lg"
           >
-            {locations.map(location => (
-              <option 
-                key={location.id} 
+            {locations.map((location) => (
+              <option
+                key={location.id}
                 value={location.id}
                 disabled={!location.available}
               >
-                {location.name} {!location.available && '(Coming Soon)'}
+                {location.name} {!location.available && "(Coming Soon)"}
               </option>
             ))}
           </select>
@@ -191,25 +221,29 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
               onClick={() => setShowSubscriptions(!showSubscriptions)}
               className="text-purple-600 hover:text-purple-800"
             >
-              {showSubscriptions ? 'Hide' : 'View Plans'}
+              {showSubscriptions ? "Hide" : "View Plans"}
             </button>
           </div>
-          
+
           {showSubscriptions && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {subscriptionPlans.map(plan => (
-                <div 
+              {subscriptionPlans.map((plan) => (
+                <div
                   key={plan.id}
                   className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-                    formData.subscription === plan.id 
-                      ? 'border-purple-500 bg-purple-100' 
-                      : 'border-gray-200 hover:border-purple-300'
+                    formData.subscription === plan.id
+                      ? "border-purple-500 bg-purple-100"
+                      : "border-gray-200 hover:border-purple-300"
                   }`}
                   onClick={() => handleSubscriptionSelect(plan)}
                 >
                   <h4 className="font-bold">{plan.name}</h4>
-                  <p className="text-purple-600 font-bold">৳{plan.price}/{plan.duration}</p>
-                  <p className="text-sm text-gray-600">{plan.services} services</p>
+                  <p className="text-purple-600 font-bold">
+                    ৳{plan.price}/{plan.duration}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {plan.services} services
+                  </p>
                 </div>
               ))}
             </div>
@@ -220,25 +254,34 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
         {aiRecommendations && (
           <div className="bg-blue-50 p-6 rounded-lg">
             <h3 className="text-lg font-bold mb-4 flex items-center">
-              <FaRobot className="mr-2 text-blue-600" /> AI Recommended Decorator
+              <FaRobot className="mr-2 text-blue-600" /> AI Recommended
+              Decorator
             </h3>
             <div className="flex items-center space-x-4">
-              <img 
-                src={aiRecommendations.recommendations[0]?.photo} 
+              <img
+                src={aiRecommendations.recommendations[0]?.photo}
                 alt={aiRecommendations.recommendations[0]?.name}
                 className="w-16 h-16 rounded-full"
               />
               <div>
-                <h4 className="font-bold">{aiRecommendations.recommendations[0]?.name}</h4>
-                <p className="text-sm text-gray-600">★ {aiRecommendations.recommendations[0]?.rating} • {aiRecommendations.recommendations[0]?.experience} years</p>
-                <p className="text-xs text-blue-600">AI Match: {aiRecommendations.recommendations[0]?.aiScore}%</p>
+                <h4 className="font-bold">
+                  {aiRecommendations.recommendations[0]?.name}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  ★ {aiRecommendations.recommendations[0]?.rating} •{" "}
+                  {aiRecommendations.recommendations[0]?.experience} years
+                </p>
+                <p className="text-xs text-blue-600">
+                  AI Match: {aiRecommendations.recommendations[0]?.aiScore}%
+                </p>
               </div>
             </div>
             {multipleDecorators && (
               <div className="mt-4 p-3 bg-yellow-100 rounded-lg">
                 <p className="text-sm flex items-center">
                   <FaUsers className="mr-2" />
-                  <strong>Multiple decorators recommended</strong> for {formData.guests}+ guests
+                  <strong>Multiple decorators recommended</strong> for{" "}
+                  {formData.guests}+ guests
                 </p>
               </div>
             )}
@@ -249,13 +292,13 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
         <div>
           <h3 className="text-lg font-bold mb-4">Service Add-ons</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recommendedAddons.map(addon => (
-              <div 
+            {recommendedAddons.map((addon) => (
+              <div
                 key={addon.id}
                 className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-                  selectedAddons.includes(addon.id) 
-                    ? 'border-green-500 bg-green-50' 
-                    : 'border-gray-200 hover:border-green-300'
+                  selectedAddons.includes(addon.id)
+                    ? "border-green-500 bg-green-50"
+                    : "border-gray-200 hover:border-green-300"
                 }`}
                 onClick={() => toggleAddon(addon.id)}
               >
@@ -270,20 +313,28 @@ export default function EnhancedBookingForm({ service, onSubmit }) {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{addon.description}</p>
-                    <p className="text-xs text-gray-500">Duration: {addon.duration}</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {addon.description}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Duration: {addon.duration}
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-green-600">৳{addon.price}</p>
                     <button
                       type="button"
                       className={`mt-2 p-1 rounded-full ${
-                        selectedAddons.includes(addon.id) 
-                          ? 'bg-green-500 text-white' 
-                          : 'bg-gray-200 text-gray-600'
+                        selectedAddons.includes(addon.id)
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-200 text-gray-600"
                       }`}
                     >
-                      {selectedAddons.includes(addon.id) ? <FaMinus /> : <FaPlus />}
+                      {selectedAddons.includes(addon.id) ? (
+                        <FaMinus />
+                      ) : (
+                        <FaPlus />
+                      )}
                     </button>
                   </div>
                 </div>

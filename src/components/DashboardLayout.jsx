@@ -21,10 +21,8 @@ export default function DashboardLayout({
 
   return (
     <div className="flex w-full bg-base-100">
-      {/* Scrollable Sidebar */}
       <aside className={`w-64 ${sidebarColor} shadow-lg flex-shrink-0`}>
         <div className="p-4">
-          {/* Header */}
           <div className="mb-6">
             <div className="flex items-center space-x-3 mb-2">
               <div className={`w-10 h-10 ${headerColor} rounded-full flex items-center justify-center`}>
@@ -35,7 +33,6 @@ export default function DashboardLayout({
             <div className="w-full h-1 bg-primary rounded-full"></div>
           </div>
 
-          {/* Navigation */}
           <nav className="space-y-2">
             {navItems.map((item, index) => (
               <NavLink 
@@ -50,7 +47,6 @@ export default function DashboardLayout({
             ))}
           </nav>
           
-          {/* Footer Navigation */}
           <div className="mt-8 pt-4 border-t border-base-300 space-y-2">
             <NavLink 
               to="/"
@@ -70,7 +66,6 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 bg-base-100">
         <div className="p-6">
           <Outlet />

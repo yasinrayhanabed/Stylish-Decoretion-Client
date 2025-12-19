@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 class BookingErrorBoundary extends React.Component {
   constructor(props) {
@@ -7,22 +7,22 @@ class BookingErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log the error for debugging
-    console.error('Booking Error Boundary caught an error:', error, errorInfo);
-    
+    console.error("Booking Error Boundary caught an error:", error, errorInfo);
+
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     });
 
-    // Check if it's a booking ID format error
-    if (error.message && error.message.includes('booking') || error.message.includes('_id')) {
-      console.warn('Booking ID format error detected:', error.message);
+    if (
+      (error.message && error.message.includes("booking")) ||
+      error.message.includes("_id")
+    ) {
+      console.warn("Booking ID format error detected:", error.message);
     }
   }
 
@@ -36,15 +36,14 @@ class BookingErrorBoundary extends React.Component {
                 <span className="text-3xl">⚠️</span>
               </div>
               <h2 className="text-2xl font-bold text-red-700 mb-4">
-                বুকিং ডেটা সমস্যা
+                Issue with Booking Data
               </h2>
               <p className="text-gray-600 mb-6">
-                বুকিং আইডি ফরম্যাট বা ডেটা লোড করতে সমস্যা হয়েছে। 
-                দয়া করে পেজ রিফ্রেশ করুন বা অ্যাডমিনের সাথে যোগাযোগ করুন।
+                There was a problem with the booking ID format or loading data.
+                Please refresh the page or contact an administrator.
               </p>
-              
-              {/* Error Details (for development) */}
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+
+              {process.env.NODE_ENV === "development" && this.state.error && (
                 <details className="text-left bg-gray-100 p-4 rounded-lg mb-4">
                   <summary className="cursor-pointer font-medium text-gray-700 mb-2">
                     Error Details (Development Only)
@@ -55,19 +54,25 @@ class BookingErrorBoundary extends React.Component {
                   </pre>
                 </details>
               )}
-              
+
               <div className="flex space-x-4">
                 <button
                   onClick={() => window.location.reload()}
                   className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
                 >
-                  পেজ রিফ্রেশ করুন
+                  Refresh Page
                 </button>
                 <button
-                  onClick={() => this.setState({ hasError: false, error: null, errorInfo: null })}
+                  onClick={() =>
+                    this.setState({
+                      hasError: false,
+                      error: null,
+                      errorInfo: null,
+                    })
+                  }
                   className="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
                 >
-                  আবার চেষ্টা করুন
+                  Try Again
                 </button>
               </div>
             </div>

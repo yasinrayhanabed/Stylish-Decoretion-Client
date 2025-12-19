@@ -1,7 +1,6 @@
 import React from 'react';
 import { formatAmountDisplay, formatAmountFull } from '../utils/formatCurrency';
 
-// Test component to verify amount formatting
 export default function AmountTest() {
   const testAmounts = [
     1000,

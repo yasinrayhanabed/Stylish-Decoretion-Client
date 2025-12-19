@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import FallbackImage from './FallbackImage';
-import { formatCurrency } from '../utils/formatCurrency';
+import React from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import FallbackImage from "./FallbackImage";
+import { formatCurrency } from "../utils/formatCurrency";
 
 export default function ServiceCard({ service, index = 0 }) {
   return (
@@ -16,25 +16,28 @@ export default function ServiceCard({ service, index = 0 }) {
     >
       <figure className="h-48 overflow-hidden">
         <FallbackImage
-          src={service.images?.[0] || service.photo}
+          src={service.photo}
           alt={service.service_name}
           category={service.category}
           className="w-full h-full object-cover"
         />
       </figure>
-      
+
       <div className="card-body p-6">
         <h3 className="card-title text-lg font-semibold mb-2">
           {service.service_name}
         </h3>
-        
+
         <p className="text-base-content/70 text-sm mb-4 line-clamp-2">
-          {service.description || 'Professional decoration service'}
+          {service.description || "Professional decoration service"}
         </p>
-        
+
         <div className="card-actions justify-between items-center">
           <span className="text-xl font-bold text-primary">
-            {formatCurrency(service.cost, { currency: '৳', showCurrency: true })}
+            {formatCurrency(Number(service.cost) || 0, {
+              currency: "৳",
+              showCurrency: true,
+            })}
           </span>
           <Link
             to={`/services/${service._id}`}

@@ -1,23 +1,22 @@
-// src/pages/Dashboard/UserDashboard.jsx (Fixed)
-
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import {
+  FaTachometerAlt,
   FaUser,
   FaCalendarCheck,
   FaSignOutAlt,
   FaHome,
   FaCreditCard,
   FaPalette,
+  FaDollarSign,
   FaBars,
   FaTimes,
 } from "react-icons/fa";
 import useAuth from "../../hooks/useAuth";
 import ErrorBoundary from "../../components/ErrorBoundary";
-import { Outlet } from "react-router-dom";
 
-const DashboardSidebar = () => {
-  const { logout } = useAuth();
+const DashboardSidebar = ({ userRole }) => {
+  const { user, logout } = useAuth();
 
   const getNavLinkClass = ({ isActive }) =>
     `flex items-center space-x-3 p-3 rounded-lg transition duration-150 ${
@@ -26,31 +25,62 @@ const DashboardSidebar = () => {
         : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
     }`;
 
+  // Define links based on user role
+  const userLinks = [
+    { to: "/dashboard", end: true, icon: <FaHome />, label: "Dashboard" },
+    { to: "/dashboard/profile", icon: <FaUser />, label: "My Profile" },
+    {
+      to: "/dashboard/my-bookings",
+      icon: <FaCalendarCheck />,
+      label: "My Bookings",
+    },
+    {
+      to: "/dashboard/payment-history",
+      icon: <FaCreditCard />,
+      label: "Payment History",
+    },
+    {
+      to: "/dashboard/become-decorator",
+      icon: <FaPalette />,
+      label: "Become Decorator",
+    },
+  ];
+
+  const decoratorLinks = [
+    {
+      to: "/dashboard/decorator-dashboard",
+      end: true,
+      icon: <FaTachometerAlt />,
+      label: "Decorator Dashboard",
+    },
+    { to: "/dashboard/profile", icon: <FaUser />, label: "My Profile" },
+    {
+      to: "/dashboard/my-earnings",
+      icon: <FaDollarSign />,
+      label: "My Earnings",
+    },
+  ];
+
+  const links = userRole === "decorator" ? decoratorLinks : userLinks;
+
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto bg-base-200">
       <div className="p-4">
-        <h2 className="text-2xl font-bold mb-6 text-primary">User Dashboard</h2>
+        <h2 className="text-2xl font-bold mb-6 text-primary">
+          {userRole === "decorator" ? "Decorator Menu" : "User Menu"}
+        </h2>
         <nav className="space-y-2">
-          <NavLink to="/dashboard" end className={getNavLinkClass}>
-            <FaHome />
-            <span>Dashboard</span>
-          </NavLink>
-          <NavLink to="/dashboard/profile" className={getNavLinkClass}>
-            <FaUser />
-            <span>My Profile</span>
-          </NavLink>
-          <NavLink to="/dashboard/my-bookings" className={getNavLinkClass}>
-            <FaCalendarCheck />
-            <span>My Bookings</span>
-          </NavLink>
-          <NavLink to="/dashboard/payment-history" className={getNavLinkClass}>
-            <FaCreditCard />
-            <span>Payment History</span>
-          </NavLink>
-          <NavLink to="/dashboard/become-decorator" className={getNavLinkClass}>
-            <FaPalette />
-            <span>Become Decorator</span>
-          </NavLink>
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.end}
+              className={getNavLinkClass}
+            >
+              {link.icon}
+              <span>{link.label}</span>
+            </NavLink>
+          ))}
         </nav>
 
         <div className="mt-8 pt-4 border-t border-base-300 space-y-2">
@@ -74,14 +104,17 @@ const DashboardSidebar = () => {
   );
 };
 
-export default function UserDashboard() {
+export default function UserDashboard({ content = null }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <div className="relative min-h-screen md:flex">
       {/* Mobile Menu Button */}
       <div className="md:hidden flex justify-between items-center bg-base-200 p-4 shadow-md">
-        <h2 className="text-xl font-bold text-primary">User Menu</h2>
+        <h2 className="text-xl font-bold text-primary">
+          {user?.role === "decorator" ? "Decorator Menu" : "User Menu"}
+        </h2>
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
           {isSidebarOpen ? (
             <FaTimes className="text-2xl" />
@@ -97,12 +130,12 @@ export default function UserDashboard() {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-30`}
       >
-        <DashboardSidebar />
+        <DashboardSidebar userRole={user?.role} />
       </aside>
 
       <main className="flex-1 bg-base-100">
         <div className="p-6">
-          <Outlet />
+          <ErrorBoundary>{content ? content : <Outlet />}</ErrorBoundary>
         </div>
       </main>
     </div>

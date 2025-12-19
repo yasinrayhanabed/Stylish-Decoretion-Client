@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar.jsx";
+import Navbar from "./components/navbar.jsx";
 import Footer from "./components/Footer.jsx";
 
 import Home from "./pages/Home.jsx";
@@ -13,7 +13,6 @@ import NotFoundPage from "./pages/NotFoundPage.jsx";
 import ServiceCoverageMap from "./pages/ServiceCoverageMap.jsx";
 
 import BookingPage from "./pages/BookingPage.jsx";
-import CheckoutPage from "./pages/CheckoutPage.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage.jsx";
 
@@ -34,19 +33,19 @@ import MyBookingsPage from "./pages/Dashboard/MyBookingsPage.jsx";
 import UserProfile from "./pages/Dashboard/UserProfile.jsx";
 import UserDashboardHome from "./pages/Dashboard/UserDashboardHome.jsx";
 import PaymentHistory from "./pages/Dashboard/PaymentHistory.jsx";
+import MyEarnings from "./pages/Dashboard/MyEarnings.jsx";
 import DecoratorRequest from "./pages/DecoratorRequest.jsx";
 import AdminDecoratorRequests from "./pages/Dashboard/AdminDecoratorRequests.jsx";
 import AdminServiceManager from "./pages/Dashboard/AdminServiceManager.jsx";
 
 import PrivateRoute from "./routes/PrivateRoute.jsx";
-import RoleGuard from "./components/RoleGuard.jsx"; 
+import RoleGuard from "./components/RoleGuard.jsx";
 
 function App() {
   return (
     <>
       <Navbar />
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />
         <Route path="/services/:id" element={<ServiceDetails />} />
@@ -57,51 +56,61 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Routes */}
         <Route element={<PrivateRoute />}>
-          
-          {/* Booking & Payment Routes */}
           <Route path="/booking/:serviceId" element={<BookingPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route
+            path="/payment-success/:transactionId"
+            element={<PaymentSuccessPage />}
+          />
 
-          {/* User Dashboard Routes */}
-          <Route path="/dashboard" element={<UserDashboard><UserDashboardHome /></UserDashboard>} />
-          <Route path="/dashboard/my-bookings" element={<UserDashboard><MyBookingsPage /></UserDashboard>} />
-          <Route path="/dashboard/profile" element={<UserDashboard><UserProfile /></UserDashboard>} />
-          <Route path="/dashboard/payment-history" element={<UserDashboard><PaymentHistory /></UserDashboard>} />
-          <Route path="/dashboard/become-decorator" element={<UserDashboard><DecoratorRequest /></UserDashboard>} />
-
-          {/* Decorator Routes */}
-          <Route path="/dashboard/decorator" element={
-            <DecoratorDashboard />
-          }>
+          <Route path="/dashboard" element={<UserDashboard />}>
+            <Route index element={<UserDashboardHome />} />
+            <Route path="my-bookings" element={<MyBookingsPage />} />
+            <Route path="profile" element={<UserProfile />} />
+            <Route path="payment-history" element={<PaymentHistory />} />
+            <Route path="my-earnings" element={<MyEarnings />} />
+            <Route path="become-decorator" element={<DecoratorRequest />} />
           </Route>
 
-          <Route path="/dashboard/admin" element={
-            <RoleGuard allowedRoles={['admin']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }>
+          <Route
+            path="/dashboard/admin"
+            element={
+              <RoleGuard allowedRoles={["admin"]}>
+                <AdminDashboard />
+              </RoleGuard>
+            }
+          >
             <Route index element={<AdminDashboardHome />} />
             <Route path="add-service" element={<AddService />} />
             <Route path="manage-users" element={<AdminManageUsers />} />
             <Route path="manage-services" element={<AdminManageServices />} />
-            <Route path="manage-decorators" element={<AdminManageDecorators />} />
+            <Route
+              path="manage-decorators"
+              element={<AdminManageDecorators />}
+            />
             <Route path="manage-bookings" element={<AdminManageBookings />} />
-            <Route path="decorator-requests" element={<AdminDecoratorRequests />} />
+            <Route
+              path="decorator-requests"
+              element={<AdminDecoratorRequests />}
+            />
             <Route path="revenue-monitoring" element={<RevenueMonitoring />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="analytics-charts" element={<AnalyticsCharts />} />
             <Route path="business-analytics" element={<BusinessAnalytics />} />
             <Route path="service-manager" element={<AdminServiceManager />} />
           </Route>
-          
-        </Route>
-        {/* Protected Routes End */}
 
-        {/* 404 Route */}
+          <Route
+            path="/dashboard/decorator-dashboard"
+            element={
+              <RoleGuard allowedRoles={["decorator"]}>
+                <DecoratorDashboard />
+              </RoleGuard>
+            }
+          />
+        </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
