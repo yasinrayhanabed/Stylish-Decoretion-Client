@@ -45,7 +45,7 @@ export default function Register() {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        // 5MB limit
+        
         toast.error("Image size should be less than 5MB");
         return;
       }
@@ -86,14 +86,14 @@ export default function Register() {
       });
 
       if (data?.token && data?.user) {
-        const fetched = await login(data.token, false); // Pass false to prevent default navigation
+        const fetched = await login(data.token, false); 
 
         const role = fetched?.role ?? data.user.role;
-        // Redirect based on user role
+       
         if (role === "admin") {
           navigate("/dashboard/admin");
         } else if (role === "decorator") {
-          navigate("/dashboard/decorator-dashboard"); // Corrected path
+          navigate("/dashboard/decorator-dashboard"); 
         } else {
           navigate("/dashboard/my-bookings");
         }

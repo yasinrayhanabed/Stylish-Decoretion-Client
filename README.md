@@ -7,7 +7,8 @@
 ## 🌐 Live URL
 
 **Frontend:** [https://stylish-decoration.netlify.app](https://stylish-decoration.netlify.app)  
-**Backend API:** [https://stylish-decoration-api.herokuapp.com](https://stylish-decoration-api.herokuapp.com)
+**Backend API:** [https://stylish-decoretion-s.vercel.app](https://stylish-decoretion-s.vercel.app)
+
 
 ## ✨ Key Features
 
@@ -167,7 +168,7 @@
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/stylish-decoration.git
+git clone https://github.com/yasinrayhanabed/Stylish-Decoretion-Client
 cd stylish-decoration
 ```
 
@@ -184,21 +185,19 @@ cp .env.example .env
 4. **Configure Environment Variables**
 ```env
 # Firebase Configuration
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 
-# ImageBB Configuration
-VITE_IMAGEBB_API_KEY=your_imagebb_api_key
 
 # Stripe Configuration
-VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+VITE_STRIPE_PUBLIC_KEY=pk_test_51ScT9LEUL4UsrqGqxjI4Gd2lMzfMqtsyju8aZH3HCdppRPVUZOe960Wy9tN6lp9eoAEPzs5ahDInSV7QRTEwg8UY00EIXLmDSg
 
 # API Configuration
-VITE_API_BASE_URL=stylish-decoretion-s.vercel.app/api
+VITE_API_BASE_URL=stylish-decoretion-s.vercel.app/api/
 ```
 
 5. **Start Development Server**
@@ -267,8 +266,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
+- GitHub: https://github.com/yasinrayhanabed/Stylish-Decoretion-Client
+- Email: yasinrayhanabed@gmail.com
 
 ## 🙏 Acknowledgments
 
