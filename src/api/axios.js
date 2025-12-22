@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API = axios.create({
 
-  baseURL: 'stylish-decoretion-s.vercel.app/api', 
+  baseURL: 'https://stylish-decoretion-s.vercel.app/api/', 
 });
 
 API.interceptors.request.use((config) => {
