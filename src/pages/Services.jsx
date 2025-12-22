@@ -15,7 +15,6 @@ export default function Services() {
   const [minBudget, setMinBudget] = useState("");
   const [maxBudget, setMaxBudget] = useState("");
 
-  // Deduplicate services by _id
   const dedupeServices = (arr) => {
     if (!Array.isArray(arr)) return [];
     const map = new Map();

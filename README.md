@@ -198,7 +198,7 @@ VITE_IMAGEBB_API_KEY=your_imagebb_api_key
 VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
 
 # API Configuration
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=stylish-decoretion-s.vercel.app/api
 ```
 
 5. **Start Development Server**

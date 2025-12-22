@@ -76,10 +76,10 @@ function CheckoutForm({ bookingDetails, onPaymentSuccess }) {
           await API.post("/payments", {
             bookingId,
             transactionId: result.paymentIntent.id,
-            amount: finalAmount / 100, 
+            amount: finalAmount / 100,
             currency: "BDT",
             serviceName: serviceName,
-            decoratorId: assignedDecorator, 
+            decoratorId: assignedDecorator,
           });
 
           try {
@@ -159,12 +159,13 @@ export default function PaymentPage() {
         }
       }
 
-      if (localBookingInfo?.bookingId) {
+      // Use bookingId from localStorage OR from URL params
+      const targetBookingId = localBookingInfo?.bookingId || bookingId;
+
+      if (targetBookingId) {
         try {
-          const res = await API.get(
-            `/bookings/details/${localBookingInfo.bookingId}`
-          );
-          setBookingData(res.data); 
+          const res = await API.get(`/bookings/details/${targetBookingId}`);
+          setBookingData(res.data);
           setLoading(false);
           return;
         } catch (fetchErr) {
@@ -172,15 +173,20 @@ export default function PaymentPage() {
             "Failed to fetch latest booking data, using local data as fallback.",
             fetchErr
           );
-          const fallbackData = {
-            ...localBookingInfo,
-            _id: localBookingInfo.bookingId,
-            cost: localBookingInfo.amount,
-            assignedDecorator: localBookingInfo.decoratorId,
-          };
-          setBookingData(fallbackData);
-          setLoading(false);
-          return;
+          if (
+            localBookingInfo &&
+            localBookingInfo.bookingId === targetBookingId
+          ) {
+            const fallbackData = {
+              ...localBookingInfo,
+              _id: localBookingInfo.bookingId,
+              cost: localBookingInfo.amount,
+              assignedDecorator: localBookingInfo.decoratorId,
+            };
+            setBookingData(fallbackData);
+            setLoading(false);
+            return;
+          }
         }
       }
       toast.error("No booking data found. Please select a booking to pay.");

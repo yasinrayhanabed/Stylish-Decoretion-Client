@@ -132,7 +132,18 @@ export default function MyBookingsPage() {
     setError(null);
     try {
       const res = await API.get("/bookings/my");
-      setBookings(res.data);
+      // Fix: Map backend fields to ensure assignedDecorator is detected
+      const rawData = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const mappedData = rawData.map((booking) => ({
+        ...booking,
+        assignedDecorator:
+          booking.assignedDecorator ||
+          booking.decoratorId ||
+          (typeof booking.decorator === "object"
+            ? booking.decorator?._id
+            : booking.decorator),
+      }));
+      setBookings(mappedData);
     } catch (err) {
       console.error("Failed to fetch bookings:", err.response || err);
 
@@ -207,38 +218,46 @@ export default function MyBookingsPage() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto"
-    >
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="card-title text-3xl">
-              <FaCalendarAlt className="mr-2" /> My Bookings
-            </h2>
+    <div className="w-full bg-base-200 p-4 md:p-6 rounded-xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-5xl mx-auto"
+      >
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center">
+                <FaCalendarAlt className="mr-3" /> My Bookings
+              </h1>
+              <p className="text-blue-100 text-lg">
+                Track and manage your service appointments
+              </p>
+            </div>
             <button
               onClick={fetchBookings}
-              className="btn btn-sm btn-outline"
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors flex items-center backdrop-blur-sm font-medium"
               disabled={loading}
             >
               {loading ? (
                 "Loading..."
               ) : (
                 <>
-                  <FaSync className="mr-1" /> Refresh
+                  <FaSync className="mr-2" /> Refresh List
                 </>
               )}
             </button>
           </div>
+        </div>
 
+        <div className="bg-base-100 rounded-2xl shadow-xl p-6">
           {/* Search and Filter Section */}
           {bookings.length > 0 && (
-            <div className="bg-base-200 rounded-lg p-4 mb-6">
+            <div className="bg-base-200 border border-base-300 rounded-xl p-4 mb-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="relative">
-                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" />
                   <input
                     type="text"
                     placeholder="🔍 Search bookings..."
@@ -250,7 +269,7 @@ export default function MyBookingsPage() {
                         console.error("Search error:", err);
                       }
                     }}
-                    className="input input-bordered w-full pl-10"
+                    className="w-full pl-10 pr-4 py-2 border border-base-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base-content bg-base-100"
                   />
                 </div>
                 <select
@@ -265,7 +284,7 @@ export default function MyBookingsPage() {
                       console.error("Filter update error:", err);
                     }
                   }}
-                  className="select select-bordered"
+                  className="px-3 py-2 border border-base-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base-content bg-base-100"
                 >
                   <option value="">🔍 All Status</option>
                   <option value="Pending">⏳ Pending</option>
@@ -283,7 +302,7 @@ export default function MyBookingsPage() {
                       console.error("Sort error:", err);
                     }
                   }}
-                  className="select select-bordered"
+                  className="px-3 py-2 border border-base-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base-content bg-base-100"
                 >
                   <option value="">📈 Sort by</option>
                   <option value="date">📅 Date</option>
@@ -300,7 +319,7 @@ export default function MyBookingsPage() {
                         console.error("Sort order error:", err);
                       }
                     }}
-                    className="btn btn-outline btn-sm flex-1"
+                    className="px-3 py-2 border border-base-300 rounded-lg hover:bg-base-200 text-base-content flex-1 flex items-center justify-center"
                   >
                     <FaSort className="mr-1" />
                     {sortOrder === "asc" ? "↑" : "↓"}
@@ -317,14 +336,14 @@ export default function MyBookingsPage() {
                         setSortOrder("asc");
                       }
                     }}
-                    className="btn btn-outline btn-error btn-sm"
+                    className="px-3 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 flex items-center justify-center"
                   >
                     <FaFilter className="mr-1" />
                     Clear
                   </button>
                 </div>
               </div>
-              <div className="mt-4 text-sm opacity-70">
+              <div className="mt-4 text-sm text-base-content/70 font-medium">
                 Showing {filteredBookings.length} of {bookings.length} bookings
               </div>
             </div>
@@ -332,11 +351,13 @@ export default function MyBookingsPage() {
 
           {filteredBookings.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-6xl flex items-center justify-center mb-4">
+              <div className="text-6xl flex items-center justify-center mb-4 text-base-content/30">
                 <FaClipboardList />
               </div>
-              <p className="text-xl font-semibold mb-2">No bookings found</p>
-              <p className="text-base-content/70 mb-4">
+              <p className="text-xl font-semibold mb-2 text-base-content">
+                No bookings found
+              </p>
+              <p className="text-base-content/70 mb-6">
                 You haven't booked any services yet
               </p>
               <a href="/services" className="btn btn-primary">
@@ -351,15 +372,15 @@ export default function MyBookingsPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="card bg-base-200 shadow-md"
+                  className="bg-base-100 border border-base-300 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
                 >
-                  <div className="card-body">
+                  <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="card-title text-xl">
+                        <h3 className="text-xl font-bold text-base-content">
                           {booking.serviceName}
                         </h3>
-                        <p className="text-base-content/70">
+                        <p className="text-sm text-base-content/70 font-medium">
                           {booking.serviceCategory}
                         </p>
                       </div>
@@ -374,22 +395,27 @@ export default function MyBookingsPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
-                        <span className="font-semibold">
-                          <FaCalendar className="inline mr-1" /> Date:
+                        <span className="font-semibold text-base-content flex items-center">
+                          <FaCalendar className="mr-2 text-blue-500" /> Date:
                         </span>
-                        <p>{new Date(booking.date).toLocaleDateString()}</p>
+                        <p className="text-base-content/80 ml-6">
+                          {new Date(booking.date).toLocaleDateString()}
+                        </p>
                       </div>
                       <div>
-                        <span className="font-semibold">
-                          <FaMapMarkerAlt className="inline mr-1" /> Location:
+                        <span className="font-semibold text-base-content flex items-center">
+                          <FaMapMarkerAlt className="mr-2 text-red-500" />{" "}
+                          Location:
                         </span>
-                        <p>{booking.location}</p>
+                        <p className="text-base-content/80 ml-6">
+                          {booking.location}
+                        </p>
                       </div>
                       <div>
-                        <span className="font-semibold">
-                          <FaDollarSign className="inline mr-1" /> Cost:
+                        <span className="font-semibold text-base-content flex items-center">
+                          <FaDollarSign className="mr-2 text-green-500" /> Cost:
                         </span>
-                        <p className="text-lg font-bold text-success">
+                        <p className="text-lg font-bold text-green-600 ml-6">
                           {formatCurrency(booking.cost, {
                             currency: "৳",
                             showCurrency: true,
@@ -397,30 +423,32 @@ export default function MyBookingsPage() {
                         </p>
                       </div>
                       <div>
-                        <span className="font-semibold">
-                          <FaCreditCard className="inline mr-1" /> Payment:
+                        <span className="font-semibold text-base-content flex items-center">
+                          <FaCreditCard className="mr-2 text-purple-500" />{" "}
+                          Payment:
                         </span>
                         <p
-                          className={`font-semibold ${
+                          className={`font-semibold ml-6 ${
                             isPaymentCompleted(booking)
-                              ? "text-success"
-                              : "text-warning"
+                              ? "text-green-600"
+                              : "text-yellow-600"
                           }`}
                         >
                           {isPaymentCompleted(booking) ? "Paid" : "Pending"}
                         </p>
                       </div>
                       <div>
-                        <span className="font-semibold">
-                          <FaCalendar className="inline mr-1" /> Booked:
+                        <span className="font-semibold text-base-content flex items-center">
+                          <FaCalendar className="mr-2 text-base-content/40" />{" "}
+                          Booked On:
                         </span>
-                        <p>
+                        <p className="text-base-content/80 ml-6">
                           {new Date(booking.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
 
-                    <div className="card-actions justify-end">
+                    <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-base-200">
                       {!isPaymentCompleted(booking) &&
                         booking.status !== "Completed" &&
                         booking.status !== "Canceled" && (
@@ -438,7 +466,7 @@ export default function MyBookingsPage() {
                               );
                               navigate("/payment");
                             }}
-                            className="btn btn-success btn-sm"
+                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium flex items-center transition-colors"
                           >
                             <FaCreditCard className="mr-1" /> Pay Now
                           </button>
@@ -449,7 +477,7 @@ export default function MyBookingsPage() {
                           onClick={() =>
                             handleCancelBooking(booking._id, booking.status)
                           }
-                          className="btn btn-error btn-sm"
+                          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium flex items-center transition-colors"
                         >
                           <FaTimes className="mr-1" /> Cancel
                         </button>
@@ -474,50 +502,60 @@ export default function MyBookingsPage() {
           )}
 
           {bookings.length > 0 && (
-            <div className="mt-6 p-4 bg-base-300 rounded-lg">
+            <div className="mt-6 p-6 bg-base-200 rounded-xl border border-base-300">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-2xl font-bold text-indigo-600">
                     {bookings.length}
                   </div>
-                  <div className="text-sm opacity-70">Total Bookings</div>
+                  <div className="text-sm text-base-content/70 font-medium">
+                    Total Bookings
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-success">
+                  <div className="text-2xl font-bold text-green-600">
                     {bookings.filter((b) => b.status === "Completed").length}
                   </div>
-                  <div className="text-sm opacity-70">Completed</div>
+                  <div className="text-sm text-base-content/70 font-medium">
+                    Completed
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-info">
+                  <div className="text-2xl font-bold text-blue-500">
                     {
                       bookings.filter(
                         (b) => getDisplayStatus(b) === "In Progress"
                       ).length
                     }
                   </div>
-                  <div className="text-sm opacity-70">In Progress</div>
+                  <div className="text-sm text-base-content/70 font-medium">
+                    In Progress
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-2xl font-bold text-purple-600">
                     {
                       bookings.filter((b) => getDisplayStatus(b) === "Assigned")
                         .length
                     }
                   </div>
-                  <div className="text-sm opacity-70">Assigned</div>
+                  <div className="text-sm text-base-content/70 font-medium">
+                    Assigned
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-warning">
+                  <div className="text-2xl font-bold text-yellow-500">
                     {bookings.filter((b) => b.status === "Pending").length}
                   </div>
-                  <div className="text-sm opacity-70">Pending</div>
+                  <div className="text-sm text-base-content/70 font-medium">
+                    Pending
+                  </div>
                 </div>
               </div>
             </div>
           )}
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

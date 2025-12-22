@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
-import API from '../api/axios';
-import FallbackImage from './FallbackImage';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import API from "../api/axios";
+import FallbackImage from "./FallbackImage";
 
 const StarRating = ({ rating }) => {
   const fullStars = Math.floor(rating);
@@ -35,11 +35,12 @@ export default function TopDecorators() {
 
   const fetchTopDecorators = async () => {
     try {
-      const response = await API.get('/decorators/top-rated');
-      const topDecorators = (response.data?.data || response.data || []);
-      setDecorators(topDecorators);
+      const response = await API.get("/decorators/top-rated");
+      const data =
+        response.data?.decorators ?? response.data?.data ?? response.data ?? [];
+      setDecorators(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Failed to fetch top decorators:', error);
+      console.error("Failed to fetch top decorators:", error);
       setDecorators([]);
     } finally {
       setLoading(false);
@@ -68,13 +69,25 @@ export default function TopDecorators() {
   if (decorators.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-base-content/60">No decorators available at the moment</p>
+        <p className="text-base-content/60">
+          No decorators available at the moment
+        </p>
       </div>
     );
   }
 
   return (
-    <div className={`grid gap-6 ${decorators.length === 1 ? 'grid-cols-1 max-w-sm mx-auto' : decorators.length === 2 ? 'grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto' : decorators.length === 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
+    <div
+      className={`grid gap-6 ${
+        decorators.length === 1
+          ? "grid-cols-1 max-w-sm mx-auto"
+          : decorators.length === 2
+          ? "grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto"
+          : decorators.length === 3
+          ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          : "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+      }`}
+    >
       {decorators.slice(0, 4).map((decorator, index) => (
         <motion.div
           key={decorator._id}
@@ -94,11 +107,11 @@ export default function TopDecorators() {
             />
           </figure>
           <div className="card-body text-center p-6">
-            <h3 className="font-semibold text-base">
-              {decorator.name}
-            </h3>
+            <h3 className="font-semibold text-base">{decorator.name}</h3>
             <p className="text-sm text-base-content/70 mb-3">
-              {decorator.specialty || decorator.specialization || 'Interior Designer'}
+              {decorator.specialty ||
+                decorator.specialization ||
+                "Interior Designer"}
             </p>
             <StarRating rating={decorator.averageRating || 4.5} />
             <div className="text-xs text-base-content/60 mt-2">

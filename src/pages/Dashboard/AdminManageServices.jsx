@@ -154,17 +154,18 @@ export default function AdminManageServices() {
     setServices((prev) =>
       dedupeServices(
         prev.map((s) =>
-          s._id === serviceId ?
-          normalizeServiceUtil({
+          s._id === serviceId
+            ? normalizeServiceUtil({
                 ...s,
                 service_name: updates.service_name ?? s.service_name,
                 description: updates.description ?? s.description,
                 cost: Number(updates.cost ?? s.cost),
                 category: updates.category ?? s.category,
                 unit: updates.unit ?? s.unit,
-                photo: updates.photo instanceof File ?
-                  URL.createObjectURL(updates.photo) :
-                  s.photo,
+                photo:
+                  updates.photo instanceof File
+                    ? URL.createObjectURL(updates.photo)
+                    : s.photo,
               })
             : s
         )
@@ -177,18 +178,17 @@ export default function AdminManageServices() {
     const formData = new FormData();
 
     // Append only fields that have actually changed to avoid overwriting with undefined
-    const originalService = services.find(s => s._id === serviceId);
+    const originalService = services.find((s) => s._id === serviceId);
 
-    Object.keys(updates).forEach(key => {
+    Object.keys(updates).forEach((key) => {
       // Also check if originalService is found to prevent errors
-      if (originalService && (updates[key] !== originalService[key] || updates[key] instanceof File)) {
-        // The backend expects 'service_name' for updates.
-        // Ensure we send the correct key.
+      if (
+        originalService && (updates[key] !== originalService[key] || updates[key] instanceof File)
+      ) {
         const backendKey = key;
         formData.append(backendKey, updates[key] ?? "");
       }
     });
-
 
     if (updates.photo && updates.photo instanceof File) {
       formData.append("photo", updates.photo);
@@ -196,7 +196,8 @@ export default function AdminManageServices() {
 
     const toastId = toast.loading("Saving changes to server...");
 
-    try { // Simplified update logic
+    try {
+      // Simplified update logic
       const res = await API.put(`/services/${serviceId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -223,7 +224,9 @@ export default function AdminManageServices() {
         if (updatedServiceFromServer) {
           setServices((prev) => {
             const updatedList = prev.map((s) =>
-              s._id === serviceId ? normalizeServiceUtil(updatedServiceFromServer) : s
+              s._id === serviceId
+                ? normalizeServiceUtil(updatedServiceFromServer)
+                : s
             );
             return dedupeServices(updatedList);
           });
@@ -235,7 +238,9 @@ export default function AdminManageServices() {
         return;
       } else {
         // If the server responds with success: false but no error
-        throw new Error(res.data?.message || "Update failed with an unknown server error.");
+        throw new Error(
+          res.data?.message || "Update failed with an unknown server error."
+        );
       }
     } catch (err) {
       const serverMessage =
@@ -246,8 +251,7 @@ export default function AdminManageServices() {
       console.error("Service update failed:", err.response || err);
 
       toast.update(toastId, {
-        render: serverMessage +
-          " Changes are applied locally.",
+        render: serverMessage + " Changes are applied locally.",
         type: "error",
         isLoading: false,
         autoClose: 5000,
@@ -570,7 +574,7 @@ export default function AdminManageServices() {
 
                   <div className="p-4 md:p-6">
                     <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
-                      🎨 {s.service_name}
+                      🎨 {s.service_name || s.name}
                     </h3>
                     <p className="text-gray-700 text-sm line-clamp-3 mb-4 leading-relaxed">
                       {s.description || "No description available"}

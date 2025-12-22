@@ -232,7 +232,7 @@ const DecoratorDashboardContent = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-purple-500 group hover:scale-105">
           <div className="flex items-center justify-between">
             <div>
@@ -295,24 +295,7 @@ const DecoratorDashboardContent = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-blue-500 group hover:scale-105">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-3xl font-bold text-blue-600 mb-1">
-                ৳
-                {paymentHistory
-                  .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
-                  .toLocaleString()}
-              </div>
-              <div className="text-sm text-blue-500 font-medium">
-                Total Earnings
-              </div>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-              <FaDollarSign className="text-2xl" />
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       {/* Search and Filter Section */}
